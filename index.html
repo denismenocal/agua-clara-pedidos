@@ -30,6 +30,23 @@
         }
     </style>
 </head>
+
+    <hr>
+
+<h3>Pedido de Agua</h3>
+
+<input type="number"
+       id="cantidad"
+       placeholder="Cantidad de botellones">
+
+<input type="text"
+       id="comentario"
+       placeholder="Comentario (opcional)">
+
+<button onclick="guardarPedido()">
+    Enviar Pedido
+</button>
+    
 <body>
 
 <h1>Agua Clara La Muralla</h1>
@@ -72,6 +89,7 @@ const supabaseClient = supabase.createClient(
 
 let latitud = null;
 let longitud = null;
+let cliente_id = null;
 
 function obtenerUbicacion() {
     navigator.geolocation.getCurrentPosition(
@@ -118,6 +136,8 @@ async function buscarCliente() {
         document.getElementById("referencia").value =
             data[0].referencia || "";
 
+        cliente_id = data[0].id;
+        
         latitud = data[0].latitud;
         longitud = data[0].longitud;
 
@@ -208,6 +228,42 @@ async function guardarCliente() {
     latitud = null;
     longitud = null;
 }
+}
+
+    async function guardarPedido() {
+
+    if (!cliente_id) {
+        alert("Primero busque un cliente");
+        return;
+    }
+
+    const cantidad =
+        parseInt(document.getElementById("cantidad").value);
+
+    const comentario =
+        document.getElementById("comentario").value;
+
+    const { error } = await supabaseClient
+        .from("pedidos")
+        .insert([
+            {
+                cliente_id: cliente_id,
+                cantidad: cantidad,
+                comentario: comentario
+            }
+        ]);
+
+    if (error) {
+        alert("Error: " + error.message);
+        console.log(error);
+
+    } else {
+
+        alert("Pedido enviado correctamente");
+
+        document.getElementById("cantidad").value = "";
+        document.getElementById("comentario").value = "";
+    }
 }
 
 </script>
