@@ -144,7 +144,32 @@ async function guardarCliente() {
     const referencia =
         document.getElementById("referencia").value;
 
-    const { error } = await supabaseClient
+    const { data: existe } = await supabaseClient
+    .from("clientes")
+    .select("id")
+    .eq("telefono", telefono)
+    .limit(1);
+
+let error = null;
+
+if (existe.length > 0) {
+
+    const resultado = await supabaseClient
+        .from("clientes")
+        .update({
+            nombre,
+            barrio,
+            referencia,
+            latitud,
+            longitud
+        })
+        .eq("telefono", telefono);
+
+    error = resultado.error;
+
+} else {
+
+    const resultado = await supabaseClient
         .from("clientes")
         .insert([
             {
@@ -157,12 +182,8 @@ async function guardarCliente() {
             }
         ]);
 
-    if (error) {
-        alert("Error: " + error.message);
-        console.log(error);
-    } else {
-        alert("Cliente guardado correctamente");
-    }
+    error = resultado.error;
+}
 }
 
 </script>
