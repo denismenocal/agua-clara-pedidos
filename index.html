@@ -38,6 +38,10 @@
 
 <input type="text" id="telefono" placeholder="Número de celular">
 
+<button onclick="buscarCliente()">
+Buscar Cliente
+</button>
+
 <input type="text" id="nombre" placeholder="Nombre completo">
 
 <input type="text" id="barrio" placeholder="Barrio">
@@ -85,6 +89,46 @@ function obtenerUbicacion() {
         }
     );
 }
+
+async function buscarCliente() {
+
+    const telefono =
+        document.getElementById("telefono").value;
+
+    const { data, error } = await supabaseClient
+        .from("clientes")
+        .select("*")
+        .eq("telefono", telefono)
+        .limit(1);
+
+    if (error) {
+        alert("Error buscando cliente");
+        console.log(error);
+        return;
+    }
+
+    if (data.length > 0) {
+
+        document.getElementById("nombre").value =
+            data[0].nombre || "";
+
+        document.getElementById("barrio").value =
+            data[0].barrio || "";
+
+        document.getElementById("referencia").value =
+            data[0].referencia || "";
+
+        latitud = data[0].latitud;
+        longitud = data[0].longitud;
+
+        alert("Cliente encontrado");
+
+    } else {
+
+        alert("Cliente no encontrado. Puede registrarlo.");
+
+    }
+}    
 
 async function guardarCliente() {
 
