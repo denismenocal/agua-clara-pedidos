@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agua Clara La Muralla</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        button {
+            background: #0077cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Agua Clara La Muralla</h1>
+
+<h3>Registro de Cliente</h3>
+
+<input type="text" id="telefono" placeholder="Número de celular">
+
+<input type="text" id="nombre" placeholder="Nombre completo">
+
+<input type="text" id="barrio" placeholder="Barrio">
+
+<input type="text" id="referencia" placeholder="Referencia de la vivienda">
+
+<button onclick="obtenerUbicacion()">
+Obtener Ubicación
+</button>
+
+<p id="gps"></p>
+
+<button>
+Guardar Cliente
+</button>
+
+</body>
+
+<script>
+function obtenerUbicacion() {
+    navigator.geolocation.getCurrentPosition(
+        function(posicion) {
+            document.getElementById("gps").innerHTML =
+                "Ubicación capturada correctamente";
+        },
+        function(error) {
+            alert("No fue posible obtener la ubicación");
+        }
+    );
+}
+</script>
+
+</html>
