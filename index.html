@@ -191,11 +191,23 @@ async function guardarCliente() {
     }
 
     if (error) {
-        alert("Error: " + error.message);
-        console.log(error);
-    } else {
-        alert("Cliente " + accion + " correctamente");
-    }
+    alert("Error: " + error.message);
+    console.log(error);
+
+} else {
+
+    alert("Cliente " + accion + " correctamente");
+
+    document.getElementById("telefono").value = "";
+    document.getElementById("nombre").value = "";
+    document.getElementById("barrio").value = "";
+    document.getElementById("referencia").value = "";
+
+    document.getElementById("gps").innerHTML = "";
+
+    latitud = null;
+    longitud = null;
+}
 }
 
 </script>
