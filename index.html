@@ -145,45 +145,57 @@ async function guardarCliente() {
         document.getElementById("referencia").value;
 
     const { data: existe } = await supabaseClient
-    .from("clientes")
-    .select("id")
-    .eq("telefono", telefono)
-    .limit(1);
-
-let error = null;
-
-if (existe.length > 0) {
-
-    const resultado = await supabaseClient
         .from("clientes")
-        .update({
-            nombre,
-            barrio,
-            referencia,
-            latitud,
-            longitud
-        })
-        .eq("telefono", telefono);
+        .select("id")
+        .eq("telefono", telefono)
+        .limit(1);
 
-    error = resultado.error;
+    let error = null;
+    let accion = "";
 
-} else {
+    if (existe.length > 0) {
 
-    const resultado = await supabaseClient
-        .from("clientes")
-        .insert([
-            {
-                telefono,
+        accion = "actualizado";
+
+        const resultado = await supabaseClient
+            .from("clientes")
+            .update({
                 nombre,
                 barrio,
                 referencia,
                 latitud,
                 longitud
-            }
-        ]);
+            })
+            .eq("telefono", telefono);
 
-    error = resultado.error;
-}
+        error = resultado.error;
+
+    } else {
+
+        accion = "registrado";
+
+        const resultado = await supabaseClient
+            .from("clientes")
+            .insert([
+                {
+                    telefono,
+                    nombre,
+                    barrio,
+                    referencia,
+                    latitud,
+                    longitud
+                }
+            ]);
+
+        error = resultado.error;
+    }
+
+    if (error) {
+        alert("Error: " + error.message);
+        console.log(error);
+    } else {
+        alert("Cliente " + accion + " correctamente");
+    }
 }
 
 </script>
