@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <head>
     <title>Agua Clara La Muralla</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -49,24 +50,77 @@ Obtener Ubicación
 
 <p id="gps"></p>
 
-<button>
+<button onclick="guardarCliente()">
 Guardar Cliente
 </button>
 
 </body>
 
 <script>
+
+const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
+const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let latitud = null;
+let longitud = null;
+
 function obtenerUbicacion() {
     navigator.geolocation.getCurrentPosition(
         function(posicion) {
+
+            latitud = posicion.coords.latitude;
+            longitud = posicion.coords.longitude;
+
             document.getElementById("gps").innerHTML =
                 "Ubicación capturada correctamente";
+
         },
         function(error) {
             alert("No fue posible obtener la ubicación");
         }
     );
 }
+
+async function guardarCliente() {
+
+    const telefono =
+        document.getElementById("telefono").value;
+
+    const nombre =
+        document.getElementById("nombre").value;
+
+    const barrio =
+        document.getElementById("barrio").value;
+
+    const referencia =
+        document.getElementById("referencia").value;
+
+    const { error } = await supabaseClient
+        .from("clientes")
+        .insert([
+            {
+                telefono,
+                nombre,
+                barrio,
+                referencia,
+                latitud,
+                longitud
+            }
+        ]);
+
+    if (error) {
+        alert("Error: " + error.message);
+        console.log(error);
+    } else {
+        alert("Cliente guardado correctamente");
+    }
+}
+
 </script>
 
 </html>
