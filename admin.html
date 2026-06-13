@@ -43,10 +43,18 @@ const supabaseClient = supabase.createClient(
 async function cargarPedidos() {
 
     const { data, error } = await supabaseClient
-        .from("pedidos")
-        .select("*")
-        .eq("estado", "Pendiente")
-        .order("fecha", { ascending: false });
+    .from("pedidos")
+    .select(`
+        *,
+        clientes (
+            nombre,
+            telefono,
+            barrio,
+            referencia
+        )
+    `)
+    .eq("estado", "Pendiente")
+    .order("fecha", { ascending: false });
 
     if (error) {
         console.log(error);
