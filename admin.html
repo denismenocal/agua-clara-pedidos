@@ -6,6 +6,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    let estadoActual = "Pendiente";
+
     <style>
         body {
             font-family: Arial;
@@ -55,6 +57,7 @@ const supabaseClient = supabase.createClient(
 );
 
 async function cargarPedidos(estado = 'Pendiente') {
+    estadoActual = estado;
 
     const { data, error } = await supabaseClient
     .from("pedidos")
@@ -127,7 +130,7 @@ cargarPedidos();
         return;
     }
 
-    cargarPedidos();
+    cargarPedidos(estadoActual);
 }
 
 </script>
