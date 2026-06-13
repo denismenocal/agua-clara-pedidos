@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Panel Administrativo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        .pedido {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Pedidos Agua Clara</h1>
+
+<div id="listaPedidos"></div>
+
+  <script>
+
+const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
+const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function cargarPedidos() {
+
+    const { data, error } = await supabaseClient
+        .from("pedidos")
+        .select("*")
+        .eq("estado", "Pendiente")
+        .order("fecha", { ascending: false });
+
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    let html = "";
+
+    data.forEach(pedido => {
+
+        html += `
+            <div class="pedido">
+                <h3>Pedido</h3>
+                <p>Cantidad: ${pedido.cantidad}</p>
+                <p>Comentario: ${pedido.comentario || ""}</p>
+                <p>Estado: ${pedido.estado}</p>
+            </div>
+        `;
+    });
+
+    document.getElementById("listaPedidos").innerHTML = html;
+}
+
+cargarPedidos();
+
+</script>
+
+</body>
+</html>
