@@ -63,6 +63,10 @@ Guardar Cliente
 
     <hr>
 
+<div id="pedidoSection" style="display:none;">
+
+<hr>
+
 <h3>Pedido de Agua</h3>
 
 <input type="number"
@@ -76,6 +80,8 @@ Guardar Cliente
 <button onclick="guardarPedido()">
     Enviar Pedido
 </button>
+
+</div>
 
 </body>
 
@@ -143,6 +149,8 @@ async function buscarCliente() {
         latitud = data[0].latitud;
         longitud = data[0].longitud;
 
+        document.getElementById("pedidoSection").style.display = "block";
+
         alert("Cliente encontrado");
 
     } else {
@@ -165,6 +173,9 @@ async function guardarCliente() {
 
     const referencia =
         document.getElementById("referencia").value;
+
+    document.getElementById("pedidoSection").style.display = "none";
+cliente_id = null;
 
     const { data: existe } = await supabaseClient
         .from("clientes")
