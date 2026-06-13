@@ -28,6 +28,20 @@
 
 <h1>Pedidos Agua Clara</h1>
 
+    <button onclick="cargarPedidos('Pendiente')">
+    Pendientes
+    </button>
+
+    <button onclick="cargarPedidos('En ruta')">
+    En ruta
+    </button>
+
+    <button onclick="cargarPedidos('Entregado')">
+    Entregados
+    </button>
+
+<hr>
+
 <div id="listaPedidos"></div>
 
   <script>
@@ -40,7 +54,7 @@ const supabaseClient = supabase.createClient(
     SUPABASE_KEY
 );
 
-async function cargarPedidos() {
+async function cargarPedidos(estado = 'Pendiente') {
 
     const { data, error } = await supabaseClient
     .from("pedidos")
@@ -53,7 +67,7 @@ async function cargarPedidos() {
             referencia
         )
     `)
-    .eq("estado", "Pendiente")
+    .eq("estado", estado)
     .order("fecha", { ascending: false });
 
     if (error) {
