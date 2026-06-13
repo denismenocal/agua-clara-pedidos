@@ -81,6 +81,15 @@ async function cargarPedidos() {
         <p><b>Comentario:</b> ${pedido.comentario || ""}</p>
 
         <p><b>Estado:</b> ${pedido.estado}</p>
+        
+        <button onclick="cambiarEstado('${pedido.id}', 'En ruta')">
+         En ruta
+        </button>
+
+        <button onclick="cambiarEstado('${pedido.id}', 'Entregado')">
+        Entregado
+        </button>
+
     </div>
 `;
     });
@@ -89,6 +98,23 @@ async function cargarPedidos() {
 }
 
 cargarPedidos();
+
+      async function cambiarEstado(id, estado) {
+
+    const { error } = await supabaseClient
+        .from("pedidos")
+        .update({
+            estado: estado
+        })
+        .eq("id", id);
+
+    if (error) {
+        alert("Error: " + error.message);
+        return;
+    }
+
+    cargarPedidos();
+}
 
 </script>
 
