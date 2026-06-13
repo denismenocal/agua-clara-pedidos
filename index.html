@@ -57,7 +57,8 @@ Obtener Ubicación
 
 <p id="gps"></p>
 
-<button onclick="guardarCliente()">
+<button id="btnGuardarCliente"
+        onclick="guardarCliente()">
 Guardar Cliente
 </button>
 
@@ -149,6 +150,7 @@ async function buscarCliente() {
         latitud = data[0].latitud;
         longitud = data[0].longitud;
 
+        document.getElementById("btnGuardarCliente").style.display = "none";
         document.getElementById("pedidoSection").style.display = "block";
 
         alert("Cliente encontrado");
