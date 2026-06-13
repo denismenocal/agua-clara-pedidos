@@ -267,16 +267,35 @@ cliente_id = null;
         ]);
 
     if (error) {
-        alert("Error: " + error.message);
-        console.log(error);
+    alert("Error: " + error.message);
+    console.log(error);
 
-    } else {
+} else {
 
-        alert("Pedido enviado correctamente");
+    alert("Pedido enviado correctamente");
 
-        document.getElementById("cantidad").value = "";
-        document.getElementById("comentario").value = "";
-    }
+    // Limpiar pedido
+    document.getElementById("cantidad").value = "";
+    document.getElementById("comentario").value = "";
+
+    // Limpiar datos del cliente
+    document.getElementById("telefono").value = "";
+    document.getElementById("nombre").value = "";
+    document.getElementById("barrio").value = "";
+    document.getElementById("referencia").value = "";
+    document.getElementById("gps").innerHTML = "";
+
+    // Limpiar variables
+    cliente_id = null;
+    latitud = null;
+    longitud = null;
+
+    // Ocultar sección de pedidos
+    document.getElementById("pedidoSection").style.display = "none";
+
+    // Regresar el cursor al teléfono
+    document.getElementById("telefono").focus();
+}
 }
 
 </script>
