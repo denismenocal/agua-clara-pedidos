@@ -57,9 +57,10 @@ async function cargarPedidos() {
     .order("fecha", { ascending: false });
 
     if (error) {
-        console.log(error);
-        return;
-    }
+    alert("Error: " + error.message);
+    console.log(error);
+    return;
+}
 
     let html = "";
 
