@@ -66,13 +66,22 @@ async function cargarPedidos() {
     data.forEach(pedido => {
 
         html += `
-            <div class="pedido">
-                <h3>Pedido</h3>
-                <p>Cantidad: ${pedido.cantidad}</p>
-                <p>Comentario: ${pedido.comentario || ""}</p>
-                <p>Estado: ${pedido.estado}</p>
-            </div>
-        `;
+    <div class="pedido">
+        <h3>${pedido.clientes.nombre}</h3>
+
+        <p><b>Teléfono:</b> ${pedido.clientes.telefono}</p>
+
+        <p><b>Barrio:</b> ${pedido.clientes.barrio}</p>
+
+        <p><b>Referencia:</b> ${pedido.clientes.referencia}</p>
+
+        <p><b>Botellones:</b> ${pedido.cantidad}</p>
+
+        <p><b>Comentario:</b> ${pedido.comentario || ""}</p>
+
+        <p><b>Estado:</b> ${pedido.estado}</p>
+    </div>
+`;
     });
 
     document.getElementById("listaPedidos").innerHTML = html;
