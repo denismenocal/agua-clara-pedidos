@@ -157,9 +157,11 @@ async function buscarCliente() {
 
     } else {
 
-        alert("Cliente no encontrado. Puede registrarlo.");
+    document.getElementById("btnGuardarCliente").style.display = "block";
+    document.getElementById("pedidoSection").style.display = "none";
 
-    }
+    alert("Cliente no encontrado. Puede registrarlo.");
+}
 }    
 
 async function guardarCliente() {
