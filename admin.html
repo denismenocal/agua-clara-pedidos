@@ -54,7 +54,6 @@ const supabaseClient = supabase.createClient(
     SUPABASE_KEY
 );
       let estadoActual = "Pendiente";
-      console.log("Estado inicial:", estadoActual);
 
 async function cargarPedidos(estado = 'Pendiente') {
     estadoActual = estado;
@@ -62,14 +61,16 @@ async function cargarPedidos(estado = 'Pendiente') {
     const { data, error } = await supabaseClient
     .from("pedidos")
     .select(`
-        *,
-        clientes (
-            nombre,
-            telefono,
-            barrio,
-            referencia
-        )
-    `)
+    *,
+    clientes (
+        nombre,
+        telefono,
+        barrio,
+        referencia,
+        latitud,
+        longitud
+    )
+`)
     .eq("estado", estado)
     .order("fecha", { ascending: false });
 
@@ -98,6 +99,14 @@ async function cargarPedidos(estado = 'Pendiente') {
         <p><b>Comentario:</b> ${pedido.comentario || ""}</p>
 
         <p><b>Estado:</b> ${pedido.estado}</p>
+
+        <button onclick="
+window.open(
+'https://www.google.com/maps?q=${pedido.clientes.latitud},${pedido.clientes.longitud}',
+'_blank'
+)">
+📍 Abrir mapa
+</button>
         
         <button onclick="cambiarEstado('${pedido.id}', 'En ruta')">
          En ruta
