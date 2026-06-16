@@ -54,6 +54,7 @@ const supabaseClient = supabase.createClient(
     SUPABASE_KEY
 );
       let estadoActual = "Pendiente";
+      console.log("Estado inicial:", estadoActual);
 
 async function cargarPedidos(estado = 'Pendiente') {
     estadoActual = estado;
