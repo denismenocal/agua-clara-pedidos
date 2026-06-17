@@ -46,6 +46,23 @@
     Buscar
 </button>
 
+    <div id="resumen"
+     style="
+        border:1px solid #ccc;
+        padding:15px;
+        border-radius:10px;
+        margin-top:10px;
+        margin-bottom:10px;
+     ">
+     
+    <h3>Resumen Diario</h3>
+
+    <div id="contenidoResumen">
+        Sin datos
+    </div>
+
+</div>
+
 <hr>
 
 <div id="lista"></div>
@@ -113,9 +130,58 @@ async function cargarViajes() {
         return;
     }
 
+    let totalVenta = 0;
+    let totalEfectivo = 0;
+    let totalDiferencia = 0;
+
+    let botellonesVendidos = 0;
+    let botellonesVacios = 0;
+
+    let aguaVendida = 0;
+    let aguaRegalada = 0;
+
+    let juguitosVendidos = 0;
+    let hieloVendido = 0;
+
     let html = "";
 
     data.forEach(viaje => {
+
+        totalVenta += Number(viaje.total_venta || 0);
+
+totalEfectivo += Number(
+    viaje.efectivo_entregado || 0
+);
+
+totalDiferencia += Number(
+    viaje.diferencia || 0
+);
+
+botellonesVendidos +=
+    Number(viaje.zona1_publico || 0) +
+    Number(viaje.zona1_pulperia || 0) +
+    Number(viaje.zona2_publico || 0) +
+    Number(viaje.zona2_pulperia || 0);
+
+botellonesVacios += Number(
+    viaje.botellones_vacios || 0
+);
+
+aguaVendida += Number(
+    viaje.agua_vendida || 0
+);
+
+aguaRegalada += Number(
+    viaje.agua_regalada || 0
+);
+
+juguitosVendidos += Number(
+    viaje.juguitos_vendidos || 0
+);
+
+hieloVendido += Number(
+    viaje.hielo_vendido || 0
+);
 
         html += `
         <div class="viaje">
@@ -147,6 +213,41 @@ async function cargarViajes() {
         </div>
         `;
     });
+
+    document.getElementById(
+    "contenidoResumen"
+).innerHTML = `
+
+<p><b>Total vendido:</b>
+L ${totalVenta.toFixed(2)}</p>
+
+<p><b>Efectivo recibido:</b>
+L ${totalEfectivo.toFixed(2)}</p>
+
+<p><b>Diferencia:</b>
+L ${totalDiferencia.toFixed(2)}</p>
+
+<hr>
+
+<p><b>Botellones vendidos:</b>
+${botellonesVendidos}</p>
+
+<p><b>Botellones vacíos:</b>
+${botellonesVacios}</p>
+
+<p><b>Agua vendida:</b>
+${aguaVendida}</p>
+
+<p><b>Agua regalada:</b>
+${aguaRegalada}</p>
+
+<p><b>Juguitos vendidos:</b>
+${juguitosVendidos}</p>
+
+<p><b>Hielo vendido:</b>
+${hieloVendido}</p>
+
+`;
 
     document.getElementById(
         "lista"
