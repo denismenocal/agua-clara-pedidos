@@ -119,5 +119,159 @@
     Guardar cierre
 </button>
 
+    <script>
+
+const SUPABASE_URL = "TU_URL_SUPABASE";
+const SUPABASE_KEY = "TU_PUBLISHABLE_KEY";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function guardarViaje() {
+
+    const camion =
+        document.getElementById("camion").value;
+
+    const chofer =
+        document.getElementById("chofer").value;
+
+    const numero_viaje =
+        parseInt(document.getElementById(
+            "numero_viaje").value) || 1;
+
+    const hora_salida =
+        document.getElementById(
+            "hora_salida").value;
+
+    const hora_regreso =
+        document.getElementById(
+            "hora_regreso").value;
+
+    const botellones_cargados =
+        parseInt(document.getElementById(
+            "botellones_cargados").value) || 0;
+
+    const zona1_publico =
+        parseInt(document.getElementById(
+            "zona1_publico").value) || 0;
+
+    const zona1_pulperia =
+        parseInt(document.getElementById(
+            "zona1_pulperia").value) || 0;
+
+    const zona2_publico =
+        parseInt(document.getElementById(
+            "zona2_publico").value) || 0;
+
+    const zona2_pulperia =
+        parseInt(document.getElementById(
+            "zona2_pulperia").value) || 0;
+
+    const botellones_vacios =
+        parseInt(document.getElementById(
+            "botellones_vacios").value) || 0;
+
+    const agua_cargada =
+        parseInt(document.getElementById(
+            "agua_cargada").value) || 0;
+
+    const agua_vendida =
+        parseInt(document.getElementById(
+            "agua_vendida").value) || 0;
+
+    const agua_regalada =
+        parseInt(document.getElementById(
+            "agua_regalada").value) || 0;
+
+    const juguitos_cargados =
+        parseInt(document.getElementById(
+            "juguitos_cargados").value) || 0;
+
+    const juguitos_vendidos =
+        parseInt(document.getElementById(
+            "juguitos_vendidos").value) || 0;
+
+    const hielo_cargado =
+        parseInt(document.getElementById(
+            "hielo_cargado").value) || 0;
+
+    const hielo_vendido =
+        parseInt(document.getElementById(
+            "hielo_vendido").value) || 0;
+
+    const efectivo_entregado =
+        parseFloat(document.getElementById(
+            "efectivo_entregado").value) || 0;
+
+    const observaciones =
+        document.getElementById(
+            "observaciones").value;
+
+    // Cálculos automáticos
+    const total_botellones =
+        zona1_publico * 40 +
+        zona1_pulperia * 35 +
+        zona2_publico * 35 +
+        zona2_pulperia * 30;
+
+    const total_agua =
+        agua_vendida * 25;
+
+    const total_juguitos =
+        juguitos_vendidos * 25;
+
+    const total_hielo =
+        hielo_vendido * 25;
+
+    const total_venta =
+        total_botellones +
+        total_agua +
+        total_juguitos +
+        total_hielo;
+
+    const diferencia =
+        efectivo_entregado -
+        total_venta;
+
+    const { error } =
+        await supabaseClient
+        .from("viajes")
+        .insert([{
+            camion,
+            chofer,
+            numero_viaje,
+            hora_salida,
+            hora_regreso,
+            botellones_cargados,
+            zona1_publico,
+            zona1_pulperia,
+            zona2_publico,
+            zona2_pulperia,
+            botellones_vacios,
+            agua_cargada,
+            agua_vendida,
+            agua_regalada,
+            juguitos_cargados,
+            juguitos_vendidos,
+            hielo_cargado,
+            hielo_vendido,
+            efectivo_entregado,
+            total_venta,
+            diferencia,
+            observaciones
+        }]);
+
+    if (error) {
+        alert("Error: " + error.message);
+        console.log(error);
+    } else {
+        alert("Cierre guardado correctamente");
+    }
+}
+
+</script>
+
 </body>
 </html>
