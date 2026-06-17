@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iniciar Sesión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<h1>Agua Clara La Muralla</h1>
+
+<input type="email"
+       id="correo"
+       placeholder="Correo">
+
+<input type="password"
+       id="clave"
+       placeholder="Contraseña">
+
+<button onclick="login()">
+    Iniciar sesión
+</button>
+
+<script>
+
+const SUPABASE_URL = "TU_URL";
+const SUPABASE_KEY = "TU_KEY";
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+async function login() {
+
+    const email =
+        document.getElementById(
+            "correo"
+        ).value;
+
+    const password =
+        document.getElementById(
+            "clave"
+        ).value;
+
+    const { error } =
+        await supabaseClient.auth
+        .signInWithPassword({
+            email,
+            password
+        });
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    window.location.href =
+        "admin.html";
+}
+
+</script>
+
+</body>
+</html>
