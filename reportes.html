@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reportes de Viajes</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        .viaje {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        select, input {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Reportes de Viajes</h1>
+
+<input type="date" id="fecha">
+
+<select id="camion">
+    <option value="">Todos los camiones</option>
+    <option>JAC 1</option>
+    <option>JAC 2</option>
+</select>
+
+<button onclick="cargarViajes()">
+    Buscar
+</button>
+
+<hr>
+
+<div id="lista"></div>
+
+</body>
+</html>
