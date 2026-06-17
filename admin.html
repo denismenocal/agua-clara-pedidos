@@ -26,6 +26,10 @@
 </head>
 <body>
 
+    <button onclick="cerrarSesion()">
+    Cerrar sesión
+</button>
+
 <h1>Pedidos Agua Clara</h1>
 
     <button onclick="cargarPedidos('Pendiente')">
@@ -64,6 +68,15 @@ const supabaseClient = supabase.createClient(
         window.location.href =
             "login.html";
     }
+}
+
+      async function cerrarSesion() {
+
+    await supabaseClient.auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
 }
 
 verificarSesion();
