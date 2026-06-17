@@ -53,6 +53,21 @@ const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
+
+      async function verificarSesion() {
+
+    const { data } =
+        await supabaseClient.auth
+        .getSession();
+
+    if (!data.session) {
+        window.location.href =
+            "login.html";
+    }
+}
+
+verificarSesion();
+      
       let estadoActual = "Pendiente";
 
 async function cargarPedidos(estado = 'Pendiente') {
