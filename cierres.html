@@ -34,6 +34,10 @@
 </head>
 <body>
 
+    <button onclick="cerrarSesion()">
+    Cerrar sesión
+</button>
+
 <h1>Cierre de Viajes</h1>
 
 <h3>Información General</h3>
@@ -167,6 +171,15 @@ const supabaseClient = supabase.createClient(
         window.location.href =
             "login.html";
     }
+}
+
+        async function cerrarSesion() {
+
+    await supabaseClient.auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
 }
 
 verificarSesion();
