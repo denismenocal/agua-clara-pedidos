@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cierre de Viajes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px;
+            width: 100%;
+        }
+
+        h3 {
+            background: #eee;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Cierre de Viajes</h1>
+
+<h3>Información General</h3>
+
+<select id="camion">
+    <option>JAC 1</option>
+    <option>JAC 2</option>
+</select>
+
+<select id="chofer">
+    <option>Erick Hernández</option>
+    <option>Cristian</option>
+</select>
+
+<input type="number"
+       id="numero_viaje"
+       placeholder="Número de viaje">
+
+<input type="time"
+       id="hora_salida">
+
+<input type="time"
+       id="hora_regreso">
+
+<h3>Botellones</h3>
+
+<input type="number" id="botellones_cargados"
+       placeholder="Botellones cargados">
+
+<input type="number" id="zona1_publico"
+       placeholder="Zona 1 público">
+
+<input type="number" id="zona1_pulperia"
+       placeholder="Zona 1 pulpería">
+
+<input type="number" id="zona2_publico"
+       placeholder="Zona 2 público">
+
+<input type="number" id="zona2_pulperia"
+       placeholder="Zona 2 pulpería">
+
+<input type="number" id="botellones_vacios"
+       placeholder="Botellones vacíos recibidos">
+
+<h3>Agua en bolsa</h3>
+
+<input type="number" id="agua_cargada"
+       placeholder="Paquetes cargados">
+
+<input type="number" id="agua_vendida"
+       placeholder="Paquetes vendidos">
+
+<input type="number" id="agua_regalada"
+       placeholder="Paquetes regalados">
+
+<h3>Juguitos</h3>
+
+<input type="number" id="juguitos_cargados"
+       placeholder="Cargados">
+
+<input type="number" id="juguitos_vendidos"
+       placeholder="Vendidos">
+
+<h3>Hielo</h3>
+
+<input type="number" id="hielo_cargado"
+       placeholder="Cargado">
+
+<input type="number" id="hielo_vendido"
+       placeholder="Vendido">
+
+<h3>Caja</h3>
+
+<input type="number"
+       step="0.01"
+       id="efectivo_entregado"
+       placeholder="Efectivo entregado">
+
+<textarea id="observaciones"
+          placeholder="Observaciones"></textarea>
+
+<button onclick="guardarViaje()">
+    Guardar cierre
+</button>
+
+</body>
+</html>
