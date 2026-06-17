@@ -50,5 +50,104 @@
 
 <div id="lista"></div>
 
+    <script>
+
+const SUPABASE_URL = "TU_URL_SUPABASE";
+const SUPABASE_KEY = "TU_PUBLISHABLE_KEY";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function cargarViajes() {
+
+    let consulta = supabaseClient
+        .from("viajes")
+        .select("*")
+        .order("fecha", { ascending: false });
+
+    const fecha =
+        document.getElementById("fecha").value;
+
+    const camion =
+        document.getElementById("camion").value;
+
+    if (fecha) {
+        consulta = consulta.eq(
+            "fecha",
+            fecha
+        );
+    }
+
+    if (camion) {
+        consulta = consulta.eq(
+            "camion",
+            camion
+        );
+    }
+
+    const { data, error } =
+        await consulta;
+
+    if (error) {
+        alert(
+            "Error: " +
+            error.message
+        );
+        return;
+    }
+
+    let html = "";
+
+    data.forEach(viaje => {
+
+        html += `
+        <div class="viaje">
+
+            <h3>${viaje.camion}
+            - Viaje ${viaje.numero_viaje}</h3>
+
+            <p><b>Fecha:</b>
+            ${viaje.fecha}</p>
+
+            <p><b>Chofer:</b>
+            ${viaje.chofer}</p>
+
+            <p><b>Total:</b>
+            L ${viaje.total_venta}</p>
+
+            <p><b>Efectivo:</b>
+            L ${viaje.efectivo_entregado}</p>
+
+            <p><b>Diferencia:</b>
+            L ${viaje.diferencia}</p>
+
+            <button onclick="
+            verDetalle('${viaje.id}')
+            ">
+            Ver detalle
+            </button>
+
+        </div>
+        `;
+    });
+
+    document.getElementById(
+        "lista"
+    ).innerHTML = html;
+}
+
+function verDetalle(id) {
+    alert(
+        "Próximamente mostraremos el detalle del viaje: "
+        + id
+    );
+}
+
+cargarViajes();
+
+</script>
+
 </body>
 </html>
