@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+    <button onclick="cerrarSesion()">
+    Cerrar sesión
+</button>
+    
     <title>Iniciar Sesión</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -44,6 +49,15 @@ const supabaseClient =
         window.location.href =
             "login.html";
     }
+}
+
+    async function cerrarSesion() {
+
+    await supabaseClient.auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
 }
 
 verificarSesion();
