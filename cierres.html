@@ -157,6 +157,20 @@ const supabaseClient = supabase.createClient(
     SUPABASE_KEY
 );
 
+        async function verificarSesion() {
+
+    const { data } =
+        await supabaseClient.auth
+        .getSession();
+
+    if (!data.session) {
+        window.location.href =
+            "login.html";
+    }
+}
+
+verificarSesion();
+        
         function calcularTotales() {
 
     const botellones_cargados =
