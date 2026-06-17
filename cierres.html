@@ -115,6 +115,34 @@
 <textarea id="observaciones"
           placeholder="Observaciones"></textarea>
 
+    <h3>Resumen</h3>
+
+<p>Botellones devueltos:
+    <span id="botellones_devueltos">0</span>
+</p>
+
+<p>Agua devuelta:
+    <span id="agua_devuelta">0</span>
+</p>
+
+<p>Juguitos devueltos:
+    <span id="juguitos_devueltos">0</span>
+</p>
+
+<p>Hielo devuelto:
+    <span id="hielo_devuelto">0</span>
+</p>
+
+<hr>
+
+<p>Total venta:
+    <b>L <span id="total_venta">0.00</span></b>
+</p>
+
+<p>Diferencia:
+    <b>L <span id="diferencia">0.00</span></b>
+</p>
+
 <button onclick="guardarViaje()">
     Guardar cierre
 </button>
@@ -128,6 +156,114 @@ const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
+
+        function calcularTotales() {
+
+    const botellones_cargados =
+        parseInt(document.getElementById(
+            "botellones_cargados").value) || 0;
+
+    const z1p =
+        parseInt(document.getElementById(
+            "zona1_publico").value) || 0;
+
+    const z1pu =
+        parseInt(document.getElementById(
+            "zona1_pulperia").value) || 0;
+
+    const z2p =
+        parseInt(document.getElementById(
+            "zona2_publico").value) || 0;
+
+    const z2pu =
+        parseInt(document.getElementById(
+            "zona2_pulperia").value) || 0;
+
+    const agua_cargada =
+        parseInt(document.getElementById(
+            "agua_cargada").value) || 0;
+
+    const agua_vendida =
+        parseInt(document.getElementById(
+            "agua_vendida").value) || 0;
+
+    const agua_regalada =
+        parseInt(document.getElementById(
+            "agua_regalada").value) || 0;
+
+    const juguitos_cargados =
+        parseInt(document.getElementById(
+            "juguitos_cargados").value) || 0;
+
+    const juguitos_vendidos =
+        parseInt(document.getElementById(
+            "juguitos_vendidos").value) || 0;
+
+    const hielo_cargado =
+        parseInt(document.getElementById(
+            "hielo_cargado").value) || 0;
+
+    const hielo_vendido =
+        parseInt(document.getElementById(
+            "hielo_vendido").value) || 0;
+
+    const efectivo =
+        parseFloat(document.getElementById(
+            "efectivo_entregado").value) || 0;
+
+    const total_botellones =
+        z1p * 40 +
+        z1pu * 35 +
+        z2p * 35 +
+        z2pu * 30;
+
+    const total_agua =
+        agua_vendida * 25;
+
+    const total_juguitos =
+        juguitos_vendidos * 25;
+
+    const total_hielo =
+        hielo_vendido * 25;
+
+    const total =
+        total_botellones +
+        total_agua +
+        total_juguitos +
+        total_hielo;
+
+    const diferencia =
+        efectivo - total;
+
+    document.getElementById(
+        "botellones_devueltos").innerText =
+        botellones_cargados -
+        z1p - z1pu - z2p - z2pu;
+
+    document.getElementById(
+        "agua_devuelta").innerText =
+        agua_cargada -
+        agua_vendida -
+        agua_regalada;
+
+    document.getElementById(
+        "juguitos_devueltos").innerText =
+        juguitos_cargados -
+        juguitos_vendidos;
+
+    document.getElementById(
+        "hielo_devuelto").innerText =
+        hielo_cargado -
+        hielo_vendido;
+
+    document.getElementById(
+        "total_venta").innerText =
+        total.toFixed(2);
+
+    document.getElementById(
+        "diferencia").innerText =
+        diferencia.toFixed(2);
+}
 
 async function guardarViaje() {
 
@@ -270,6 +406,15 @@ async function guardarViaje() {
         alert("Cierre guardado correctamente");
     }
 }
+
+        document.querySelectorAll(
+    "input"
+).forEach(input => {
+    input.addEventListener(
+        "input",
+        calcularTotales
+    );
+});
 
 </script>
 
