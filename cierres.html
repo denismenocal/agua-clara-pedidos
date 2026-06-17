@@ -267,6 +267,9 @@ const supabaseClient = supabase.createClient(
 
 async function guardarViaje() {
 
+    const fecha = new Date()
+    .toLocaleDateString('en-CA');
+
     const camion =
         document.getElementById("camion").value;
 
@@ -375,6 +378,7 @@ async function guardarViaje() {
         await supabaseClient
         .from("viajes")
         .insert([{
+            fecha,
             camion,
             chofer,
             numero_viaje,
