@@ -106,8 +106,33 @@ const supabaseClient = supabase.createClient(
     if (!data.session) {
         window.location.href =
             "login.html";
+        return;
+    }
+
+    const { data: perfil } =
+        await supabaseClient
+        .from("usuarios")
+        .select("rol")
+        .eq(
+            "id",
+            data.session.user.id
+        )
+        .single();
+
+    if (
+        perfil.rol !==
+        "administrador"
+    ) {
+        alert(
+            "Acceso denegado"
+        );
+
+        window.location.href =
+            "login.html";
     }
 }
+
+verificarSesion();
 
         async function cerrarSesion() {
 
