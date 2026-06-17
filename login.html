@@ -56,12 +56,40 @@ async function login() {
         });
 
     if (error) {
-        alert(error.message);
-        return;
-    }
+    alert(error.message);
+    return;
+}
 
+const { data: usuario } =
+    await supabaseClient.auth
+    .getUser();
+
+const { data: perfil, error: errorPerfil } =
+    await supabaseClient
+    .from("usuarios")
+    .select("*")
+    .eq("id", usuario.user.id)
+    .single();
+
+if (errorPerfil) {
+    alert(
+        "El usuario no tiene rol asignado."
+    );
+    return;
+}
+
+if (perfil.rol === "administrador") {
     window.location.href =
         "admin.html";
+}
+else if (perfil.rol === "cajera") {
+    window.location.href =
+        "cierres.html";
+}
+else if (perfil.rol === "chofer") {
+    window.location.href =
+        "admin.html";
+}
 }
 
 </script>
