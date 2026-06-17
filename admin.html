@@ -78,7 +78,8 @@ const supabaseClient = supabase.createClient(
         .eq("id", data.session.user.id)
         .single();
 
-    if (!perfil || perfil.rol !== "administrador") {
+    if (!perfil || perfil.rol !== "administrador" &&
+                   perfil.rol !== "chofer") {
 
         alert("Acceso denegado");
 
