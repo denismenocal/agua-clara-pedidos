@@ -50,6 +50,21 @@
 
 <div id="lista"></div>
 
+    <hr>
+
+<div id="detalleViaje"
+     style="display:none;
+            border:1px solid #ccc;
+            padding:15px;
+            margin-top:20px;
+            border-radius:10px;">
+
+    <h2>Detalle del Viaje</h2>
+
+    <div id="contenidoDetalle"></div>
+
+</div>
+
     <script>
 
 const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
@@ -138,11 +153,123 @@ async function cargarViajes() {
     ).innerHTML = html;
 }
 
-function verDetalle(id) {
-    alert(
-        "Próximamente mostraremos el detalle del viaje: "
-        + id
-    );
+async function verDetalle(id) {
+
+    const { data, error } =
+        await supabaseClient
+        .from("viajes")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    let html = `
+
+    <p><b>Camión:</b>
+    ${data.camion}</p>
+
+    <p><b>Chofer:</b>
+    ${data.chofer}</p>
+
+    <p><b>Viaje:</b>
+    ${data.numero_viaje}</p>
+
+    <p><b>Hora salida:</b>
+    ${data.hora_salida}</p>
+
+    <p><b>Hora regreso:</b>
+    ${data.hora_regreso}</p>
+
+    <hr>
+
+    <h3>Botellones</h3>
+
+    <p>Cargados:
+    ${data.botellones_cargados}</p>
+
+    <p>Zona 1 Público:
+    ${data.zona1_publico}</p>
+
+    <p>Zona 1 Pulpería:
+    ${data.zona1_pulperia}</p>
+
+    <p>Zona 2 Público:
+    ${data.zona2_publico}</p>
+
+    <p>Zona 2 Pulpería:
+    ${data.zona2_pulperia}</p>
+
+    <p>Vacíos recibidos:
+    ${data.botellones_vacios}</p>
+
+    <hr>
+
+    <h3>Agua en bolsa</h3>
+
+    <p>Cargada:
+    ${data.agua_cargada}</p>
+
+    <p>Vendida:
+    ${data.agua_vendida}</p>
+
+    <p>Regalada:
+    ${data.agua_regalada}</p>
+
+    <hr>
+
+    <h3>Juguitos</h3>
+
+    <p>Cargados:
+    ${data.juguitos_cargados}</p>
+
+    <p>Vendidos:
+    ${data.juguitos_vendidos}</p>
+
+    <hr>
+
+    <h3>Hielo</h3>
+
+    <p>Cargado:
+    ${data.hielo_cargado}</p>
+
+    <p>Vendido:
+    ${data.hielo_vendido}</p>
+
+    <hr>
+
+    <h3>Finanzas</h3>
+
+    <p>Total venta:
+    L ${data.total_venta}</p>
+
+    <p>Efectivo:
+    L ${data.efectivo_entregado}</p>
+
+    <p>Diferencia:
+    L ${data.diferencia}</p>
+
+    <p>Observaciones:
+    ${data.observaciones || ""}</p>
+
+    `;
+
+    document.getElementById(
+        "contenidoDetalle"
+    ).innerHTML = html;
+
+    document.getElementById(
+        "detalleViaje"
+    ).style.display = "block";
+
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+    });
+}
 }
 
 cargarViajes();
