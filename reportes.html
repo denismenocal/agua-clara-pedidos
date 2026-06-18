@@ -196,6 +196,7 @@ async function cargarViajes() {
     let totalDiferencia = 0;
 
     let botellonesVendidos = 0;
+    let totalBotellonesNuevos = 0;
     let botellonesVacios = 0;
 
     let aguaVendida = 0;
@@ -223,6 +224,9 @@ botellonesVendidos +=
     Number(viaje.zona1_pulperia || 0) +
     Number(viaje.zona2_publico || 0) +
     Number(viaje.zona2_pulperia || 0);
+
+totalBotellonesNuevos +=
+    viaje.botellon_nuevo || 0;
 
 botellonesVacios += Number(
     viaje.botellones_vacios || 0
@@ -292,6 +296,9 @@ L ${totalDiferencia.toFixed(2)}</p>
 
 <p><b>Botellones vendidos:</b>
 ${botellonesVendidos}</p>
+
+<p><b>Botellones + Agua Nuevos vendidos:</b>
+${totalBotellonesNuevos}</p>
 
 <p><b>Botellones vacíos:</b>
 ${botellonesVacios}</p>
