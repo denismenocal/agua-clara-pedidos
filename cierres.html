@@ -178,25 +178,18 @@ const supabaseClient = supabase.createClient(
         await supabaseClient
         .from("usuarios")
         .select("rol")
-        .eq(
-            "id",
-            data.session.user.id
-        )
+        .eq("id", data.session.user.id)
         .single();
 
-    if (
-    !perfil ||
-    (
-        perfil.rol !== "administrador" &&
-        perfil.rol !== "chofer"
-    )
-    {
-        alert(
-            "Acceso denegado"
-        );
+    if (!perfil || perfil.rol !== "administrador" &&
+                   perfil.rol !== "chofer") {
+
+        alert("Acceso denegado");
 
         window.location.href =
             "login.html";
+
+        return;
     }
 }
 
