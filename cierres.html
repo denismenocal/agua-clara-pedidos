@@ -111,6 +111,9 @@
 <input type="number" id="zona2_pulperia"
        placeholder="Zona 2 pulpería Lps.30">
 
+    <input type="number" id="botellon_nuevo"
+       placeholder="Botellón nuevo + agua Lps.150">
+
 <input type="number" id="botellones_vacios"
        placeholder="Botellones vacíos recibidos">
 
@@ -295,6 +298,7 @@ verificarSesion();
         z1pu * 35 +
         z2p * 35 +
         z2pu * 30;
+        botellon_nuevo * 150;
 
     const total_agua =
         agua_vendida * 25;
@@ -317,7 +321,8 @@ verificarSesion();
     document.getElementById(
         "botellones_devueltos").innerText =
         botellones_cargados -
-        z1p - z1pu - z2p - z2pu;
+        z1p - z1pu - z2p - z2pu -
+    botellon_nuevo;
 
     document.getElementById(
         "agua_devuelta").innerText =
@@ -396,6 +401,10 @@ async function guardarViaje() {
         parseInt(document.getElementById(
             "zona2_pulperia").value) || 0;
 
+    const botellon_nuevo =
+    parseInt(document.getElementById(
+        "botellon_nuevo").value) || 0;
+
     const botellones_vacios =
         parseInt(document.getElementById(
             "botellones_vacios").value) || 0;
@@ -438,10 +447,11 @@ async function guardarViaje() {
 
     // Cálculos automáticos
     const total_botellones =
-        zona1_publico * 40 +
-        zona1_pulperia * 35 +
-        zona2_publico * 35 +
-        zona2_pulperia * 30;
+    zona1_publico * 40 +
+    zona1_pulperia * 35 +
+    zona2_publico * 35 +
+    zona2_pulperia * 30 +
+    botellon_nuevo * 150;
 
     const total_agua =
         agua_vendida * 25;
@@ -477,6 +487,7 @@ async function guardarViaje() {
             zona1_pulperia,
             zona2_publico,
             zona2_pulperia,
+            botellon_nuevo,
             botellones_vacios,
             agua_cargada,
             agua_vendida,
