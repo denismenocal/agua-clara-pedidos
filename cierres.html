@@ -62,10 +62,27 @@
 </select>
 
 <select id="numero_viaje">
-    <option>Primer Viaje</option>
-    <option>Segundo Viaje</option>
-    <option>Tercero Viaje</option>
-    <option>Cuarto Viaje</option>
+
+     <option value="">
+        Seleccione viaje
+    </option>
+
+    <option value="1">
+        Primer Viaje
+    </option>
+
+    <option value="2">
+        Segundo Viaje
+    </option>
+
+    <option value="3">
+        Tercer Viaje
+    </option>
+
+    <option value="4">
+        Cuarto Viaje
+    </option>
+
 </select>
 
 <input type="time"
@@ -339,7 +356,18 @@ async function guardarViaje() {
         document.getElementById("chofer").value;
 
     const numero_viaje =
-        document.getElementById("numero_viaje").value;
+    parseInt(
+        document.getElementById(
+            "numero_viaje"
+        ).value
+    );
+
+    // AQUÍ VA LA VALIDACIÓN
+
+    const hora_salida =
+        document.getElementById(
+            "hora_salida"
+        ).value;
 
     const hora_salida =
         document.getElementById(
@@ -477,6 +505,7 @@ async function guardarViaje() {
 
         document.getElementById("camion").selectedIndex = 0;
         document.getElementById("chofer").selectedIndex = 0;
+        document.getElementById("numero_viaje").selectedIndex = 0;
 
         calcularTotales();
     }
