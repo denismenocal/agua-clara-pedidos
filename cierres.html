@@ -62,10 +62,10 @@
 </select>
 
 <select id="numero_viaje">
-    <option>Primero</option>
-    <option>Segundo</option>
-    <option>Tercero</option>
-    <option>Cuarto</option>
+    <option>Primer Viaje</option>
+    <option>Segundo Viaje</option>
+    <option>Tercero Viaje</option>
+    <option>Cuarto Viaje</option>
 </select>
 
 <input type="number"
@@ -343,8 +343,7 @@ async function guardarViaje() {
         document.getElementById("chofer").value;
 
     const numero_viaje =
-        parseInt(document.getElementById(
-            "numero_viaje").value) || 1;
+        document.getElementById("numero_viaje").value;
 
     const hora_salida =
         document.getElementById(
