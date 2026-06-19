@@ -41,13 +41,28 @@
         }
 
         input,
-select,
-textarea,
-button {
+     select,
+     textarea,
+     button {
 
-    font-size: 18px;
-    padding: 14px;
-    box-sizing: border-box;
+    font-size:18px;
+    box-sizing:border-box;
+
+    }
+
+    input:not([type="time"]),
+    select,
+    textarea,
+    button {
+
+    padding:14px;
+
+}
+
+        input[type="time"] {
+
+    height: 56px;
+    width: 100%;
 
 }
     </style>
