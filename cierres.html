@@ -450,6 +450,85 @@ async function guardarViaje() {
         document.getElementById(
             "observaciones").value;
 
+    const totalBotellonesVendidos =
+    zona1_publico +
+    zona1_pulperia +
+    zona2_publico +
+    zona2_pulperia +
+    botellon_nuevo;
+
+if (totalBotellonesVendidos > botellones_cargados) {
+    alert(
+        "Los botellones vendidos no pueden ser mayores a los cargados."
+    );
+    return;
+}
+
+    if (
+    agua_vendida + agua_regalada >
+    agua_cargada
+) {
+    alert(
+        "La cantidad de pack de agua vendida + regalada no puede ser mayor a la cargada."
+    );
+    return;
+}
+
+    if (
+    juguitos_vendidos >
+    juguitos_cargados
+) {
+    alert(
+        "Los juguitos vendidos no pueden ser mayores a los cargados."
+    );
+    return;
+}
+
+    if (
+    hielo_vendido >
+    hielo_cargado
+) {
+    alert(
+        "El hielo vendido no puede ser mayor al cargado."
+    );
+    return;
+}
+
+    if (
+    !camion ||
+    !chofer ||
+    !numero_viaje ||
+    !hora_salida ||
+    !hora_regreso ||
+
+    document.getElementById("botellones_cargados").value === "" ||
+    document.getElementById("zona1_publico").value === "" ||
+    document.getElementById("zona1_pulperia").value === "" ||
+    document.getElementById("zona2_publico").value === "" ||
+    document.getElementById("zona2_pulperia").value === "" ||
+    document.getElementById("botellon_nuevo").value === "" ||
+    document.getElementById("botellones_vacios").value === "" ||
+
+    document.getElementById("agua_cargada").value === "" ||
+    document.getElementById("agua_vendida").value === "" ||
+    document.getElementById("agua_regalada").value === "" ||
+
+    document.getElementById("juguitos_cargados").value === "" ||
+    document.getElementById("juguitos_vendidos").value === "" ||
+
+    document.getElementById("hielo_cargado").value === "" ||
+    document.getElementById("hielo_vendido").value === "" ||
+
+    document.getElementById("efectivo_entregado").value === ""
+) {
+
+    alert(
+        "Debe completar todos los campos antes de guardar."
+    );
+
+    return;
+}
+
     // Cálculos automáticos
     const total_botellones =
     zona1_publico * 40 +
