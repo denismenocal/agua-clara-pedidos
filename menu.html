@@ -33,6 +33,58 @@
             margin-bottom:20px;
         }
 
+        body{
+    font-family:Arial;
+    background:#f4f8fb;
+    margin:0;
+    padding:20px;
+}
+
+.logo{
+    width:120px;
+    margin-bottom:10px;
+}
+
+.menu-btn{
+
+    width:100%;
+
+    padding:20px;
+
+    margin-bottom:15px;
+
+    font-size:22px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#0077b6;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+.salir-btn{
+
+    width:100%;
+
+    padding:20px;
+
+    font-size:22px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#dc3545;
+
+    color:white;
+
+    cursor:pointer;
+}
+
     </style>
 
 </head>
@@ -92,50 +144,62 @@ async function cargarMenu(){
     if(perfil.rol==="administrador"){
 
         html += `
-        <button onclick="
-        location.href='admin.html'
-        ">
-        🚚 Pedidos
-        </button>
 
-        <button onclick="
-        location.href='cierres.html'
-        ">
-        💰 Cierres
-        </button>
+<button class="menu-btn"
+onclick="location.href='admin.html'">
 
-        <button onclick="
-        location.href='reportes.html'
-        ">
-        📊 Reportes
-        </button>
-        `;
+📦 Pedidos
+
+</button>
+
+<button class="menu-btn"
+onclick="location.href='cierres.html'">
+
+🚚 Cierres
+
+</button>
+
+<button class="menu-btn"
+onclick="location.href='reportes.html'">
+
+📊 Reportes
+
+</button>
+
+`;
     }
 
     if(perfil.rol==="chofer"){
 
-        html += `
-        <button onclick="
-        location.href='admin.html'
-        ">
-        🚚 Pedidos
-        </button>
+       html += `
 
-        <button onclick="
-        location.href='cierres.html'
-        ">
-        💰 Cierres
-        </button>
-        `;
+<button class="menu-btn"
+onclick="location.href='admin.html'">
+
+📦 Pedidos
+
+</button>
+
+<button class="menu-btn"
+onclick="location.href='cierres.html'">
+
+🚚 Cierres
+
+</button>
+
+`;
     }
 
     html += `
-    <button onclick="
-    cerrarSesion()
-    ">
-    🚪 Cerrar sesión
-    </button>
-    `;
+
+<button class="salir-btn"
+onclick="cerrarSesion()">
+
+🚪 Cerrar sesión
+
+</button>
+
+`;
 
     document.getElementById(
         "menu"
