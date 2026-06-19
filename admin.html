@@ -43,7 +43,21 @@
 
 </div>
 
+    <div id="alertaPedidos"
+     style="
+     display:none;
+     background:#28a745;
+     color:white;
+     padding:10px;
+     border-radius:8px;
+     margin-bottom:10px;">
+</div>
+
 <h1>Pedidos Agua Clara</h1>
+
+    <h2 id="contadorPedidos">
+0 pedidos
+</h2>
 
     <button onclick="cargarPedidos('Pendiente')">
     Pendientes
@@ -118,6 +132,7 @@ verificarSesion();
 verificarSesion();
       
       let estadoActual = "Pendiente";
+      let ultimoConteo = -1;
 
 async function cargarPedidos(estado = 'Pendiente') {
     estadoActual = estado;
@@ -143,6 +158,43 @@ async function cargarPedidos(estado = 'Pendiente') {
     console.log(error);
     return;
 }
+
+    const totalPedidos = data.length;
+
+document.getElementById(
+    "contadorPedidos"
+).innerText =
+    totalPedidos + " pedidos";
+
+    if (
+    ultimoConteo >= 0 &&
+    estado === "Pendiente" &&
+    totalPedidos > ultimoConteo
+)
+    {
+
+    document.getElementById(
+        "alertaPedidos"
+    ).style.display = "block";
+
+    document.getElementById(
+        "alertaPedidos"
+    ).innerText =
+        "🔔 Nuevo pedido recibido";
+        new Audio(
+'https://actions.google.com/sounds/v1/alarms/beep_short.ogg'
+).play();
+
+    setTimeout(() => {
+
+        document.getElementById(
+            "alertaPedidos"
+        ).style.display = "none";
+
+    }, 5000);
+}
+
+ultimoConteo = totalPedidos;
 
     let html = "";
 
