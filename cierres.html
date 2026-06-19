@@ -101,8 +101,13 @@
 
 <h3>Botellones</h3>
 
-<input type="number" id="botellones_cargados"
-       placeholder="Botellones cargados">
+<input
+    type="number"
+    inputmode="numeric"
+    pattern="[0-9]*"
+    min="0"
+    step="1"
+    id="botellones_cargados">
 
 <input type="number" id="zona1_publico"
        placeholder="Zona 1 público Lps.40">
