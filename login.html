@@ -7,21 +7,97 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
+    <style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f8fb;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    margin:0;
+}
+
+.login-box{
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.15);
+    width:90%;
+    max-width:400px;
+    text-align:center;
+}
+
+.logo{
+    width:120px;
+    margin-bottom:10px;
+}
+
+h1{
+    color:#0077b6;
+    margin-bottom:5px;
+}
+
+.subtitulo{
+    color:#666;
+    margin-bottom:20px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#0077b6;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#005f8f;
+}
+
+</style>
+
 <body>
 
-<h1>Agua Clara La Muralla</h1>
+<div class="login-box">
 
-<input type="email"
-       id="correo"
-       placeholder="Correo">
+    <img src="logo_login_512.webp"
+     style="width:180px;">
 
-<input type="password"
-       id="clave"
-       placeholder="Contraseña">
+    <h1>Agua Clara</h1>
 
-<button onclick="login()">
-    Iniciar sesión
-</button>
+    <div class="subtitulo">
+        Sistema de Distribución
+    </div>
+
+    <input type="email"
+           id="correo"
+           placeholder="Correo">
+
+    <input type="password"
+           id="clave"
+           placeholder="Contraseña">
+
+    <button onclick="login()">
+        Iniciar Sesión
+    </button>
+
+</div>
+
+</body>
 
 <script>
 
