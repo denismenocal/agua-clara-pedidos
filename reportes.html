@@ -71,7 +71,17 @@ button {
 
 </div>
 
-<h1>Reportes de Viajes</h1>
+<label>Desde</label>
+
+<input
+    type="date"
+    id="fechaInicio">
+
+<label>Hasta</label>
+
+<input
+    type="date"
+    id="fechaFin">
 
 <input type="date" id="fecha">
 
@@ -186,18 +196,31 @@ async function cargarViajes() {
         .select("*")
         .order("fecha", { ascending: false });
 
-    const fecha =
-        document.getElementById("fecha").value;
+    const fechaInicio =
+    document.getElementById("fechaInicio").value;
 
+    const fechaFin =
+    document.getElementById("fechaFin").value;
     const camion =
         document.getElementById("camion").value;
 
-    if (fecha) {
-        consulta = consulta.eq(
-            "fecha",
-            fecha
-        );
-    }
+    if (fechaInicio) {
+
+    consulta = consulta.gte(
+        "fecha",
+        fechaInicio
+    );
+
+}
+
+if (fechaFin) {
+
+    consulta = consulta.lte(
+        "fecha",
+        fechaFin
+    );
+
+}
 
     if (camion) {
         consulta = consulta.eq(
