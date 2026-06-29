@@ -44,16 +44,7 @@ button {
     box-sizing: border-box;
 
 }
-        input,
-select,
-textarea,
-button {
-
-    font-size: 18px;
-    padding: 14px;
-    box-sizing: border-box;
-
-}
+        
     </style>
 </head>
 
@@ -83,7 +74,6 @@ button {
     type="date"
     id="fechaFin">
 
-<input type="date" id="fecha">
 
 <select id="camion">
     <option value="">Todos los camiones</option>
@@ -104,7 +94,7 @@ button {
         margin-bottom:10px;
      ">
      
-    <h3>Resumen Diario</h3>
+    <h3>Resumen Periodo</h3>
 
     <div id="contenidoResumen">
         Sin datos
@@ -201,6 +191,7 @@ async function cargarViajes() {
 
     const fechaFin =
     document.getElementById("fechaFin").value;
+    
     const camion =
         document.getElementById("camion").value;
 
@@ -218,6 +209,18 @@ if (fechaFin) {
     consulta = consulta.lte(
         "fecha",
         fechaFin
+    );
+
+}
+
+    if (!fechaInicio && !fechaFin) {
+
+    const hoy = new Date()
+        .toLocaleDateString('en-CA');
+
+    consulta = consulta.eq(
+        "fecha",
+        hoy
     );
 
 }
