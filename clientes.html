@@ -146,6 +146,8 @@ const supabaseClient = supabase.createClient(
     SUPABASE_KEY
 );
 
+            let clienteEditando = null;
+
       async function guardarCliente() {
 
     const nombre =
@@ -337,12 +339,50 @@ const supabaseClient = supabase.createClient(
 
     }
 
-    // Crear cliente nuevo
+    let error;
 
-    const { error } =
+if(clienteEditando){
+
+    const resultado =
+        await supabaseClient
+        .from("clientes")
+        .update({
+
+            nombre,
+            telefono,
+            municipio,
+            barrio,
+            referencia,
+            identificacion,
+            tipo_cliente
+
+        })
+        .eq("id", clienteEditando);
+
+    error = resultado.error;
+
+}else{
+
+    const resultado =
         await supabaseClient
         .from("clientes")
         .insert([{
+
+            nombre,
+            telefono,
+            municipio,
+            barrio,
+            referencia,
+            identificacion,
+            tipo_cliente,
+            latitud,
+            longitud
+
+        }]);
+
+    error = resultado.error;
+
+}
 
             nombre,
             telefono,
@@ -366,6 +406,13 @@ const supabaseClient = supabase.createClient(
     alert(
         "Cliente guardado correctamente."
     );
+
+            clienteEditando = null;
+
+document.querySelector(
+    "button[onclick='guardarCliente()']"
+).innerHTML =
+"💾 Guardar Cliente";
 
     document
         .querySelectorAll(
@@ -515,9 +562,41 @@ const supabaseClient = supabase.createClient(
 
       function editarCliente(id){
 
-    alert(
-        "Próximamente podremos editar este cliente."
-    );
+    const cliente =
+        window.listaClientes.find(c => c.id == id);
+
+    if(!cliente) return;
+
+    clienteEditando = id;
+
+    document.getElementById("nombre").value =
+        cliente.nombre;
+
+    document.getElementById("telefono").value =
+        cliente.telefono;
+
+    document.getElementById("municipio").value =
+        cliente.municipio || "";
+
+    document.getElementById("barrio").value =
+        cliente.barrio || "";
+
+    document.getElementById("referencia").value =
+        cliente.referencia || "";
+
+    document.getElementById("identificacion").value =
+        cliente.identificacion || "";
+
+    document.getElementById("tipo_cliente").value =
+        cliente.tipo_cliente;
+
+    document.querySelector("button[onclick='guardarCliente()']").innerHTML =
+        "💾 Actualizar Cliente";
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
 
 }
 
