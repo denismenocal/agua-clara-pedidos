@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Clientes Mayoristas</title>
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
+
+<link rel="icon"
+      href="img/favicon_64.png">
+
+<link rel="manifest"
+      href="manifest.json">
+
+<meta name="theme-color"
+      content="#0077b6">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+body{
+    font-family:Arial;
+    padding:20px;
+    background:#f4f8fb;
+}
+
+input,
+select,
+button{
+
+    width:100%;
+    padding:14px;
+    margin-bottom:12px;
+    font-size:18px;
+    box-sizing:border-box;
+
+}
+
+button{
+
+    background:#0077b6;
+    color:white;
+    border:none;
+    border-radius:10px;
+
+}
+
+.tarjeta{
+
+    background:white;
+    border-radius:10px;
+    padding:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div style="display:flex;gap:10px;margin-bottom:15px;">
+
+<button onclick="location.href='menu.html'">
+🏠 Menú
+</button>
+
+<button onclick="cerrarSesion()">
+🚪 Salir
+</button>
+
+</div>
+
+<h2>🏪 Clientes Mayoristas</h2>
+
+<div class="tarjeta">
+
+<select id="cliente">
+
+<option value="">
+Seleccione un cliente
+</option>
+
+</select>
+
+<input
+id="nombre_tienda"
+placeholder="Nombre de la tienda">
+
+<input
+id="municipio"
+placeholder="Municipio">
+
+<input
+id="barrio"
+placeholder="Barrio o Aldea">
+
+<input
+type="number"
+inputmode="numeric"
+pattern="[0-9]*"
+min="0"
+step="1"
+id="precio_botellon"
+placeholder="Precio especial del botellón">
+
+<button onclick="guardarMayorista()">
+
+Guardar Cliente Mayorista
+
+</button>
+
+</div>
+
+<hr>
+
+<div id="listaMayoristas">
+
+</div>
+
+</body>
+
+</html>
