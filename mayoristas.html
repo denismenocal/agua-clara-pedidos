@@ -169,7 +169,145 @@ const supabaseClient = supabase.createClient(
 
 }
 
+            async function guardarMayorista() {
+
+    const cliente_id =
+        document.getElementById("cliente").value;
+
+    const nombre_tienda =
+        document.getElementById("nombre_tienda").value.trim();
+
+    const municipio =
+        document.getElementById("municipio").value.trim();
+
+    const barrio =
+        document.getElementById("barrio").value.trim();
+
+    const precio_botellon =
+        parseFloat(
+            document.getElementById("precio_botellon").value
+        );
+
+    if (
+        !cliente_id ||
+        !nombre_tienda ||
+        !municipio ||
+        !barrio ||
+        isNaN(precio_botellon)
+    ) {
+
+        alert("Complete todos los campos.");
+        return;
+
+    }
+
+    const { error } =
+        await supabaseClient
+        .from("clientes_mayoristas")
+        .insert([{
+
+            cliente_id,
+            nombre_tienda,
+            municipio,
+            barrio,
+            precio_botellon
+
+        }]);
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    alert("Cliente mayorista guardado correctamente.");
+
+    document.getElementById("cliente").selectedIndex = 0;
+    document.getElementById("nombre_tienda").value = "";
+    document.getElementById("municipio").value = "";
+    document.getElementById("barrio").value = "";
+    document.getElementById("precio_botellon").value = "";
+
+    cargarMayoristas();
+
+}
+
+            async function cargarMayoristas() {
+
+    const { data, error } =
+        await supabaseClient
+        .from("clientes_mayoristas")
+        .select(`
+            *,
+            clientes(
+                nombre,
+                telefono
+            )
+        `)
+        .order("nombre_tienda");
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    let html = "";
+
+    data.forEach(item => {
+
+        html += `
+
+        <div class="tarjeta"
+             style="margin-bottom:15px;">
+
+            <h3>${item.nombre_tienda}</h3>
+
+            <p>
+            <b>Propietario:</b>
+            ${item.clientes.nombre}
+            </p>
+
+            <p>
+            <b>Teléfono:</b>
+            ${item.clientes.telefono}
+            </p>
+
+            <p>
+            <b>Municipio:</b>
+            ${item.municipio}
+            </p>
+
+            <p>
+            <b>Barrio:</b>
+            ${item.barrio}
+            </p>
+
+            <p>
+            <b>Precio especial:</b>
+
+            L ${item.precio_botellon}
+
+            </p>
+
+        </div>
+
+        `;
+
+    });
+
+    document.getElementById(
+        "listaMayoristas"
+    ).innerHTML = html;
+
+}
+
+            
+
             cargarClientes();
+            cargarMayoristas();
 
       </script>
 
