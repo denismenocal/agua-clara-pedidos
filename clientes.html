@@ -79,6 +79,11 @@ button{
 
 <div class="tarjeta">
 
+      <input
+id="buscarCliente"
+placeholder="🔍 Buscar por nombre o teléfono..."
+onkeyup="filtrarClientes()">
+
 <input
 id="nombre"
 placeholder="Nombre del cliente">
@@ -396,6 +401,8 @@ const supabaseClient = supabase.createClient(
 
     }
 
+            window.listaClientes = data;
+
     let html = "";
 
     data.forEach(cliente => {
@@ -538,6 +545,75 @@ const supabaseClient = supabase.createClient(
     }
 
     cargarClientes();
+
+}
+
+            function filtrarClientes(){
+
+    const texto =
+        document
+        .getElementById("buscarCliente")
+        .value
+        .toLowerCase();
+
+    let html = "";
+
+    window.listaClientes
+    .filter(cliente =>
+
+        cliente.nombre
+            .toLowerCase()
+            .includes(texto)
+
+        ||
+
+        cliente.telefono
+            .includes(texto)
+
+    )
+
+    .forEach(cliente=>{
+
+        html += `
+
+<div class="tarjeta"
+style="margin-bottom:15px;">
+
+<h3>👤 ${cliente.nombre}</h3>
+
+<p><b>📞</b> ${cliente.telefono}</p>
+
+<p><b>🏘️</b> ${cliente.municipio || ""}</p>
+
+<p><b>📍</b> ${cliente.barrio || ""}</p>
+
+<p><b>Tipo:</b> ${cliente.tipo_cliente}</p>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+<button onclick="abrirMapa(${cliente.latitud},${cliente.longitud})">
+📍 Ver mapa
+</button>
+
+<button onclick="editarCliente('${cliente.id}')">
+✏️ Editar
+</button>
+
+<button onclick="eliminarCliente('${cliente.id}')">
+🗑️ Eliminar
+</button>
+
+</div>
+
+</div>
+
+`;
+
+    });
+
+    document.getElementById(
+        "listaClientes"
+    ).innerHTML = html;
 
 }
 
