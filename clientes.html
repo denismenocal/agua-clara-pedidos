@@ -74,3 +74,59 @@ button{
 </button>
 
 </div>
+
+      <h2>👥 Gestión de Clientes</h2>
+
+<div class="tarjeta">
+
+<input
+id="nombre"
+placeholder="Nombre del cliente">
+
+<input
+id="telefono"
+placeholder="Teléfono">
+
+<input
+id="municipio"
+placeholder="Municipio">
+
+<input
+id="barrio"
+placeholder="Barrio o Aldea">
+
+<input
+id="referencia"
+placeholder="Referencia">
+
+<input
+id="identificacion"
+placeholder="RTN o DNI">
+
+<select id="tipo_cliente">
+
+<option value="Delivery">
+🚚 Delivery
+</option>
+
+<option value="Tienda">
+🏪 Tienda
+</option>
+
+<option value="Cliente Final">
+👤 Cliente Final
+</option>
+
+</select>
+
+<button onclick="guardarCliente()">
+
+💾 Guardar Cliente
+
+</button>
+
+</div>
+
+<hr>
+
+<div id="listaClientes"></div>
