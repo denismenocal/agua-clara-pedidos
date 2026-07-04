@@ -131,7 +131,7 @@ placeholder="RTN o DNI">
 
 <div id="listaClientes"></div>
 
-      script>
+      <script>
 
 const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
 const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
@@ -266,6 +266,286 @@ const supabaseClient = supabase.createClient(
     );
 
 }
+
+      async function guardarClienteBD(
+
+    nombre,
+    telefono,
+    municipio,
+    barrio,
+    referencia,
+    identificacion,
+    tipo_cliente,
+    latitud,
+    longitud
+
+){
+
+    // Buscar si ya existe por teléfono
+
+    const { data: clienteExistente } =
+        await supabaseClient
+        .from("clientes")
+        .select("*")
+        .eq("telefono", telefono)
+        .maybeSingle();
+
+    // Si existe
+
+    if(clienteExistente){
+
+        // Si no tiene coordenadas y ahora sí las obtuvimos,
+        // solo actualizamos las coordenadas.
+
+        if(
+
+            (!clienteExistente.latitud ||
+             !clienteExistente.longitud)
+
+            &&
+
+            latitud &&
+            longitud
+
+        ){
+
+            await supabaseClient
+                .from("clientes")
+                .update({
+
+                    latitud,
+                    longitud
+
+                })
+                .eq(
+                    "id",
+                    clienteExistente.id
+                );
+
+        }
+
+        alert(
+            "Este cliente ya existe."
+        );
+
+        return;
+
+    }
+
+    // Crear cliente nuevo
+
+    const { error } =
+        await supabaseClient
+        .from("clientes")
+        .insert([{
+
+            nombre,
+            telefono,
+            municipio,
+            barrio,
+            referencia,
+            identificacion,
+            tipo_cliente,
+            latitud,
+            longitud
+
+        }]);
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    alert(
+        "Cliente guardado correctamente."
+    );
+
+    document
+        .querySelectorAll(
+            "input"
+        )
+        .forEach(campo => {
+
+            campo.value = "";
+
+        });
+
+    document
+        .getElementById(
+            "tipo_cliente"
+        ).selectedIndex = 0;
+
+    cargarClientes();
+
+}
+
+      async function cargarClientes() {
+
+    const { data, error } =
+        await supabaseClient
+        .from("clientes")
+        .select("*")
+        .order("nombre");
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    let html = "";
+
+    data.forEach(cliente => {
+
+        html += `
+
+        <div class="tarjeta"
+             style="margin-bottom:15px;">
+
+            <h3>
+            👤 ${cliente.nombre}
+            </h3>
+
+            <p>
+            <b>📞 Teléfono:</b>
+            ${cliente.telefono}
+            </p>
+
+            <p>
+            <b>🏘️ Municipio:</b>
+            ${cliente.municipio || ""}
+            </p>
+
+            <p>
+            <b>📍 Barrio:</b>
+            ${cliente.barrio || ""}
+            </p>
+
+            <p>
+            <b>🚚 Tipo:</b>
+            ${cliente.tipo_cliente}
+            </p>
+
+            <div
+            style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            ">
+
+                <button
+                onclick="
+                abrirMapa(
+                ${cliente.latitud},
+                ${cliente.longitud}
+                )
+                ">
+                📍 Ver mapa
+                </button>
+
+                <button
+                onclick="
+                editarCliente(
+                '${cliente.id}'
+                )
+                ">
+                ✏️ Editar
+                </button>
+
+                <button
+                onclick="
+                eliminarCliente(
+                '${cliente.id}'
+                )
+                ">
+                🗑️ Eliminar
+                </button>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    document.getElementById(
+        "listaClientes"
+    ).innerHTML = html;
+
+}
+
+      function abrirMapa(
+    latitud,
+    longitud
+){
+
+    if(
+        !latitud ||
+        !longitud
+    ){
+
+        alert(
+            "Este cliente no tiene ubicación."
+        );
+
+        return;
+
+    }
+
+    window.open(
+
+        `https://www.google.com/maps?q=${latitud},${longitud}`,
+
+        "_blank"
+
+    );
+
+}
+
+      function editarCliente(id){
+
+    alert(
+        "Próximamente podremos editar este cliente."
+    );
+
+}
+
+      async function eliminarCliente(id){
+
+    if(
+        !confirm(
+            "¿Eliminar este cliente?"
+        )
+    ){
+        return;
+    }
+
+    const { error } =
+        await supabaseClient
+        .from("clientes")
+        .delete()
+        .eq("id", id);
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    cargarClientes();
+
+}
+
+
+      cargarClientes();
+
+      </script>
+
 
       </body>
 
