@@ -443,10 +443,15 @@ document.querySelector(
 
     if(error){
 
-        alert(error.message);
-        return;
+    console.log(error);
 
-    }
+    alert(error.message);
+
+    return;
+
+}
+
+console.log(data);
 
             window.listaClientes = data;
 
