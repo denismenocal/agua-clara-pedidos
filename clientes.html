@@ -131,6 +131,142 @@ placeholder="RTN o DNI">
 
 <div id="listaClientes"></div>
 
+      script>
+
+const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
+const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+      async function guardarCliente() {
+
+    const nombre =
+        document.getElementById("nombre").value.trim();
+
+    const telefono =
+        document.getElementById("telefono").value.trim();
+
+    const municipio =
+        document.getElementById("municipio").value.trim();
+
+    const barrio =
+        document.getElementById("barrio").value.trim();
+
+    const referencia =
+        document.getElementById("referencia").value.trim();
+
+    const identificacion =
+        document.getElementById("identificacion").value.trim();
+
+    const tipo_cliente =
+        document.getElementById("tipo_cliente").value;
+
+    if(
+        !nombre ||
+        !telefono ||
+        !municipio ||
+        !barrio
+    ){
+
+        alert(
+            "Complete todos los campos obligatorios."
+        );
+
+        return;
+
+    }
+
+    obtenerUbicacionYGuardar(
+        nombre,
+        telefono,
+        municipio,
+        barrio,
+        referencia,
+        identificacion,
+        tipo_cliente
+    );
+
+}
+
+      function obtenerUbicacionYGuardar(
+
+    nombre,
+    telefono,
+    municipio,
+    barrio,
+    referencia,
+    identificacion,
+    tipo_cliente
+
+){
+
+    if(!navigator.geolocation){
+
+        guardarClienteBD(
+
+            nombre,
+            telefono,
+            municipio,
+            barrio,
+            referencia,
+            identificacion,
+            tipo_cliente,
+            null,
+            null
+
+        );
+
+        return;
+
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(posicion){
+
+            guardarClienteBD(
+
+                nombre,
+                telefono,
+                municipio,
+                barrio,
+                referencia,
+                identificacion,
+                tipo_cliente,
+
+                posicion.coords.latitude,
+                posicion.coords.longitude
+
+            );
+
+        },
+
+        function(){
+
+            guardarClienteBD(
+
+                nombre,
+                telefono,
+                municipio,
+                barrio,
+                referencia,
+                identificacion,
+                tipo_cliente,
+
+                null,
+                null
+
+            );
+
+        }
+
+    );
+
+}
+
       </body>
 
 </html>
