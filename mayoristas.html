@@ -201,10 +201,21 @@ const supabaseClient = supabase.createClient(
 
     }
 
-    const { error } =
-        await supabaseClient
-        .from("clientes_mayoristas")
-        .insert([{
+    const { data: existe } =
+    await supabaseClient
+    .from("clientes_mayoristas")
+    .select("id")
+    .eq("cliente_id", cliente_id)
+    .maybeSingle();
+
+if (existe) {
+
+    alert(
+        "Este cliente ya está registrado como mayorista."
+    );
+
+    return;
+}
 
             cliente_id,
             nombre_tienda,
