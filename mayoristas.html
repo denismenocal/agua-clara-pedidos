@@ -79,7 +79,7 @@ button{
 
 <div class="tarjeta">
 
-<select id="cliente">
+<select id="cliente" onchange="cargarDatosCliente()">
 
 <option value="">
 Seleccione un cliente
@@ -166,6 +166,40 @@ const supabaseClient = supabase.createClient(
     document.getElementById(
         "cliente"
     ).innerHTML = html;
+
+}
+
+            async function cargarDatosCliente() {
+
+    const cliente_id =
+        document.getElementById("cliente").value;
+
+    if (!cliente_id) {
+
+        document.getElementById("municipio").value = "";
+        document.getElementById("barrio").value = "";
+
+        return;
+    }
+
+    const { data, error } =
+        await supabaseClient
+        .from("clientes")
+        .select("municipio,barrio")
+        .eq("id", cliente_id)
+        .single();
+
+    if (error) {
+
+        alert(error.message);
+        return;
+    }
+
+    document.getElementById("municipio").value =
+        data.municipio || "";
+
+    document.getElementById("barrio").value =
+        data.barrio || "";
 
 }
 
