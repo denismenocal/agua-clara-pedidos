@@ -131,6 +131,45 @@ const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 
+      async function cargarClientes() {
+
+    const { data, error } =
+        await supabaseClient
+        .from("clientes")
+        .select("id,nombre")
+        .order("nombre");
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    let html = `
+        <option value="">
+            Seleccione un cliente
+        </option>
+    `;
+
+    data.forEach(cliente => {
+
+        html += `
+            <option value="${cliente.id}">
+                ${cliente.nombre}
+            </option>
+        `;
+
+    });
+
+    document.getElementById(
+        "cliente"
+    ).innerHTML = html;
+
+}
+
+            cargarClientes();
+
       </script>
 
 </body>
