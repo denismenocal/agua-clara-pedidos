@@ -183,6 +183,227 @@ SUPABASE_KEY
 
 let listaTiendas=[];
 
+    async function verificarSesion(){
+
+    const { data } =
+        await supabaseClient.auth.getSession();
+
+    if(!data.session){
+
+        window.location.href="login.html";
+        return;
+
+    }
+
+}
+
+async function cerrarSesion(){
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href="login.html";
+
+}
+
+async function cargarTiendas(){
+
+    const { data,error } =
+        await supabaseClient
+
+        .from("clientes")
+
+        .select("*")
+
+        .eq("tipo_cliente","Tienda")
+
+        .order("nombre");
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    listaTiendas=data;
+
+    mostrarTiendas(data);
+
+}
+
+    async function mostrarTiendas(clientes){
+
+    let html="";
+
+    for(const cliente of clientes){
+
+        const { data: mayorista } =
+            await supabaseClient
+
+            .from("clientes_mayoristas")
+
+            .select("*")
+
+            .eq("cliente_id",cliente.id)
+
+            .maybeSingle();
+
+        html += `
+
+<div class="cliente">
+
+<h3>
+
+🏪 ${cliente.nombre}
+
+</h3>
+
+<p>
+
+<b>📞</b>
+
+${cliente.telefono}
+
+</p>
+
+<p>
+
+<b>📍</b>
+
+${cliente.barrio}
+
+</p>
+
+<p>
+
+<b>Municipio:</b>
+
+${cliente.municipio}
+
+</p>
+
+`;
+
+        if(mayorista){
+
+            html += `
+
+<p
+style="color:green;
+font-weight:bold;">
+
+✅ Configurado
+
+</p>
+
+<p>
+
+Precio especial:
+
+L ${mayorista.precio_botellon}
+
+</p>
+
+<button
+onclick="
+editarMayorista(
+'${cliente.id}'
+)
+">
+
+✏ Editar
+
+</button>
+
+`;
+
+        }else{
+
+            html += `
+
+<p
+style="color:#d68910;
+font-weight:bold;">
+
+⚠ Sin configurar
+
+</p>
+
+<button
+onclick="
+configurarMayorista(
+'${cliente.id}'
+)
+">
+
+➕ Configurar
+
+</button>
+
+`;
+
+        }
+
+        html +=`
+
+</div>
+
+`;
+
+    }
+
+    document.getElementById(
+        "listaTiendas"
+    ).innerHTML=html;
+
+}
+
+    function filtrarTiendas(){
+
+    const texto =
+        document
+        .getElementById("buscar")
+        .value
+        .toLowerCase();
+
+    const filtradas =
+        listaTiendas.filter(c=>
+
+            c.nombre
+            .toLowerCase()
+            .includes(texto)
+
+            ||
+
+            c.telefono
+            .includes(texto)
+
+        );
+
+    mostrarTiendas(filtradas);
+
+}
+
+    function configurarMayorista(id){
+
+    alert(
+        "Aquí construiremos el formulario."
+    );
+
+}
+
+    function editarMayorista(id){
+
+    alert(
+        "Aquí editaremos el precio."
+    );
+
+}
+
+    verificarSesion();
+
+    cargarTiendas();
+
 </script>
 
 </body>
