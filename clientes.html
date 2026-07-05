@@ -457,6 +457,22 @@ function editarCliente(id){
     document.getElementById("tipo_cliente").value=
     cliente.tipo_cliente;
 
+      latitudCliente = cliente.latitud;
+longitudCliente = cliente.longitud;
+
+const btnUbicacion =
+    document.getElementById("btnUbicacion");
+
+if(cliente.latitud && cliente.longitud){
+
+    btnUbicacion.style.display = "none";
+
+}else{
+
+    btnUbicacion.style.display = "block";
+
+}
+
     document.getElementById(
         "btnGuardar"
     ).innerHTML=
@@ -556,6 +572,10 @@ boton.disabled = false;
 
 boton.innerHTML =
 "📍 Obtener ubicación";
+
+      document.getElementById(
+    "btnUbicacion"
+).style.display = "block";
 
 }
 
