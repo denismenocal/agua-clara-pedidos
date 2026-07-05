@@ -1,59 +1,123 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
 
-<title>Clientes Mayoristas</title>
+<meta charset="UTF-8">
 
 <meta name="viewport"
-      content="width=device-width, initial-scale=1">
+content="width=device-width, initial-scale=1">
 
-<link rel="icon"
-      href="img/favicon_64.png">
+<title>Clientes Mayoristas</title>
 
-<link rel="manifest"
-      href="manifest.json">
+<link rel="manifest" href="manifest.json">
 
 <meta name="theme-color"
-      content="#0077b6">
+content="#0077b6">
+
+<link rel="icon"
+href="img/favicon_64.png">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
 body{
-    font-family:Arial;
-    padding:20px;
+
+    font-family:Arial,Helvetica,sans-serif;
     background:#f4f8fb;
+    margin:0;
+    padding:20px;
+
 }
 
-input,
-select,
+.menu{
+
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+
+}
+
 button{
 
     width:100%;
     padding:14px;
-    margin-bottom:12px;
-    font-size:18px;
-    box-sizing:border-box;
-
-}
-
-button{
+    border:none;
+    border-radius:10px;
+    font-size:17px;
+    cursor:pointer;
 
     background:#0077b6;
     color:white;
-    border:none;
-    border-radius:10px;
+
+}
+
+button:hover{
+
+    background:#005f8f;
 
 }
 
 .tarjeta{
 
     background:white;
-    border-radius:10px;
-    padding:15px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
+
+    padding:18px;
+
+    border-radius:12px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.10);
+
+    margin-bottom:18px;
+
+}
+
+input{
+
+    width:100%;
+
+    box-sizing:border-box;
+
+    padding:14px;
+
+    margin-bottom:15px;
+
+    font-size:17px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+
+}
+
+h2{
+
+    color:#0077b6;
+
+    text-align:center;
+
+}
+
+.cliente{
+
+    background:white;
+
+    padding:18px;
+
+    border-radius:12px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.10);
+
+    margin-bottom:15px;
+
+}
+
+.estado{
+
+    font-weight:bold;
+
+    color:#666;
 
 }
 
@@ -63,298 +127,63 @@ button{
 
 <body>
 
-<div style="display:flex;gap:10px;margin-bottom:15px;">
+<div class="menu">
 
-<button onclick="location.href='menu.html'">
+<button
+onclick="location.href='menu.html'">
+
 🏠 Menú
+
 </button>
 
-<button onclick="cerrarSesion()">
+<button
+onclick="cerrarSesion()">
+
 🚪 Salir
+
 </button>
 
 </div>
 
-<h2>🏪 Clientes Mayoristas</h2>
+<h2>
+
+🏪 Clientes Mayoristas
+
+</h2>
 
 <div class="tarjeta">
 
-<select id="cliente" onchange="cargarDatosCliente()">
-
-<option value="">
-Seleccione un cliente
-</option>
-
-</select>
-
 <input
-id="nombre_tienda"
-placeholder="Nombre de la tienda">
 
-<input
-id="municipio"
-placeholder="Municipio">
+id="buscar"
 
-<input
-id="barrio"
-placeholder="Barrio o Aldea">
+placeholder="🔍 Buscar tienda o propietario..."
 
-<input
-type="number"
-inputmode="numeric"
-pattern="[0-9]*"
-min="0"
-step="1"
-id="precio_botellon"
-placeholder="Precio especial del botellón">
-
-<button onclick="guardarMayorista()">
-
-Guardar Cliente Mayorista
-
-</button>
+onkeyup="filtrarTiendas()">
 
 </div>
 
-<hr>
-
-<div id="listaMayoristas">
+<div id="listaTiendas">
 
 </div>
 
-      <script>
+<script>
 
-const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
-const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+const SUPABASE_URL =
+"https://ayzddkcxeswjfpinwvth.supabase.co";
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
+const SUPABASE_KEY =
+"TU_PUBLIC_KEY";
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
-      async function cargarClientes() {
+let listaTiendas=[];
 
-    const { data, error } =
-        await supabaseClient
-        .from("clientes")
-        .select("id,nombre")
-        .order("nombre");
-
-    if(error){
-
-        alert(error.message);
-        return;
-
-    }
-
-    let html = `
-        <option value="">
-            Seleccione un cliente
-        </option>
-    `;
-
-    data.forEach(cliente => {
-
-        html += `
-            <option value="${cliente.id}">
-                ${cliente.nombre}
-            </option>
-        `;
-
-    });
-
-    document.getElementById(
-        "cliente"
-    ).innerHTML = html;
-
-}
-
-            async function cargarDatosCliente() {
-
-    const cliente_id =
-        document.getElementById("cliente").value;
-
-    if (!cliente_id) {
-
-        document.getElementById("municipio").value = "";
-        document.getElementById("barrio").value = "";
-
-        return;
-    }
-
-    const { data, error } =
-        await supabaseClient
-        .from("clientes")
-        .select("municipio,barrio")
-        .eq("id", cliente_id)
-        .single();
-
-    if (error) {
-
-        alert(error.message);
-        return;
-    }
-
-    document.getElementById("municipio").value =
-        data.municipio || "";
-
-    document.getElementById("barrio").value =
-        data.barrio || "";
-
-}
-
-            async function guardarMayorista() {
-
-    const cliente_id =
-        document.getElementById("cliente").value;
-
-    const nombre_tienda =
-        document.getElementById("nombre_tienda").value.trim();
-
-    const municipio =
-        document.getElementById("municipio").value.trim();
-
-    const barrio =
-        document.getElementById("barrio").value.trim();
-
-    const precio_botellon =
-        parseFloat(
-            document.getElementById("precio_botellon").value
-        );
-
-    if (
-        !cliente_id ||
-        !nombre_tienda ||
-        !municipio ||
-        !barrio ||
-        isNaN(precio_botellon)
-    ) {
-
-        alert("Complete todos los campos.");
-        return;
-
-    }
-
-    const { data: existe } =
-    await supabaseClient
-    .from("clientes_mayoristas")
-    .select("id")
-    .eq("cliente_id", cliente_id)
-    .maybeSingle();
-
-if (existe) {
-
-    alert(
-        "Este cliente ya está registrado como mayorista."
-    );
-
-    return;
-}
-
-            cliente_id,
-            nombre_tienda,
-            municipio,
-            barrio,
-            precio_botellon
-
-        }]);
-
-    if(error){
-
-        alert(error.message);
-        return;
-
-    }
-
-    alert("Cliente mayorista guardado correctamente.");
-
-    document.getElementById("cliente").selectedIndex = 0;
-    document.getElementById("nombre_tienda").value = "";
-    document.getElementById("municipio").value = "";
-    document.getElementById("barrio").value = "";
-    document.getElementById("precio_botellon").value = "";
-
-    cargarMayoristas();
-
-}
-
-            async function cargarMayoristas() {
-
-    const { data, error } =
-        await supabaseClient
-        .from("clientes_mayoristas")
-        .select(`
-            *,
-            clientes(
-                nombre,
-                telefono
-            )
-        `)
-        .order("nombre_tienda");
-
-    if(error){
-
-        alert(error.message);
-        return;
-
-    }
-
-    let html = "";
-
-    data.forEach(item => {
-
-        html += `
-
-        <div class="tarjeta"
-             style="margin-bottom:15px;">
-
-            <h3>${item.nombre_tienda}</h3>
-
-            <p>
-            <b>Propietario:</b>
-            ${item.clientes.nombre}
-            </p>
-
-            <p>
-            <b>Teléfono:</b>
-            ${item.clientes.telefono}
-            </p>
-
-            <p>
-            <b>Municipio:</b>
-            ${item.municipio}
-            </p>
-
-            <p>
-            <b>Barrio:</b>
-            ${item.barrio}
-            </p>
-
-            <p>
-            <b>Precio especial:</b>
-
-            L ${item.precio_botellon}
-
-            </p>
-
-        </div>
-
-        `;
-
-    });
-
-    document.getElementById(
-        "listaMayoristas"
-    ).innerHTML = html;
-
-}
-
-            
-
-            cargarClientes();
-            cargarMayoristas();
-
-      </script>
+</script>
 
 </body>
 
