@@ -182,6 +182,7 @@ SUPABASE_KEY
 );
 
 let listaTiendas=[];
+let configuracion = {};
 
     async function verificarSesion(){
 
@@ -202,6 +203,31 @@ async function cerrarSesion(){
     await supabaseClient.auth.signOut();
 
     window.location.href="login.html";
+
+}
+
+    async function cargarConfiguracion(){
+
+    const { data, error } =
+        await supabaseClient
+        .from("configuracion")
+        .select("*");
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    configuracion = {};
+
+    data.forEach(item=>{
+
+        configuracion[item.clave] =
+            Number(item.valor);
+
+    });
 
 }
 
@@ -294,7 +320,7 @@ ${cliente.barrio}
 
 <b>Precio normal:</b>
 
-L 40
+L ${configuracion.precio_publico_zona1}
 
 </p>
 
@@ -310,7 +336,7 @@ L ${mayorista.precio_botellon}
 
 <b>Descuento:</b>
 
-L ${(40-mayorista.precio_botellon).toFixed(2)}
+L (configuracion.precio_publico_zona1-mayorista.precio_botellon)
 
 </p>
 
@@ -563,9 +589,15 @@ onclick="guardarMayorista('${cliente.id}')">
 
 }
 
-    verificarSesion();
+    (async ()=>{
 
-    cargarTiendas();
+    await verificarSesion();
+
+    await cargarConfiguracion();
+
+    await cargarTiendas();
+
+})();
 
 </script>
 
