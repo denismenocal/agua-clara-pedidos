@@ -273,150 +273,119 @@ const supabaseClient = supabase.createClient(
 
 }
 
-      async function guardarClienteBD(
+      let clienteEditando = null;
 
-    nombre,
-    telefono,
-    municipio,
-    barrio,
-    referencia,
-    identificacion,
-    tipo_cliente,
-    latitud,
-    longitud
+async function guardarCliente() {
 
-){
 
-    // Buscar si ya existe por teléfono
+      function limpiarFormulario(){
 
-    const { data: clienteExistente } =
-        await supabaseClient
-        .from("clientes")
-        .select("*")
-        .eq("telefono", telefono)
-        .maybeSingle();
+    document.getElementById("nombre").value="";
+    document.getElementById("telefono").value="";
+    document.getElementById("municipio").value="";
+    document.getElementById("barrio").value="";
+    document.getElementById("referencia").value="";
+    document.getElementById("identificacion").value="";
 
-    // Si existe
+    document.getElementById(
+        "tipo_cliente"
+    ).selectedIndex = 0;
 
-    if(clienteExistente){
+    clienteEditando = null;
 
-        // Si no tiene coordenadas y ahora sí las obtuvimos,
-        // solo actualizamos las coordenadas.
+    document.querySelector(
+        "button[onclick='guardarCliente()']"
+    ).innerHTML =
+    "💾 Guardar Cliente";
 
-        if(
+}
 
-            (!clienteExistente.latitud ||
-             !clienteExistente.longitud)
+    const nombre =
+        document.getElementById("nombre").value.trim();
 
-            &&
+    const telefono =
+        document.getElementById("telefono").value.trim();
 
-            latitud &&
-            longitud
+    const municipio =
+        document.getElementById("municipio").value.trim();
 
-        ){
+    const barrio =
+        document.getElementById("barrio").value.trim();
 
-            await supabaseClient
-                .from("clientes")
-                .update({
+    const referencia =
+        document.getElementById("referencia").value.trim();
 
-                    latitud,
-                    longitud
+    const identificacion =
+        document.getElementById("identificacion").value.trim();
 
-                })
-                .eq(
-                    "id",
-                    clienteExistente.id
-                );
+    const tipo_cliente =
+        document.getElementById("tipo_cliente").value;
 
-        }
+    if (
+        !nombre ||
+        !telefono ||
+        !municipio ||
+        !barrio
+    ) {
 
-        alert(
-            "Este cliente ya existe."
-        );
-
+        alert("Complete los campos obligatorios.");
         return;
 
     }
 
     let error;
 
-if(clienteEditando){
+    if (clienteEditando) {
 
-    const resultado =
-        await supabaseClient
-        .from("clientes")
-        .update({
+        const resultado =
+            await supabaseClient
+            .from("clientes")
+            .update({
 
-            nombre,
-            telefono,
-            municipio,
-            barrio,
-            referencia,
-            identificacion,
-            tipo_cliente
+                nombre,
+                telefono,
+                municipio,
+                barrio,
+                referencia,
+                identificacion,
+                tipo_cliente
 
-        })
-        .eq("id", clienteEditando);
+            })
+            .eq("id", clienteEditando);
 
-    error = resultado.error;
+        error = resultado.error;
 
-}else{
+    } else {
 
-    const resultado =
-        await supabaseClient
-        .from("clientes")
-        .insert([{
+        const resultado =
+            await supabaseClient
+            .from("clientes")
+            .insert([{
 
-            nombre,
-            telefono,
-            municipio,
-            barrio,
-            referencia,
-            identificacion,
-            tipo_cliente,
-            latitud,
-            longitud
+                nombre,
+                telefono,
+                municipio,
+                barrio,
+                referencia,
+                identificacion,
+                tipo_cliente
 
-        }]);
+            }]);
 
-    error = resultado.error;
+        error = resultado.error;
 
-}
+    }
 
-
-
-    if(error){
+    if (error) {
 
         alert(error.message);
         return;
 
     }
 
-    alert(
-        "Cliente guardado correctamente."
-    );
+    alert("Cliente guardado correctamente.");
 
-            clienteEditando = null;
-
-document.querySelector(
-    "button[onclick='guardarCliente()']"
-).innerHTML =
-"💾 Guardar Cliente";
-
-    document
-        .querySelectorAll(
-            "input"
-        )
-        .forEach(campo => {
-
-            campo.value = "";
-
-        });
-
-    document
-        .getElementById(
-            "tipo_cliente"
-        ).selectedIndex = 0;
+    limpiarFormulario();
 
     cargarClientes();
 
