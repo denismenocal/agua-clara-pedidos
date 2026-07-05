@@ -193,6 +193,15 @@ placeholder="RTN o DNI">
 </select>
 
 <button
+type="button"
+id="btnUbicacion"
+onclick="obtenerUbicacion()">
+
+📍 Obtener ubicación
+
+</button>
+
+<button
 id="btnGuardar"
 onclick="guardarCliente()">
 
@@ -360,6 +369,9 @@ async function guardarCliente(){
 
         tipo_cliente:
         document.getElementById("tipo_cliente").value
+
+          latitud: latitudCliente,
+          longitud: longitudCliente
 
     };
 
@@ -532,6 +544,69 @@ function limpiarFormulario(){
 
     clienteEditando=null;
 
+      latitudCliente = null;
+      longitudCliente = null;
+
+const boton =
+    document.getElementById(
+        "btnUbicacion"
+    );
+
+boton.disabled = false;
+
+boton.innerHTML =
+"📍 Obtener ubicación";
+
+}
+
+function obtenerUbicacion(){
+
+    if(!navigator.geolocation){
+
+        alert("Este dispositivo no soporta GPS.");
+        return;
+
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(posicion){
+
+            latitudCliente =
+                posicion.coords.latitude;
+
+            longitudCliente =
+                posicion.coords.longitude;
+
+            const boton =
+                document.getElementById(
+                    "btnUbicacion"
+                );
+
+            boton.innerHTML =
+                "✅ Ubicación obtenida";
+
+            boton.disabled = true;
+
+        },
+
+        function(){
+
+            alert(
+                "No fue posible obtener la ubicación."
+            );
+
+        },
+
+        {
+
+            enableHighAccuracy:true,
+            timeout:10000
+
+        }
+
+    );
+
 }
 
 verificarSesion();
@@ -539,8 +614,10 @@ verificarSesion();
 cargarClientes();
 
 let clienteEditando = null;
-
 let listaClientes = [];
+
+let latitudCliente = null;
+let longitudCliente = null;
 
 </script>
 
