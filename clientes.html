@@ -465,11 +465,23 @@ const btnUbicacion =
 
 if(cliente.latitud && cliente.longitud){
 
-    btnUbicacion.style.display = "none";
+    btnUbicacion.disabled = true;
+
+    btnUbicacion.innerHTML =
+    "✅ Ubicación registrada";
+
+    btnUbicacion.style.background =
+    "#28a745";
 
 }else{
 
-    btnUbicacion.style.display = "block";
+    btnUbicacion.disabled = false;
+
+    btnUbicacion.innerHTML =
+    "📍 Obtener ubicación";
+
+    btnUbicacion.style.background =
+    "#0077b6";
 
 }
 
@@ -573,9 +585,18 @@ boton.disabled = false;
 boton.innerHTML =
 "📍 Obtener ubicación";
 
-      document.getElementById(
+      const btnUbicacion =
+document.getElementById(
     "btnUbicacion"
-).style.display = "block";
+);
+
+btnUbicacion.disabled = false;
+
+btnUbicacion.innerHTML =
+"📍 Obtener ubicación";
+
+btnUbicacion.style.background =
+"#0077b6";
 
 }
 
@@ -604,9 +625,12 @@ function obtenerUbicacion(){
                 );
 
             boton.innerHTML =
-                "✅ Ubicación obtenida";
+"✅ Ubicación registrada";
 
-            boton.disabled = true;
+boton.disabled = true;
+
+boton.style.background =
+"#28a745";
 
         },
 
