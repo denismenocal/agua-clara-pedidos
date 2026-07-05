@@ -1,29 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
 
-<title>Gestion de Clientes</title>
+<meta charset="UTF-8">
 
 <meta name="viewport"
       content="width=device-width, initial-scale=1">
 
+<title>Gestión de Clientes</title>
 
-
-<link rel="manifest"
-      href="manifest.json">
+<link rel="manifest" href="manifest.json">
 
 <meta name="theme-color"
       content="#0077b6">
+
+<link rel="icon"
+      href="img/favicon_64.png">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
 body{
-    font-family:Arial;
-    padding:20px;
+
+    font-family:Arial,Helvetica,sans-serif;
     background:#f4f8fb;
+    margin:0;
+    padding:20px;
+
+}
+
+h2{
+
+    text-align:center;
+    color:#0077b6;
+
+}
+
+.menu{
+
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+
+}
+
+.tarjeta{
+
+    background:white;
+    border-radius:12px;
+    padding:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,.12);
+    margin-bottom:20px;
+
 }
 
 input,
@@ -31,10 +61,17 @@ select,
 button{
 
     width:100%;
-    padding:14px;
-    margin-bottom:12px;
-    font-size:18px;
     box-sizing:border-box;
+
+    padding:14px;
+
+    margin-bottom:12px;
+
+    font-size:17px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
 
 }
 
@@ -43,16 +80,41 @@ button{
     background:#0077b6;
     color:white;
     border:none;
-    border-radius:10px;
+    cursor:pointer;
 
 }
 
-.tarjeta{
+button:hover{
+
+    background:#005f8f;
+
+}
+
+.botones{
+
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+
+}
+
+.botones button{
+
+    flex:1;
+
+}
+
+.cliente{
 
     background:white;
-    border-radius:10px;
+
     padding:15px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
+
+    border-radius:10px;
+
+    margin-bottom:15px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.10);
 
 }
 
@@ -62,8 +124,111 @@ button{
 
 <body>
 
-<div style="display:flex;gap:10px;margin-bottom:15px;">
+<div class="menu">
 
+<button onclick="location.href='menu.html'">
+🏠 Menú
+</button>
+
+<button onclick="cerrarSesion()">
+🚪 Salir
+</button>
+
+</div>
+
+<h2>
+
+👥 Gestión de Clientes
+
+</h2>
+
+<div class="tarjeta">
+
+<input
+id="buscar"
+placeholder="🔍 Buscar por nombre o teléfono..."
+onkeyup="filtrarClientes()">
+
+<hr>
+
+<input
+id="nombre"
+placeholder="Nombre del cliente">
+
+<input
+id="telefono"
+placeholder="Teléfono"
+inputmode="tel">
+
+<input
+id="municipio"
+placeholder="Municipio">
+
+<input
+id="barrio"
+placeholder="Barrio o Aldea">
+
+<input
+id="referencia"
+placeholder="Referencia">
+
+<input
+id="identificacion"
+placeholder="RTN o DNI">
+
+<select id="tipo_cliente">
+
+<option value="Delivery">
+🚚 Delivery
+</option>
+
+<option value="Tienda">
+🏪 Tienda
+</option>
+
+<option value="Cliente Final">
+👤 Cliente Final
+</option>
+
+</select>
+
+<button
+id="btnGuardar"
+onclick="guardarCliente()">
+
+💾 Guardar Cliente
+
+</button>
+
+</div>
+
+<div id="listaClientes">
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+"https://ayzddkcxeswjfpinwvth.supabase.co";
+
+const SUPABASE_KEY =
+"TU_PUBLIC_KEY";
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+let clienteEditando = null;
+
+let listaClientes = [];
+
+</script>
+
+</body>
+
+</html>
 <button onclick="location.href='menu.html'">
 🏠 Menú
 </button>
