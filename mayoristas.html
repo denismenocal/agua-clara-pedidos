@@ -384,11 +384,129 @@ configurarMayorista(
 
 }
 
-    function configurarMayorista(id){
+    async function configurarMayorista(id){
+
+    const cliente =
+        listaTiendas.find(c=>c.id===id);
+
+    if(!cliente) return;
+
+    const tarjeta =
+        event.target.closest(".cliente");
+
+    tarjeta.insertAdjacentHTML(
+
+        "beforeend",
+
+`
+<div
+id="configuracionMayorista"
+style="
+margin-top:15px;
+padding:15px;
+background:#f8f8f8;
+border-radius:10px;
+">
+
+<input
+id="nombre_tienda"
+placeholder="Nombre de la tienda"
+value="${cliente.nombre}">
+
+<input
+id="precio_botellon"
+type="number"
+inputmode="numeric"
+placeholder="Precio especial">
+
+<label>
+
+<input
+id="activo"
+type="checkbox"
+checked>
+
+Activo
+
+</label>
+
+<br><br>
+
+<button
+onclick="guardarMayorista('${cliente.id}')">
+
+💾 Guardar
+
+</button>
+
+</div>
+
+`
+
+    );
+
+    event.target.disabled=true;
+
+}
+
+    async function guardarMayorista(cliente_id){
+
+    const nombre_tienda =
+        document.getElementById(
+            "nombre_tienda"
+        ).value;
+
+    const precio_botellon =
+        parseFloat(
+            document.getElementById(
+                "precio_botellon"
+            ).value
+        );
+
+    const activo =
+        document.getElementById(
+            "activo"
+        ).checked;
+
+    if(!precio_botellon){
+
+        alert(
+            "Ingrese el precio especial."
+        );
+
+        return;
+
+    }
+
+    const { error } =
+        await supabaseClient
+
+        .from("clientes_mayoristas")
+
+        .insert([{
+
+            cliente_id,
+
+            nombre_tienda,
+
+            precio_botellon,
+
+            activo
+
+        }]);
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
 
     alert(
-        "Aquí construiremos el formulario."
+        "Mayorista configurado correctamente."
     );
+
+    cargarTiendas();
 
 }
 
