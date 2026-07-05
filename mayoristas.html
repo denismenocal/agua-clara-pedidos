@@ -336,7 +336,11 @@ L ${mayorista.precio_botellon}
 
 <b>Descuento:</b>
 
-L (configuracion.precio_publico_zona1-mayorista.precio_botellon)
+L ${(
+configuracion.precio_publico_zona1
+-
+mayorista.precio_botellon
+).toFixed(2)}
 
 </p>
 
