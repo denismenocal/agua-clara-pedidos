@@ -259,27 +259,23 @@ async function cargarTiendas(){
 </h3>
 
 <p>
+<b>👤 Propietario:</b>
+${cliente.nombre}
+</p>
 
-<b>📞</b>
-
+<p>
+<b>📞 Teléfono:</b>
 ${cliente.telefono}
-
 </p>
 
 <p>
-
-<b>📍</b>
-
-${cliente.barrio}
-
-</p>
-
-<p>
-
-<b>Municipio:</b>
-
+<b>🏘 Municipio:</b>
 ${cliente.municipio}
+</p>
 
+<p>
+<b>📍 Barrio:</b>
+${cliente.barrio}
 </p>
 
 `;
@@ -288,19 +284,41 @@ ${cliente.municipio}
 
             html += `
 
-<p
-style="color:green;
-font-weight:bold;">
+<p style="color:green;font-weight:bold;">
 
-✅ Configurado
+🟢 Configurado
 
 </p>
 
 <p>
 
-Precio especial:
+<b>Precio normal:</b>
+
+L 40
+
+</p>
+
+<p>
+
+<b>Precio especial:</b>
 
 L ${mayorista.precio_botellon}
+
+</p>
+
+<p>
+
+<b>Descuento:</b>
+
+L ${(40-mayorista.precio_botellon).toFixed(2)}
+
+</p>
+
+<p>
+
+<b>Estado:</b>
+
+${mayorista.activo ? "🟢 Activo" : "🔴 Inactivo"}
 
 </p>
 
@@ -311,7 +329,7 @@ editarMayorista(
 )
 ">
 
-✏ Editar
+✏ Editar configuración
 
 </button>
 
@@ -325,7 +343,34 @@ editarMayorista(
 style="color:#d68910;
 font-weight:bold;">
 
-⚠ Sin configurar
+<p
+style="
+color:#d68910;
+font-weight:bold;
+">
+
+🟡 Pendiente de configurar
+
+</p>
+
+<p>
+
+Precio normal:
+
+<b>L 40</b>
+
+</p>
+
+<button
+onclick="
+configurarMayorista(
+'${cliente.id}'
+)
+">
+
+⚙ Configurar precio especial
+
+</button>
 
 </p>
 
