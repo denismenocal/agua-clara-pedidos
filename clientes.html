@@ -220,6 +220,324 @@ SUPABASE_URL,
 SUPABASE_KEY
 );
 
+      async function verificarSesion(){
+
+    const { data } =
+        await supabaseClient.auth.getSession();
+
+    if(!data.session){
+
+        window.location.href="login.html";
+        return;
+
+    }
+
+}
+
+async function cerrarSesion(){
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href="login.html";
+
+}
+
+async function cargarClientes(){
+
+    const { data,error } =
+        await supabaseClient
+        .from("clientes")
+        .select("*")
+        .order("nombre");
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    listaClientes = data;
+
+    mostrarClientes(data);
+
+}
+
+function mostrarClientes(clientes){
+
+    let html="";
+
+    clientes.forEach(cliente=>{
+
+        html += `
+
+<div class="cliente">
+
+<h3>${cliente.nombre}</h3>
+
+<p><b>📞</b> ${cliente.telefono}</p>
+
+<p><b>🏘️</b> ${cliente.municipio || ""}</p>
+
+<p><b>📍</b> ${cliente.barrio || ""}</p>
+
+<p><b>Tipo:</b> ${cliente.tipo_cliente}</p>
+
+<div class="botones">
+
+<button
+onclick="editarCliente('${cliente.id}')">
+✏️ Editar
+</button>
+
+<button
+onclick="eliminarCliente('${cliente.id}')">
+🗑️ Eliminar
+</button>
+
+<button
+onclick="abrirMapa(${cliente.latitud ?? "null"},${cliente.longitud ?? "null"})">
+📍 Mapa
+</button>
+
+</div>
+
+</div>
+
+`;
+
+    });
+
+    document.getElementById(
+        "listaClientes"
+    ).innerHTML=html;
+
+}
+
+function filtrarClientes(){
+
+    const texto =
+        document.getElementById("buscar")
+        .value
+        .toLowerCase();
+
+    const filtrados =
+        listaClientes.filter(c=>
+
+            c.nombre.toLowerCase().includes(texto)
+
+            ||
+
+            c.telefono.includes(texto)
+
+        );
+
+    mostrarClientes(filtrados);
+
+}
+
+async function guardarCliente(){
+
+    const cliente={
+
+        nombre:
+        document.getElementById("nombre").value.trim(),
+
+        telefono:
+        document.getElementById("telefono").value.trim(),
+
+        municipio:
+        document.getElementById("municipio").value.trim(),
+
+        barrio:
+        document.getElementById("barrio").value.trim(),
+
+        referencia:
+        document.getElementById("referencia").value.trim(),
+
+        identificacion:
+        document.getElementById("identificacion").value.trim(),
+
+        tipo_cliente:
+        document.getElementById("tipo_cliente").value
+
+    };
+
+    if(
+
+        !cliente.nombre ||
+
+        !cliente.telefono ||
+
+        !cliente.municipio ||
+
+        !cliente.barrio
+
+    ){
+
+        alert("Complete los campos obligatorios.");
+        return;
+
+    }
+
+    let error;
+
+    if(clienteEditando){
+
+        ({error}=await supabaseClient
+
+        .from("clientes")
+
+        .update(cliente)
+
+        .eq("id",clienteEditando));
+
+    }else{
+
+        ({error}=await supabaseClient
+
+        .from("clientes")
+
+        .insert([cliente]));
+
+    }
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    limpiarFormulario();
+
+    cargarClientes();
+
+}
+
+function editarCliente(id){
+
+    const cliente=
+        listaClientes.find(c=>c.id===id);
+
+    if(!cliente) return;
+
+    clienteEditando=id;
+
+    document.getElementById("nombre").value=
+    cliente.nombre;
+
+    document.getElementById("telefono").value=
+    cliente.telefono;
+
+    document.getElementById("municipio").value=
+    cliente.municipio || "";
+
+    document.getElementById("barrio").value=
+    cliente.barrio || "";
+
+    document.getElementById("referencia").value=
+    cliente.referencia || "";
+
+    document.getElementById("identificacion").value=
+    cliente.identificacion || "";
+
+    document.getElementById("tipo_cliente").value=
+    cliente.tipo_cliente;
+
+    document.getElementById(
+        "btnGuardar"
+    ).innerHTML=
+    "💾 Actualizar Cliente";
+
+    window.scrollTo({
+
+        top:0,
+
+        behavior:"smooth"
+
+    });
+
+}
+
+async function eliminarCliente(id){
+
+    if(
+        !confirm(
+            "¿Eliminar este cliente?"
+        )
+    ) return;
+
+    const { error } =
+        await supabaseClient
+
+        .from("clientes")
+
+        .delete()
+
+        .eq("id",id);
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    cargarClientes();
+
+}
+
+function abrirMapa(lat,long){
+
+    if(!lat || !long){
+
+        alert(
+            "Este cliente no tiene ubicación."
+        );
+
+        return;
+
+    }
+
+    window.open(
+
+`https://www.google.com/maps?q=${lat},${long}`,
+
+"_blank"
+
+);
+
+}
+
+function limpiarFormulario(){
+
+    document.getElementById("nombre").value="";
+
+    document.getElementById("telefono").value="";
+
+    document.getElementById("municipio").value="";
+
+    document.getElementById("barrio").value="";
+
+    document.getElementById("referencia").value="";
+
+    document.getElementById("identificacion").value="";
+
+    document.getElementById("tipo_cliente").selectedIndex=0;
+
+    document.getElementById("btnGuardar").innerHTML=
+
+    "💾 Guardar Cliente";
+
+    clienteEditando=null;
+
+}
+
+verificarSesion();
+
+cargarClientes();
+
 let clienteEditando = null;
 
 let listaClientes = [];
