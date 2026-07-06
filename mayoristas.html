@@ -493,6 +493,7 @@ onclick="abrirMayorista('${cliente.id}')">
             .update({
 
                 nombre_tienda,
+                tipo_precio,
                 precio_botellon,
                 activo
 
@@ -515,6 +516,7 @@ onclick="abrirMayorista('${cliente.id}')">
 
                 cliente_id,
                 nombre_tienda,
+                tipo_precio,
                 precio_botellon,
                 activo
 
@@ -533,14 +535,24 @@ onclick="abrirMayorista('${cliente.id}')">
 
     alert("Configuración guardada correctamente.");
 
+        const tipo_precio =
+document.getElementById(
+    "tipo_precio"
+).value;
+
     cargarTiendas();
 
 }
 
 function calcularDescuento(){
 
-    const precioPublico =
-        configuracion.precio_publico_zona1;
+    const tipoPrecio =
+document.getElementById(
+    "tipo_precio"
+).value;
+
+const precioPublico =
+configuracion[tipoPrecio];
 
     const precioEspecial =
         parseFloat(
@@ -708,9 +720,41 @@ value="${nombreTienda}">
 
 <p>
 
+<label>
+
+<b>Tipo de precio</b>
+
+</label>
+
+<select
+id="tipo_precio"
+onchange="actualizarPrecioPublico()">
+
+<option value="precio_publico_zona1">
+Zona 1 Público
+</option>
+
+<option value="precio_publico_zona2">
+Zona 2 Público
+</option>
+
+<option value="precio_pulperia_zona1">
+Pulpería Zona 1
+</option>
+
+<option value="precio_pulperia_zona2">
+Pulpería Zona 2
+</option>
+
+</select>
+
 <b>Precio público:</b>
 
-L ${configuracion.precio_publico_zona1.toFixed(2)}
+<span id="precioPublico">
+
+L 0.00
+
+</span>
 
 </p>
 
@@ -794,6 +838,36 @@ onclick="document.getElementById('panelMayorista').remove()">
 `
 
     );
+
+        if(mayorista){
+
+    document.getElementById(
+        "tipo_precio"
+    ).value =
+    mayorista.tipo_precio;
+
+}
+
+actualizarPrecioPublico();
+
+    calcularDescuento();
+
+}
+
+    function actualizarPrecioPublico(){
+
+    const tipoPrecio =
+        document.getElementById(
+            "tipo_precio"
+        ).value;
+
+    const precio =
+        configuracion[tipoPrecio];
+
+    document.getElementById(
+        "precioPublico"
+    ).innerHTML =
+        "L " + precio.toFixed(2);
 
     calcularDescuento();
 
