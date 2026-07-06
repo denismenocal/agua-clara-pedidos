@@ -259,15 +259,19 @@ async function cargarTiendas(){
 
     async function mostrarTiendas(clientes){
 
-        let nombreMostrar = cliente.nombre;
+    let html = "";
 
-if(mayorista && mayorista.nombre_tienda){
+    const nombresTipoPrecio = {
 
-    nombreMostrar = mayorista.nombre_tienda;
+        precio_publico_zona1: "Zona 1 Público",
 
-}
+        precio_publico_zona2: "Zona 2 Público",
 
-    let html="";
+        precio_pulperia_zona1: "Pulpería Zona 1",
+
+        precio_pulperia_zona2: "Pulpería Zona 2"
+
+    };
 
     for(const cliente of clientes){
 
@@ -278,9 +282,21 @@ if(mayorista && mayorista.nombre_tienda){
 
             .select("*")
 
-            .eq("cliente_id",cliente.id)
+            .eq("cliente_id", cliente.id)
 
             .maybeSingle();
+
+        let nombreMostrar = cliente.nombre;
+
+        if(
+            mayorista &&
+            mayorista.nombre_tienda
+        ){
+
+            nombreMostrar =
+                mayorista.nombre_tienda;
+
+        }
 
         html += `
 
@@ -297,59 +313,70 @@ ${cliente.nombre}
 
 <p>
 <b>📞 Teléfono:</b>
-${cliente.telefono}
+${cliente.telefono || ""}
 </p>
 
 <p>
 <b>🏘 Municipio:</b>
-${cliente.municipio}
+${cliente.municipio || ""}
 </p>
 
 <p>
 <b>📍 Barrio:</b>
-${cliente.barrio}
+${cliente.barrio || ""}
 </p>
 
 `;
 
         if(mayorista){
 
+            const precioPublico =
+                configuracion[
+                    mayorista.tipo_precio
+                ] || 0;
+
+            const precioEspecial =
+                Number(
+                    mayorista.precio_botellon
+                );
+
+            const descuento =
+                precioPublico -
+                precioEspecial;
+
+            const porcentaje =
+                precioPublico > 0
+
+                ?
+
+                (descuento /
+                precioPublico) * 100
+
+                :
+
+                0;
+
             html += `
 
-<p style="color:green;font-weight:bold;">
+<p
+style="
+color:green;
+font-weight:bold;
+">
 
 🟢 Configurado
 
 </p>
 
-const nombresTipoPrecio = {
-
-    precio_publico_zona1: "Zona 1 Público",
-
-    precio_publico_zona2: "Zona 2 Público",
-
-    precio_pulperia_zona1: "Pulpería Zona 1",
-
-    precio_pulperia_zona2: "Pulpería Zona 2"
-
-};
-
-const precioPublico =
-    configuracion[mayorista.tipo_precio];
-
-const descuento =
-    precioPublico - mayorista.precio_botellon;
-
-const porcentaje =
-    (descuento / precioPublico) * 100;
-
 <p>
 
-<p>
+<b>Tipo de precio:</b>
 
-<b>Tipo de precio:</b><br>
+<br>
 
-${nombresTipoPrecio[mayorista.tipo_precio]}
+${nombresTipoPrecio[
+    mayorista.tipo_precio
+] || ""}
 
 </p>
 
@@ -365,11 +392,14 @@ L ${precioPublico.toFixed(2)}
 
 <b>Precio especial:</b>
 
-L ${Number(mayorista.precio_botellon).toFixed(2)}
+L ${precioEspecial.toFixed(2)}
 
 </p>
 
-<p style="color:green;">
+<p
+style="
+color:green;
+">
 
 <b>Descuento:</b>
 
@@ -379,37 +409,13 @@ L ${descuento.toFixed(2)}
 
 </p>
 
-<b>Precio normal:</b>
-
-L ${configuracion.precio_publico_zona1}
-
-</p>
-
-<p>
-
-<b>Precio especial:</b>
-
-L ${mayorista.precio_botellon}
-
-</p>
-
-<p>
-
-<b>Descuento:</b>
-
-L ${(
-configuracion.precio_publico_zona1
--
-mayorista.precio_botellon
-).toFixed(2)}
-
-</p>
-
 <p>
 
 <b>Estado:</b>
 
-${mayorista.activo ? "🟢 Activo" : "🔴 Inactivo"}
+${mayorista.activo
+? "🟢 Activo"
+: "🔴 Inactivo"}
 
 </p>
 
@@ -427,10 +433,6 @@ onclick="abrirMayorista('${cliente.id}')">
             html += `
 
 <p
-style="color:#d68910;
-font-weight:bold;">
-
-<p
 style="
 color:#d68910;
 font-weight:bold;
@@ -442,9 +444,11 @@ font-weight:bold;
 
 <p>
 
-Precio normal:
+<b>Precio público:</b>
 
-<b>L 40</b>
+L ${Number(
+configuracion.precio_publico_zona1 || 0
+).toFixed(2)}
 
 </p>
 
@@ -455,15 +459,11 @@ onclick="abrirMayorista('${cliente.id}')">
 
 </button>
 
-</p>
-
-
-
 `;
 
         }
 
-        html +=`
+        html += `
 
 </div>
 
@@ -473,7 +473,7 @@ onclick="abrirMayorista('${cliente.id}')">
 
     document.getElementById(
         "listaTiendas"
-    ).innerHTML=html;
+    ).innerHTML = html;
 
 }
 
