@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+
+<title>Facturación</title>
+
+<link rel="icon"
+href="img/favicon_64.png">
+
+<style>
+
+body{
+
+    font-family:Arial;
+    margin:0;
+    background:#f4f8fb;
+
+}
+
+header{
+
+    background:#0077b6;
+    color:white;
+    padding:15px;
+
+}
+
+h2{
+
+    margin:0;
+
+}
+
+.contenedor{
+
+    padding:15px;
+
+}
+
+.tarjeta{
+
+    background:white;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.10);
+
+}
+
+input,
+select,
+button{
+
+    width:100%;
+    padding:12px;
+    margin-top:8px;
+    margin-bottom:12px;
+    font-size:16px;
+    box-sizing:border-box;
+
+}
+
+button{
+
+    background:#0077b6;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+
+}
+
+button:hover{
+
+    background:#005f92;
+
+}
+
+.fila{
+
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+
+}
+
+.col{
+
+    flex:1;
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+th{
+
+    background:#0077b6;
+    color:white;
+
+}
+
+td,
+th{
+
+    border:1px solid #ddd;
+    padding:8px;
+    text-align:center;
+
+}
+
+.total{
+
+    font-size:22px;
+    color:#0077b6;
+    font-weight:bold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h2>
+
+🧾 Facturación
+
+</h2>
+
+</header>
+
+<div class="contenedor">
+
+<div class="tarjeta">
+
+<h3>
+
+Información Fiscal
+
+</h3>
+
+<div class="fila">
+
+<div class="col">
+
+<b>No. Factura</b>
+
+<input
+value="000-001-01-00000001"
+readonly>
+
+</div>
+
+<div class="col">
+
+<b>Fecha</b>
+
+<input
+value="06/07/2026"
+readonly>
+
+</div>
+
+</div>
+
+<div class="fila">
+
+<div class="col">
+
+<b>CAI</b>
+
+<input
+value="AAAA-BBBB-CCCC-DDDD"
+readonly>
+
+</div>
+
+<div class="col">
+
+<b>Vence</b>
+
+<input
+value="31/12/2026"
+readonly>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="tarjeta">
+
+<h3>
+
+Cliente
+
+</h3>
+
+<input
+
+placeholder="🔍 Buscar cliente...">
+
+<div class="fila">
+
+<div class="col">
+
+<button>
+
+➕ Nuevo Cliente
+
+</button>
+
+</div>
+
+<div class="col">
+
+<button>
+
+👤 Consumidor Final
+
+</button>
+
+</div>
+
+</div>
+
+<input
+placeholder="Nombre">
+
+<input
+placeholder="RTN">
+
+<input
+placeholder="Dirección">
+
+</div>
+
+<div class="tarjeta">
+
+<h3>
+
+Productos
+
+</h3>
+
+<div class="fila">
+
+<div class="col">
+
+<button>
+
+🟦 Botellón
+
+</button>
+
+</div>
+
+<div class="col">
+
+<button>
+
+🟦 Agua Bolsa
+
+</button>
+
+</div>
+
+</div>
+
+<div class="fila">
+
+<div class="col">
+
+<button>
+
+🟦 Juguitos
+
+</button>
+
+</div>
+
+<div class="col">
+
+<button>
+
+🟦 Hielo
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="tarjeta">
+
+<h3>
+
+Detalle
+
+</h3>
+
+<table>
+
+<tr>
+
+<th>
+
+Producto
+
+</th>
+
+<th>
+
+Cant.
+
+</th>
+
+<th>
+
+Precio
+
+</th>
+
+<th>
+
+Total
+
+</th>
+
+<th>
+
+Acción
+
+</th>
+
+</tr>
+
+</table>
+
+</div>
+
+<div class="tarjeta">
+
+<div class="fila">
+
+<div class="col">
+
+<b>Subtotal</b>
+
+<div class="total">
+
+L 0.00
+
+</div>
+
+</div>
+
+<div class="col">
+
+<b>ISV</b>
+
+<div class="total">
+
+L 0.00
+
+</div>
+
+</div>
+
+<div class="col">
+
+<b>Total</b>
+
+<div class="total">
+
+L 0.00
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="fila">
+
+<div class="col">
+
+<button>
+
+💾 Guardar Factura
+
+</button>
+
+</div>
+
+<div class="col">
+
+<button>
+
+🖨 Imprimir
+
+</button>
+
+</div>
+
+<div class="col">
+
+<button
+onclick="location.href='menu.html'">
+
+❌ Cancelar
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
