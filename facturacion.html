@@ -215,7 +215,15 @@ Cliente
 
 <input
 
-placeholder="🔍 Buscar cliente...">
+<input
+id="buscarCliente"
+placeholder="🔍 Buscar cliente..."
+onkeyup="buscarCliente()">
+
+<div
+id="resultadoBusqueda">
+
+</div>
 
 <div class="fila">
 
@@ -242,13 +250,19 @@ placeholder="🔍 Buscar cliente...">
 </div>
 
 <input
-placeholder="Nombre">
+id="nombreCliente"
+placeholder="Nombre"
+readonly>
 
 <input
-placeholder="RTN">
+id="rtnCliente"
+placeholder="RTN"
+readonly>
 
 <input
-placeholder="Dirección">
+id="direccionCliente"
+placeholder="Dirección"
+readonly>
 
 </div>
 
@@ -458,11 +472,15 @@ let empresa={};
 
 let cai={};
 
-window.onload=async()=>{
+window.onload = async()=>{
 
     await cargarEmpresa();
 
     await cargarCAI();
+
+    await cargarClientes();
+
+}
 
 }
 
@@ -535,6 +553,140 @@ document.getElementById(
 ).value = cai.fecha_limite;
 
 }
+
+        async function cargarClientes(){
+
+    const { data,error } =
+        await supabaseClient
+
+        .from("clientes")
+
+        .select("*")
+
+        .order("nombre");
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    listaClientes = data;
+
+}
+
+        function buscarCliente(){
+
+    const texto =
+        document
+        .getElementById("buscarCliente")
+        .value
+        .toLowerCase();
+
+    if(texto.length<2){
+
+        document.getElementById(
+            "resultadoBusqueda"
+        ).innerHTML="";
+
+        return;
+
+    }
+
+    const encontrados =
+        listaClientes.filter(c=>
+
+            c.nombre
+            .toLowerCase()
+            .includes(texto)
+
+            ||
+
+            c.telefono
+            .includes(texto)
+
+        );
+
+    let html="";
+
+    encontrados.forEach(cliente=>{
+
+        html+=`
+
+<div
+
+onclick="seleccionarCliente('${cliente.id}')"
+
+style="
+
+padding:10px;
+
+border-bottom:1px solid #ddd;
+
+cursor:pointer;
+
+background:white;
+
+">
+
+<b>
+
+${cliente.nombre}
+
+</b>
+
+<br>
+
+${cliente.telefono}
+
+</div>
+
+`;
+
+    });
+
+    document.getElementById(
+        "resultadoBusqueda"
+    ).innerHTML=html;
+
+}
+
+        function seleccionarCliente(id){
+
+    clienteSeleccionado =
+        listaClientes.find(c=>c.id===id);
+
+    document.getElementById(
+        "nombreCliente"
+    ).value =
+    clienteSeleccionado.nombre;
+
+    document.getElementById(
+        "rtnCliente"
+    ).value =
+    clienteSeleccionado.identificacion || "";
+
+    document.getElementById(
+        "direccionCliente"
+    ).value =
+    clienteSeleccionado.barrio || "";
+
+    document.getElementById(
+        "buscarCliente"
+    ).value =
+    clienteSeleccionado.nombre;
+
+    document.getElementById(
+        "resultadoBusqueda"
+    ).innerHTML="";
+
+}
+
+
+        let listaClientes = [];
+
+        let clienteSeleccionado = null;
 
 </script>
     
