@@ -872,6 +872,15 @@ actualizarPrecioPublico();
 
     function actualizarPrecioPublico(){
 
+        const tipoPrecio =
+document.getElementById("tipo_precio").value;
+
+console.log("tipoPrecio:", tipoPrecio);
+
+console.log("configuracion:", configuracion);
+
+console.log("precio:", configuracion[tipoPrecio]);
+
     const tipo_precio =
         document.getElementById(
             "tipo_precio"
