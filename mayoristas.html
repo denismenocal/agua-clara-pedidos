@@ -458,48 +458,80 @@ onclick="abrirMayorista('${cliente.id}')">
     async function guardarMayorista(cliente_id){
 
     const nombre_tienda =
-        document.getElementById(
-            "nombre_tienda"
-        ).value;
+        document.getElementById("nombre_tienda").value;
 
     const precio_botellon =
         parseFloat(
-            document.getElementById(
-                "precio_botellon"
-            ).value
+            document.getElementById("precio_botellon").value
         );
 
     const activo =
-        document.getElementById(
-            "activo"
-        ).checked;
+        document.getElementById("activo").checked;
 
-    if(!precio_botellon){
+    if(isNaN(precio_botellon)){
 
-        alert(
-            "Ingrese el precio especial."
-        );
-
+        alert("Ingrese el precio especial.");
         return;
 
     }
 
-    const { error } =
+    // Verificar si ya existe
+
+    const { data: existente } =
         await supabaseClient
 
         .from("clientes_mayoristas")
 
-        .insert([{
+        .select("id")
 
-            cliente_id,
+        .eq("cliente_id", cliente_id)
 
-            nombre_tienda,
+        .maybeSingle();
 
-            precio_botellon,
+    let error;
 
-            activo
+    if(existente){
 
-        }]);
+        // UPDATE
+
+        const resultado =
+            await supabaseClient
+
+            .from("clientes_mayoristas")
+
+            .update({
+
+                nombre_tienda,
+                precio_botellon,
+                activo
+
+            })
+
+            .eq("cliente_id", cliente_id);
+
+        error = resultado.error;
+
+    }else{
+
+        // INSERT
+
+        const resultado =
+            await supabaseClient
+
+            .from("clientes_mayoristas")
+
+            .insert([{
+
+                cliente_id,
+                nombre_tienda,
+                precio_botellon,
+                activo
+
+            }]);
+
+        error = resultado.error;
+
+    }
 
     if(error){
 
@@ -508,9 +540,7 @@ onclick="abrirMayorista('${cliente.id}')">
 
     }
 
-    alert(
-        "Mayorista configurado correctamente."
-    );
+    alert("Configuración guardada correctamente.");
 
     cargarTiendas();
 
