@@ -488,11 +488,49 @@ id="nombre_tienda"
 placeholder="Nombre de la tienda"
 value="${cliente.nombre}">
 
+<p>
+
+<b>Precio Público:</b>
+
+L ${configuracion.precio_publico_zona1.toFixed(2)}
+
+</p>
+
 <input
+
 id="precio_botellon"
+
 type="number"
-inputmode="numeric"
-placeholder="Precio especial">
+
+inputmode="decimal"
+
+placeholder="Precio especial"
+
+oninput="calcularDescuento()">
+
+<p>
+
+<b>Descuento:</b>
+
+<span id="descuento">
+
+L 0.00
+
+</span>
+
+</p>
+
+<p>
+
+<b>Porcentaje:</b>
+
+<span id="porcentaje">
+
+0 %
+
+</span>
+
+</p>
 
 <label>
 
@@ -582,6 +620,56 @@ onclick="guardarMayorista('${cliente.id}')">
     );
 
     cargarTiendas();
+
+}
+
+function calcularDescuento(){
+
+    const precioPublico =
+        configuracion.precio_publico_zona1;
+
+    const precioEspecial =
+        parseFloat(
+            document.getElementById(
+                "precio_botellon"
+            ).value
+        );
+
+    if(isNaN(precioEspecial)){
+
+        document.getElementById(
+            "descuento"
+        ).innerHTML="L 0.00";
+
+        document.getElementById(
+            "porcentaje"
+        ).innerHTML="0 %";
+
+        return;
+
+    }
+
+    const descuento =
+        precioPublico -
+        precioEspecial;
+
+    const porcentaje =
+        (
+            descuento /
+            precioPublico
+        ) * 100;
+
+    document.getElementById(
+        "descuento"
+    ).innerHTML=
+    "L " +
+    descuento.toFixed(2);
+
+    document.getElementById(
+        "porcentaje"
+    ).innerHTML=
+    porcentaje.toFixed(2)
+    + " %";
 
 }
 
