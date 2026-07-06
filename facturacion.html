@@ -3,6 +3,8 @@
 
 <head>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
@@ -160,7 +162,7 @@ Información Fiscal
 <b>No. Factura</b>
 
 <input
-value="000-001-01-00000001"
+id="numeroFactura"
 readonly>
 
 </div>
@@ -170,7 +172,7 @@ readonly>
 <b>Fecha</b>
 
 <input
-value="06/07/2026"
+id="fechaFactura"
 readonly>
 
 </div>
@@ -184,7 +186,7 @@ readonly>
 <b>CAI</b>
 
 <input
-value="AAAA-BBBB-CCCC-DDDD"
+id="cai"
 readonly>
 
 </div>
@@ -194,7 +196,7 @@ readonly>
 <b>Vence</b>
 
 <input
-value="31/12/2026"
+id="vence"
 readonly>
 
 </div>
@@ -436,6 +438,106 @@ onclick="location.href='menu.html'">
 </div>
 
 </div>
+
+
+    <script>
+
+const SUPABASE_URL =
+"https://ayzddkcxeswjfpinwvth.supabase.co";
+
+const SUPABASE_KEY =
+"TU_PUBLIC_KEY";
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+let empresa={};
+
+let cai={};
+
+window.onload=async()=>{
+
+    await cargarEmpresa();
+
+    await cargarCAI();
+
+}
+
+        async function cargarEmpresa(){
+
+    const { data,error } =
+    await supabaseClient
+
+    .from("empresa")
+
+    .select("*")
+
+    .single();
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    empresa=data;
+
+}
+
+
+        async function cargarCAI(){
+
+    const { data,error } =
+    await supabaseClient
+
+    .from("cai_facturacion")
+
+    .select("*")
+
+    .eq("activo",true)
+
+    .single();
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    cai=data;
+
+const numeroFactura =
+    cai.prefijo +
+    String(cai.numero_actual).padStart(8,"0");
+
+document.getElementById(
+    "numeroFactura"
+).value = numeroFactura;
+
+document.getElementById(
+    "fechaFactura"
+).value =
+new Date().toLocaleDateString();
+
+document.getElementById(
+    "cai"
+).value = cai.cai;
+
+document.getElementById(
+    "vence"
+).value = cai.fecha_limite;
+
+}
+
+</script>
+    
 
 </body>
 
