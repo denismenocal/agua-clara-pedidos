@@ -595,10 +595,20 @@ onclick="abrirMayorista('${cliente.id}')">
 
     }
 
-    alert("Configuración guardada correctamente.");
+    mostrarMensaje(
+"✅ Configuración guardada correctamente."
+);
 
+const panel =
+document.getElementById("panelMayorista");
 
-    cargarTiendas();
+if(panel){
+
+    panel.remove();
+
+}
+
+await cargarTiendas();
 
 }
 
@@ -954,6 +964,40 @@ actualizarPrecioPublico();
         "L " + Number(precio).toFixed(2);
 
     calcularDescuento();
+
+}
+
+    function mostrarMensaje(texto){
+
+    const mensaje =
+        document.createElement("div");
+
+    mensaje.innerHTML = texto;
+
+    mensaje.style.position = "fixed";
+
+    mensaje.style.bottom = "20px";
+
+    mensaje.style.right = "20px";
+
+    mensaje.style.background = "#28a745";
+
+    mensaje.style.color = "white";
+
+    mensaje.style.padding = "15px";
+
+    mensaje.style.borderRadius = "10px";
+
+    mensaje.style.boxShadow =
+        "0 2px 8px rgba(0,0,0,.2)";
+
+    document.body.appendChild(mensaje);
+
+    setTimeout(()=>{
+
+        mensaje.remove();
+
+    },2000);
 
 }
 
