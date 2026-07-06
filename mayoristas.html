@@ -276,7 +276,9 @@ async function cargarTiendas(){
 
         html += `
 
-<div class="cliente">
+<div
+class="cliente"
+id="cliente-${cliente.id}">
 
 <h3>
 
@@ -353,7 +355,7 @@ ${mayorista.activo ? "🟢 Activo" : "🔴 Inactivo"}
 </p>
 
 <button
-onclick="abrirMayorista('${cliente.id}', this)">
+onclick="abrirMayorista('${cliente.id}')">
 
 ✏ Editar configuración
 
@@ -401,7 +403,7 @@ configurarMayorista(
 </p>
 
 <button
-onclick="abrirMayorista('${cliente.id}', this)">
+onclick="abrirMayorista('${cliente.id}')">
 
 ➕ Configurar
 
@@ -609,7 +611,9 @@ function calcularDescuento(){
         true;
 
     const tarjeta =
-    boton.closest(".cliente");
+document.getElementById(
+    "cliente-" + cliente_id
+);
 
     tarjeta.insertAdjacentHTML(
 
