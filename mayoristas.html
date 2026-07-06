@@ -727,7 +727,7 @@ value="${nombreTienda}">
 </label>
 
 <select
-id="lista_precio"
+id="tipo_precio"
 onchange="actualizarPrecioPublico()">
 
 <option value="zona1_publico">
@@ -863,7 +863,24 @@ actualizarPrecioPublico();
 
 }
 
-   ç
+    function actualizarPrecioPublico(){
+
+    const tipoPrecio =
+        document.getElementById(
+            "tipo_precio"
+        ).value;
+
+    const precio =
+        configuracion[tipoPrecio];
+
+    document.getElementById(
+        "precioPublico"
+    ).innerHTML =
+        "L " + precio.toFixed(2);
+
+    calcularDescuento();
+
+}
 
     
 
