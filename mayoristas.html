@@ -353,11 +353,7 @@ ${mayorista.activo ? "🟢 Activo" : "🔴 Inactivo"}
 </p>
 
 <button
-onclick="
-editarMayorista(
-'${cliente.id}'
-)
-">
+onclick="abrirMayorista('${cliente.id}')">
 
 ✏ Editar configuración
 
@@ -405,11 +401,7 @@ configurarMayorista(
 </p>
 
 <button
-onclick="
-configurarMayorista(
-'${cliente.id}'
-)
-">
+onclick="abrirMayorista('${cliente.id}')">
 
 ➕ Configurar
 
@@ -459,108 +451,7 @@ configurarMayorista(
 
 }
 
-    async function configurarMayorista(id){
 
-    const cliente =
-        listaTiendas.find(c=>c.id===id);
-
-    if(!cliente) return;
-
-    const tarjeta =
-        event.target.closest(".cliente");
-
-    tarjeta.insertAdjacentHTML(
-
-        "beforeend",
-
-`
-<div
-id="configuracionMayorista"
-style="
-margin-top:15px;
-padding:15px;
-background:#f8f8f8;
-border-radius:10px;
-">
-
-<input
-id="nombre_tienda"
-placeholder="Nombre de la tienda"
-value="${cliente.nombre}">
-
-<p>
-
-<b>Precio Público:</b>
-
-L ${configuracion.precio_publico_zona1.toFixed(2)}
-
-</p>
-
-<input
-
-id="precio_botellon"
-
-type="number"
-
-inputmode="decimal"
-
-placeholder="Precio especial"
-
-oninput="calcularDescuento()">
-
-<p>
-
-<b>Descuento:</b>
-
-<span id="descuento">
-
-L 0.00
-
-</span>
-
-</p>
-
-<p>
-
-<b>Porcentaje:</b>
-
-<span id="porcentaje">
-
-0 %
-
-</span>
-
-</p>
-
-<label>
-
-<input
-id="activo"
-type="checkbox"
-checked>
-
-Activo
-
-</label>
-
-<br><br>
-
-<button
-onclick="guardarMayorista('${cliente.id}')">
-
-💾 Guardar
-
-</button>
-
-</div>
-
-`
-
-    );
-
-    event.target.disabled=true;
-
-}
 
     async function guardarMayorista(cliente_id){
 
@@ -673,13 +564,217 @@ function calcularDescuento(){
 
 }
 
-    function editarMayorista(id){
+    async function abrirMayorista(cliente_id){
 
-    alert(
-        "Aquí editaremos el precio."
+    // Cerrar cualquier formulario abierto
+
+    const anterior =
+        document.getElementById("panelMayorista");
+
+    if(anterior){
+
+        anterior.remove();
+
+    }
+
+    const cliente =
+        listaTiendas.find(c=>c.id===cliente_id);
+
+    if(!cliente) return;
+
+    const { data: mayorista } =
+        await supabaseClient
+
+        .from("clientes_mayoristas")
+
+        .select("*")
+
+        .eq("cliente_id",cliente_id)
+
+        .maybeSingle();
+
+    const nombreTienda =
+        mayorista ?
+        mayorista.nombre_tienda :
+        cliente.nombre;
+
+    const precio =
+        mayorista ?
+        mayorista.precio_botellon :
+        "";
+
+    const activo =
+        mayorista ?
+        mayorista.activo :
+        true;
+
+    const tarjeta =
+        event.target.closest(".cliente");
+
+    tarjeta.insertAdjacentHTML(
+
+        "beforeend",
+
+`
+
+<div
+
+id="panelMayorista"
+
+style="
+
+margin-top:20px;
+
+padding:20px;
+
+background:#eef7fb;
+
+border-radius:10px;
+
+">
+
+<h3>
+
+⚙ Configuración Comercial
+
+</h3>
+
+<p>
+
+<b>👤 Propietario:</b>
+
+${cliente.nombre}
+
+</p>
+
+<p>
+
+<b>📞 Teléfono:</b>
+
+${cliente.telefono}
+
+</p>
+
+<p>
+
+<b>🏘 Municipio:</b>
+
+${cliente.municipio}
+
+</p>
+
+<p>
+
+<b>📍 Barrio:</b>
+
+${cliente.barrio}
+
+</p>
+
+<hr>
+
+<input
+
+id="nombre_tienda"
+
+placeholder="Nombre comercial"
+
+value="${nombreTienda}">
+
+<p>
+
+<b>Precio público:</b>
+
+L ${configuracion.precio_publico_zona1.toFixed(2)}
+
+</p>
+
+<input
+
+id="precio_botellon"
+
+type="number"
+
+inputmode="decimal"
+
+placeholder="Precio especial"
+
+value="${precio}"
+
+oninput="calcularDescuento()">
+
+<p>
+
+<b>Descuento:</b>
+
+<span id="descuento">
+
+L 0.00
+
+</span>
+
+</p>
+
+<p>
+
+<b>Porcentaje:</b>
+
+<span id="porcentaje">
+
+0 %
+
+</span>
+
+</p>
+
+<label>
+
+<input
+
+id="activo"
+
+type="checkbox"
+
+${activo ? "checked" : ""}>
+
+Activo
+
+</label>
+
+<br><br>
+
+<div
+style="display:flex;gap:10px;">
+
+<button
+
+onclick="guardarMayorista('${cliente_id}')">
+
+💾 Guardar
+
+</button>
+
+<button
+
+onclick="document.getElementById('panelMayorista').remove()">
+
+❌ Cancelar
+
+</button>
+
+</div>
+
+</div>
+
+`
+
     );
 
+    calcularDescuento();
+
 }
+
+    
 
     (async ()=>{
 
