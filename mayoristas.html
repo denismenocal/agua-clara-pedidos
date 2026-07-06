@@ -459,6 +459,9 @@ onclick="abrirMayorista('${cliente.id}')">
     const activo =
         document.getElementById("activo").checked;
 
+        const tipo_precio =
+    document.getElementById("tipo_precio").value;
+
     if(isNaN(precio_botellon)){
 
         alert("Ingrese el precio especial.");
@@ -535,10 +538,6 @@ onclick="abrirMayorista('${cliente.id}')">
 
     alert("Configuración guardada correctamente.");
 
-        const tipo_precio =
-document.getElementById(
-    "tipo_precio"
-).value;
 
     cargarTiendas();
 
