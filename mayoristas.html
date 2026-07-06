@@ -872,27 +872,27 @@ actualizarPrecioPublico();
 
     function actualizarPrecioPublico(){
 
-        const tipoPrecio =
-document.getElementById("tipo_precio").value;
-
-console.log("tipoPrecio:", tipoPrecio);
-
-console.log("configuracion:", configuracion);
-
-console.log("precio:", configuracion[tipoPrecio]);
-
-    const tipo_precio =
-        document.getElementById(
-            "tipo_precio"
-        ).value;
+    const tipoPrecio =
+        document.getElementById("tipo_precio").value;
 
     const precio =
-        configuracion[tipo_precio];
+        configuracion[tipoPrecio];
+
+    if(precio === undefined){
+
+        console.error(
+            "No existe el precio:",
+            tipoPrecio
+        );
+
+        return;
+
+    }
 
     document.getElementById(
         "precioPublico"
     ).innerHTML =
-        "L " + precio.toFixed(2);
+        "L " + Number(precio).toFixed(2);
 
     calcularDescuento();
 
