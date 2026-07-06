@@ -266,6 +266,64 @@ readonly>
 
 </div>
 
+    <div class="tarjeta">
+
+<h3>
+
+Información Comercial
+
+</h3>
+
+<div class="fila">
+
+<div class="col">
+
+<b>Tipo Cliente</b>
+
+<input
+id="tipoCliente"
+readonly>
+
+</div>
+
+<div class="col">
+
+<b>Nombre Comercial</b>
+
+<input
+id="nombreComercial"
+readonly>
+
+</div>
+
+</div>
+
+<div class="fila">
+
+<div class="col">
+
+<b>Tipo de Precio</b>
+
+<input
+id="tipoPrecio"
+readonly>
+
+</div>
+
+<div class="col">
+
+<b>Precio Botellón</b>
+
+<input
+id="precioBotellon"
+readonly>
+
+</div>
+
+</div>
+
+</div>
+
 <div class="tarjeta">
 
 <h3>
@@ -468,6 +526,18 @@ SUPABASE_URL,
 SUPABASE_KEY
 );
 
+        let venta = {
+
+    cliente:null,
+
+    mayorista:null,
+
+    tipoPrecio:null,
+
+    precioBotellon:0
+
+};
+
 let empresa={};
 
 let cai={};
@@ -652,7 +722,7 @@ ${cliente.telefono}
 
 }
 
-        function seleccionarCliente(id){
+        async function seleccionarCliente(id){
 
     clienteSeleccionado =
         listaClientes.find(c=>c.id===id);
@@ -680,6 +750,92 @@ ${cliente.telefono}
     document.getElementById(
         "resultadoBusqueda"
     ).innerHTML="";
+
+await cargarDatosComerciales(
+    clienteSeleccionado);
+
+}
+
+        async function cargarDatosComerciales(cliente){
+
+    venta.cliente = cliente;
+
+    const { data: mayorista } =
+        await supabaseClient
+
+        .from("clientes_mayoristas")
+
+        .select("*")
+
+        .eq("cliente_id",cliente.id)
+
+        .maybeSingle();
+
+    if(mayorista){
+
+        venta.mayorista = mayorista;
+
+        venta.tipoPrecio =
+            mayorista.tipo_precio;
+
+        venta.precioBotellon =
+            Number(
+                mayorista.precio_botellon
+            );
+
+        document.getElementById(
+            "tipoCliente"
+        ).value = "Tienda";
+
+        document.getElementById(
+            "nombreComercial"
+        ).value =
+        mayorista.nombre_tienda;
+
+        document.getElementById(
+            "tipoPrecio"
+        ).value =
+        mayorista.tipo_precio;
+
+        document.getElementById(
+            "precioBotellon"
+        ).value =
+        "L " +
+        venta.precioBotellon.toFixed(2);
+
+    }else{
+
+        venta.mayorista = null;
+
+        venta.tipoPrecio =
+            "precio_publico_zona1";
+
+        venta.precioBotellon =
+            Number(
+                configuracion.precio_publico_zona1
+            );
+
+        document.getElementById(
+            "tipoCliente"
+        ).value =
+        "Cliente Final";
+
+        document.getElementById(
+            "nombreComercial"
+        ).value = "";
+
+        document.getElementById(
+            "tipoPrecio"
+        ).value =
+        "Público";
+
+        document.getElementById(
+            "precioBotellon"
+        ).value =
+        "L " +
+        venta.precioBotellon.toFixed(2);
+
+    }
 
 }
 
