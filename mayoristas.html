@@ -259,6 +259,14 @@ async function cargarTiendas(){
 
     async function mostrarTiendas(clientes){
 
+        let nombreMostrar = cliente.nombre;
+
+if(mayorista && mayorista.nombre_tienda){
+
+    nombreMostrar = mayorista.nombre_tienda;
+
+}
+
     let html="";
 
     for(const cliente of clientes){
@@ -280,11 +288,7 @@ async function cargarTiendas(){
 class="cliente"
 id="cliente-${cliente.id}">
 
-<h3>
-
-🏪 ${cliente.nombre}
-
-</h3>
+<h2>🏪 ${nombreMostrar}</h2>
 
 <p>
 <b>👤 Propietario:</b>
@@ -318,7 +322,62 @@ ${cliente.barrio}
 
 </p>
 
+const nombresTipoPrecio = {
+
+    precio_publico_zona1: "Zona 1 Público",
+
+    precio_publico_zona2: "Zona 2 Público",
+
+    precio_pulperia_zona1: "Pulpería Zona 1",
+
+    precio_pulperia_zona2: "Pulpería Zona 2"
+
+};
+
+const precioPublico =
+    configuracion[mayorista.tipo_precio];
+
+const descuento =
+    precioPublico - mayorista.precio_botellon;
+
+const porcentaje =
+    (descuento / precioPublico) * 100;
+
 <p>
+
+<p>
+
+<b>Tipo de precio:</b><br>
+
+${nombresTipoPrecio[mayorista.tipo_precio]}
+
+</p>
+
+<p>
+
+<b>Precio público:</b>
+
+L ${precioPublico.toFixed(2)}
+
+</p>
+
+<p>
+
+<b>Precio especial:</b>
+
+L ${Number(mayorista.precio_botellon).toFixed(2)}
+
+</p>
+
+<p style="color:green;">
+
+<b>Descuento:</b>
+
+L ${descuento.toFixed(2)}
+
+(${porcentaje.toFixed(2)}%)
+
+</p>
 
 <b>Precio normal:</b>
 
