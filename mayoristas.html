@@ -401,7 +401,7 @@ configurarMayorista(
 </p>
 
 <button
-onclick="abrirMayorista('${cliente.id}')">
+onclick="abrirMayorista('${cliente.id}', this)">
 
 ➕ Configurar
 
@@ -564,7 +564,7 @@ function calcularDescuento(){
 
 }
 
-    async function abrirMayorista(cliente_id){
+    async function abrirMayorista(cliente_id, boton){
 
     // Cerrar cualquier formulario abierto
 
@@ -609,7 +609,7 @@ function calcularDescuento(){
         true;
 
     const tarjeta =
-        event.target.closest(".cliente");
+    boton.closest(".cliente");
 
     tarjeta.insertAdjacentHTML(
 
