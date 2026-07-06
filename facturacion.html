@@ -332,51 +332,9 @@ Productos
 
 </h3>
 
-<div class="fila">
-
-<div class="col">
-
-<button>
-
-🟦 Botellón
-
-</button>
-
-</div>
-
-<div class="col">
-
-<button>
-
-🟦 Agua Bolsa
-
-</button>
-
-</div>
-
-</div>
-
-<div class="fila">
-
-<div class="col">
-
-<button>
-
-🟦 Juguitos
-
-</button>
-
-</div>
-
-<div class="col">
-
-<button>
-
-🟦 Hielo
-
-</button>
-
-</div>
+<div
+id="listaProductos"
+class="fila">
 
 </div>
 
@@ -525,7 +483,8 @@ supabase.createClient(
 SUPABASE_URL,
 SUPABASE_KEY
 );
-
+        
+        let productos = [];
         let venta = {
 
     cliente:null,
@@ -549,6 +508,8 @@ window.onload = async()=>{
     await cargarCAI();
 
     await cargarClientes();
+
+    await cargarProductos();
 
 }
 
@@ -836,6 +797,65 @@ await cargarDatosComerciales(
         venta.precioBotellon.toFixed(2);
 
     }
+
+}
+
+        async function cargarProductos(){
+
+    const { data, error } =
+        await supabaseClient
+
+        .from("productos")
+
+        .select("*")
+
+        .eq("activo", true)
+
+        .order("nombre");
+
+    if(error){
+
+        alert(error.message);
+        return;
+
+    }
+
+    productos = data;
+
+    mostrarProductos();
+
+}
+
+        function mostrarProductos(){
+
+    let html = "";
+
+    productos.forEach(producto=>{
+
+        html += `
+
+<button
+
+style="
+flex:1;
+min-width:180px;
+height:90px;
+font-size:20px;
+"
+
+onclick="pedirCantidad('${producto.id}')">
+
+${producto.nombre}
+
+</button>
+
+`;
+
+    });
+
+    document.getElementById(
+        "listaProductos"
+    ).innerHTML = html;
 
 }
 
