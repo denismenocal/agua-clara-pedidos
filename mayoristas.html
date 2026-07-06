@@ -730,25 +730,40 @@ value="${nombreTienda}">
 id="tipo_precio"
 onchange="actualizarPrecioPublico()">
 
-<option value="precio_publico_zona1">
+<option value="zona1_publico">
 Zona 1 Público
 </option>
 
-<option value="precio_publico_zona2">
+<option value="zona2_publico">
 Zona 2 Público
 </option>
 
-<option value="precio_pulperia_zona1">
+<option value="zona1_pulperia">
 Pulpería Zona 1
 </option>
 
-<option value="precio_pulperia_zona2">
+<option value="zona2_pulperia">
 Pulpería Zona 2
 </option>
 
 </select>
 
-<b>Precio público:</b>
+<div
+style="
+background:#f4f8fb;
+padding:15px;
+border-radius:10px;
+margin-top:10px;
+margin-bottom:15px;
+">
+
+<b>💲 Precio público</b>
+
+<h2
+style="
+margin:8px 0 0 0;
+color:#0077b6;
+">
 
 <span id="precioPublico">
 
@@ -756,7 +771,9 @@ L 0.00
 
 </span>
 
-</p>
+</h2>
+
+</div>
 
 <input
 
