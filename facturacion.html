@@ -483,6 +483,7 @@ supabase.createClient(
 SUPABASE_URL,
 SUPABASE_KEY
 );
+        let configuracion = {};
         let productoSeleccionado = null;
         let productos = [];
         let venta = {
@@ -506,6 +507,8 @@ window.onload = async()=>{
     await cargarEmpresa();
 
     await cargarCAI();
+
+    await cargarConfiguracion();
 
     await cargarClientes();
 
@@ -967,6 +970,34 @@ ${producto.nombre}
     );
 
     cerrarModal();
+
+}
+
+        async function cargarConfiguracion(){
+
+    const { data, error } =
+        await supabaseClient
+
+        .from("configuracion")
+
+        .select("*");
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    configuracion = {};
+
+    data.forEach(item=>{
+
+        configuracion[item.clave] =
+            Number(item.valor);
+
+    });
 
 }
 
