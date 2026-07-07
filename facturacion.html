@@ -350,39 +350,27 @@ Detalle
 
 <table>
 
+<thead>
+
 <tr>
 
-<th>
+<th>Producto</th>
 
-Producto
+<th>Cant.</th>
 
-</th>
+<th>Precio</th>
 
-<th>
+<th>Total</th>
 
-Cant.
-
-</th>
-
-<th>
-
-Precio
-
-</th>
-
-<th>
-
-Total
-
-</th>
-
-<th>
-
-Acción
-
-</th>
+<th></th>
 
 </tr>
+
+</thead>
+
+<tbody id="detalleFactura">
+
+</tbody>
 
 </table>
 
@@ -396,7 +384,9 @@ Acción
 
 <b>Subtotal</b>
 
-<div class="total">
+<div
+id="subtotal"
+class="total">
 
 L 0.00
 
@@ -408,7 +398,9 @@ L 0.00
 
 <b>ISV</b>
 
-<div class="total">
+<div
+id="isv"
+class="total">
 
 L 0.00
 
@@ -420,7 +412,9 @@ L 0.00
 
 <b>Total</b>
 
-<div class="total">
+<div
+id="total"
+class="total">
 
 L 0.00
 
@@ -494,7 +488,9 @@ SUPABASE_KEY
 
     tipoPrecio:null,
 
-    precioBotellon:0
+    precioBotellon:0,
+
+    productos:[]
 
 };
 
@@ -955,21 +951,26 @@ ${producto.nombre}
             ).value
         );
 
-    alert(
+    venta.productos.push({
 
-        productoSeleccionado.nombre +
+        id:productoSeleccionado.id,
 
-        "\n\nCantidad: " +
+        nombre:productoSeleccionado.nombre,
 
-        cantidad +
+        cantidad,
 
-        "\n\nPrecio: L " +
+        precio:
+        productoSeleccionado.precioVenta,
 
+        total:
+        cantidad *
         productoSeleccionado.precioVenta
 
-    );
+    });
 
     cerrarModal();
+
+    actualizarDetalle();
 
 }
 
@@ -998,6 +999,109 @@ ${producto.nombre}
             Number(item.valor);
 
     });
+
+}
+
+        function actualizarDetalle(){
+
+    let html="";
+
+    let subtotal=0;
+
+    venta.productos.forEach((item,index)=>{
+
+        subtotal+=item.total;
+
+        html+=`
+
+<tr>
+
+<td>
+
+${item.nombre}
+
+</td>
+
+<td>
+
+${item.cantidad}
+
+</td>
+
+<td>
+
+L ${item.precio.toFixed(2)}
+
+</td>
+
+<td>
+
+L ${item.total.toFixed(2)}
+
+</td>
+
+<td>
+
+<button
+
+onclick="eliminarProducto(${index})">
+
+🗑
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+    });
+
+    document.getElementById(
+        "detalleFactura"
+    ).innerHTML=html;
+
+    actualizarTotales(subtotal);
+
+}
+
+        function eliminarProducto(indice){
+
+    venta.productos.splice(
+        indice,
+        1
+    );
+
+    actualizarDetalle();
+
+}
+
+
+        function actualizarTotales(subtotal){
+
+    const isv=0;
+
+    const total=
+        subtotal+isv;
+
+    document.getElementById(
+        "subtotal"
+    ).innerHTML=
+    "L "+
+    subtotal.toFixed(2);
+
+    document.getElementById(
+        "isv"
+    ).innerHTML=
+    "L "+
+    isv.toFixed(2);
+
+    document.getElementById(
+        "total"
+    ).innerHTML=
+    "L "+
+    total.toFixed(2);
 
 }
 
