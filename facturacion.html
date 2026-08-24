@@ -214,8 +214,6 @@ Cliente
 </h3>
 
 <input
-
-<input
 id="buscarCliente"
 placeholder="🔍 Buscar cliente..."
 onkeyup="buscarCliente()">
@@ -430,7 +428,9 @@ L 0.00
 
 <div class="col">
 
-<button>
+<button
+id="btnGuardarFactura"
+onclick="guardarFactura()">
 
 💾 Guardar Factura
 
@@ -440,7 +440,8 @@ L 0.00
 
 <div class="col">
 
-<button>
+<button
+onclick="imprimirFactura()">
 
 🖨 Imprimir
 
@@ -451,7 +452,7 @@ L 0.00
 <div class="col">
 
 <button
-onclick="location.href='menu.html'">
+onclick="cancelarFactura()">
 
 ❌ Cancelar
 
@@ -497,6 +498,10 @@ SUPABASE_KEY
 let empresa={};
 
 let cai={};
+
+let facturaGuardada=null;
+
+let guardandoFactura=false;
 
 window.onload = async()=>{
 
@@ -1102,6 +1107,185 @@ onclick="eliminarProducto(${index})">
     ).innerHTML=
     "L "+
     total.toFixed(2);
+
+}
+
+        function obtenerTotales(){
+
+    const subtotal = venta.productos.reduce(
+        (acumulado,item)=>acumulado + Number(item.total),
+        0
+    );
+
+    const isv = 0;
+    const descuento = 0;
+
+    return {
+        subtotal,
+        isv,
+        descuento,
+        total:subtotal + isv - descuento
+    };
+
+}
+
+        async function guardarFactura(){
+
+    if(guardandoFactura || facturaGuardada){
+        return;
+    }
+
+    if(!venta.cliente){
+        alert("Seleccione un cliente antes de guardar la factura.");
+        return;
+    }
+
+    if(venta.productos.length===0){
+        alert("Agregue al menos un producto a la factura.");
+        return;
+    }
+
+    if(!cai || !cai.id){
+        alert("No hay un CAI activo disponible.");
+        return;
+    }
+
+    const numeroActual = Number(cai.numero_actual);
+    const rangoFinal = Number(cai.rango_final);
+
+    if(!Number.isFinite(numeroActual) || numeroActual>rangoFinal){
+        alert("El rango autorizado del CAI está agotado.");
+        return;
+    }
+
+    const { data:sesion } =
+        await supabaseClient.auth.getSession();
+
+    if(!sesion.session){
+        location.href="login.html";
+        return;
+    }
+
+    const boton = document.getElementById(
+        "btnGuardarFactura"
+    );
+
+    guardandoFactura=true;
+    boton.disabled=true;
+    boton.innerHTML="Guardando...";
+
+    const totales=obtenerTotales();
+
+    try{
+
+        const { data:factura, error:errorFactura } =
+            await supabaseClient
+            .from("facturas")
+            .insert({
+                numero_factura:numeroActual,
+                cliente_id:venta.cliente.id,
+                nombre_cliente:document.getElementById(
+                    "nombreCliente"
+                ).value,
+                rtn_cliente:document.getElementById(
+                    "rtnCliente"
+                ).value || null,
+                direccion_cliente:document.getElementById(
+                    "direccionCliente"
+                ).value || null,
+                fecha:new Date().toISOString(),
+                subtotal:totales.subtotal,
+                isv:totales.isv,
+                descuento:totales.descuento,
+                total:totales.total,
+                cai_id:cai.id,
+                usuario_id:sesion.session.user.id,
+                estado:"emitida"
+            })
+            .select("id")
+            .single();
+
+        if(errorFactura){
+            throw errorFactura;
+        }
+
+        const detalle = venta.productos.map(item=>({
+            factura_id:factura.id,
+            producto:item.nombre,
+            cantidad:item.cantidad,
+            precio_unitario:item.precio,
+            descuento:0,
+            total:item.total
+        }));
+
+        const { error:errorDetalle } =
+            await supabaseClient
+            .from("factura_detalle")
+            .insert(detalle);
+
+        if(errorDetalle){
+            throw errorDetalle;
+        }
+
+        const { data:caiActualizado, error:errorCAI } =
+            await supabaseClient
+            .from("cai_facturacion")
+            .update({
+                numero_actual:numeroActual + 1
+            })
+            .eq("id",cai.id)
+            .eq("numero_actual",numeroActual)
+            .select("id")
+            .maybeSingle();
+
+        if(errorCAI || !caiActualizado){
+            throw errorCAI || new Error(
+                "No fue posible actualizar el correlativo del CAI."
+            );
+        }
+
+        cai.numero_actual=numeroActual + 1;
+        facturaGuardada=factura;
+        boton.innerHTML="✅ Factura guardada";
+
+        alert("Factura guardada correctamente.");
+
+    }catch(error){
+
+        console.error(error);
+        alert("No se pudo guardar la factura: " + error.message);
+        boton.disabled=false;
+        boton.innerHTML="💾 Guardar Factura";
+
+    }finally{
+
+        guardandoFactura=false;
+
+    }
+
+}
+
+        function imprimirFactura(){
+
+    if(venta.productos.length===0){
+        alert("Agregue productos antes de imprimir.");
+        return;
+    }
+
+    window.print();
+
+}
+
+        function cancelarFactura(){
+
+    if(
+        venta.productos.length>0 &&
+        !confirm("¿Desea cancelar la factura en curso?")
+    ){
+        return;
+    }
+
+    location.href="menu.html";
 
 }
 
