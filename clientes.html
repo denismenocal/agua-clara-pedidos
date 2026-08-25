@@ -21,101 +21,125 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+:root{
+    --azul:#075985;
+    --celeste:#0ea5e9;
+    --verde:#059669;
+    --rojo:#dc2626;
+    --texto:#102a43;
+    --muted:#64748b;
+    --borde:#dbe7ef;
+}
+
+*{box-sizing:border-box;}
 
 body{
-
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f4f8fb;
+    font-family:Inter,Arial,Helvetica,sans-serif;
+    color:var(--texto);
+    background:linear-gradient(180deg,#dcf4f5 0,#f5f9fc 300px);
     margin:0;
-    padding:20px;
-
+    min-height:100vh;
 }
 
-h2{
-
-    text-align:center;
-    color:#0077b6;
-
+.cabecera{
+    color:white;
+    background:linear-gradient(135deg,#064e6f,#0284c7);
+    padding:22px max(18px,calc((100% - 1180px)/2));
+    box-shadow:0 8px 28px rgba(7,89,133,.22);
 }
 
-.menu{
+.cabecera-contenido{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.cabecera h1{margin:0;font-size:clamp(26px,4vw,37px);}
+.cabecera p{margin:5px 0 0;color:#dff6ff;}
+.menu{display:flex;gap:9px;}
 
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
-
-}
+.pagina{max-width:1180px;margin:auto;padding:22px 16px 70px;}
+.distribucion{display:grid;grid-template-columns:minmax(320px,410px) 1fr;gap:18px;align-items:start;}
 
 .tarjeta{
-
-    background:white;
-    border-radius:12px;
-    padding:18px;
-    box-shadow:0 2px 10px rgba(0,0,0,.12);
-    margin-bottom:20px;
-
+    background:rgba(255,255,255,.97);
+    border:1px solid rgba(219,231,239,.9);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 10px 30px rgba(15,64,91,.08);
 }
+.formulario{position:sticky;top:16px;}
+.titulo-seccion{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;}
+.titulo-seccion h2{font-size:21px;margin:0;color:var(--texto);}
+.titulo-seccion p{margin:4px 0 0;color:var(--muted);font-size:14px;}
 
-input,
-select,
-button{
+label{display:block;margin:2px 0 6px;font-size:14px;font-weight:700;color:#334155;}
+.campo-doble{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
+input,select,button{
     width:100%;
-    box-sizing:border-box;
-
-    padding:14px;
-
+    padding:13px 14px;
     margin-bottom:12px;
-
-    font-size:17px;
-
-    border-radius:8px;
-
-    border:1px solid #ccc;
-
+    font-size:16px;
+    border-radius:11px;
 }
+input,select{border:1px solid #cbd5e1;background:#fff;color:var(--texto);}
+input:focus,select:focus{outline:3px solid rgba(14,165,233,.15);border-color:var(--celeste);}
 
 button{
-
-    background:#0077b6;
-    color:white;
     border:none;
+    color:white;
+    font-weight:700;
     cursor:pointer;
-
+    background:linear-gradient(135deg,#0369a1,#0284c7);
+    transition:transform .15s,box-shadow .15s,opacity .15s;
 }
+button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 18px rgba(2,132,199,.22);}
+button:disabled{opacity:.65;cursor:not-allowed;}
+.menu button{width:auto;margin:0;padding:11px 15px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);}
+.btn-guardar{min-height:52px;background:linear-gradient(135deg,#047857,#059669);}
+.btn-secundario{background:#eff6ff;color:#075985;border:1px solid #bae6fd;}
+.btn-cancelar-edicion{display:none;background:white;color:#b91c1c;border:1px solid #fecaca;}
 
-button:hover{
+.herramientas{display:flex;align-items:center;gap:12px;margin-bottom:15px;}
+.herramientas input{margin:0;}
+.contador{white-space:nowrap;padding:10px 13px;border-radius:999px;background:#e0f2fe;color:#075985;font-weight:800;}
 
-    background:#005f8f;
-
-}
-
-.botones{
-
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-
-}
-
-.botones button{
-
-    flex:1;
-
-}
-
+#listaClientes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;}
 .cliente{
-
     background:white;
+    padding:17px;
+    border:1px solid var(--borde);
+    border-radius:16px;
+    box-shadow:0 5px 16px rgba(15,64,91,.06);
+}
+.cliente-cabecera{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.cliente h3{margin:0;font-size:18px;line-height:1.25;}
+.tipo{padding:6px 9px;border-radius:999px;background:#e0f2fe;color:#075985;font-size:12px;font-weight:800;white-space:nowrap;}
+.tipo.tienda{background:#fef3c7;color:#92400e;}
+.tipo.delivery{background:#dcfce7;color:#166534;}
+.datos-cliente{display:grid;gap:8px;margin-bottom:15px;color:#475569;font-size:14px;}
+.dato{display:flex;gap:8px;align-items:flex-start;}
+.dato span:first-child{width:20px;text-align:center;}
+.botones{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.botones button{margin:0;padding:10px 7px;font-size:13px;}
+.botones .eliminar{background:#fff1f2;color:#be123c;border:1px solid #fecdd3;}
+.botones .mapa{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;}
+.vacio{grid-column:1/-1;text-align:center;padding:45px 20px;color:var(--muted);background:#f8fafc;border:1px dashed #cbd5e1;border-radius:16px;}
 
-    padding:15px;
+@media(max-width:900px){
+    .distribucion{grid-template-columns:1fr;}
+    .formulario{position:static;}
+}
 
-    border-radius:10px;
-
-    margin-bottom:15px;
-
-    box-shadow:0 2px 8px rgba(0,0,0,.10);
-
+@media(max-width:620px){
+    .cabecera{padding:18px 14px;}
+    .cabecera-contenido{align-items:flex-start;}
+    .cabecera p{font-size:13px;}
+    .menu button{font-size:0;width:44px;padding:11px 7px;}
+    .menu button:first-child::after{content:"🏠";font-size:19px;}
+    .menu button:last-child::after{content:"🚪";font-size:19px;}
+    .pagina{padding:14px 10px 50px;}
+    .tarjeta{padding:16px;border-radius:17px;}
+    .campo-doble{grid-template-columns:1fr;gap:0;}
+    #listaClientes{grid-template-columns:1fr;}
+    .herramientas{align-items:stretch;flex-direction:column;}
+    .contador{text-align:center;}
 }
 
 </style>
@@ -124,58 +148,59 @@ button:hover{
 
 <body>
 
+<header class="cabecera">
+<div class="cabecera-contenido">
+<div>
+<h1>👥 Gestión de clientes</h1>
+<p>Registre, consulte y mantenga actualizada la información de sus clientes.</p>
+</div>
 <div class="menu">
+<button onclick="location.href='menu.html'">🏠 Menú</button>
+<button onclick="cerrarSesion()">🚪 Salir</button>
+</div>
+</div>
+</header>
 
-<button onclick="location.href='menu.html'">
-🏠 Menú
-</button>
+<main class="pagina">
+<div class="distribucion">
 
-<button onclick="cerrarSesion()">
-🚪 Salir
-</button>
-
+<section class="tarjeta formulario">
+<div class="titulo-seccion">
+<div>
+<h2 id="tituloFormulario">➕ Nuevo cliente</h2>
+<p>Complete los datos marcados como obligatorios.</p>
+</div>
 </div>
 
-<h2>
+<label for="nombre">Nombre completo *</label>
+<input id="nombre" placeholder="Ej. MARÍA LÓPEZ" autocomplete="name">
 
-👥 Gestión de Clientes
+<div class="campo-doble">
+<div>
+<label for="telefono">Teléfono *</label>
+<input id="telefono" placeholder="Ej. 9999-9999" inputmode="tel" autocomplete="tel">
+</div>
+<div>
+<label for="identificacion">RTN o DNI</label>
+<input id="identificacion" placeholder="Identificación">
+</div>
+</div>
 
-</h2>
+<div class="campo-doble">
+<div>
+<label for="municipio">Municipio *</label>
+<input id="municipio" placeholder="Municipio">
+</div>
+<div>
+<label for="barrio">Barrio o aldea *</label>
+<input id="barrio" placeholder="Barrio o aldea">
+</div>
+</div>
 
-<div class="tarjeta">
+<label for="referencia">Referencia de ubicación</label>
+<input id="referencia" placeholder="Casa, color o punto de referencia">
 
-<input
-id="buscar"
-placeholder="🔍 Buscar por nombre o teléfono..."
-onkeyup="filtrarClientes()">
-
-<hr>
-
-<input
-id="nombre"
-placeholder="Nombre del cliente">
-
-<input
-id="telefono"
-placeholder="Teléfono"
-inputmode="tel">
-
-<input
-id="municipio"
-placeholder="Municipio">
-
-<input
-id="barrio"
-placeholder="Barrio o Aldea">
-
-<input
-id="referencia"
-placeholder="Referencia">
-
-<input
-id="identificacion"
-placeholder="RTN o DNI">
-
+<label for="tipo_cliente">Tipo de cliente</label>
 <select id="tipo_cliente">
 
 <option value="Delivery">
@@ -195,6 +220,7 @@ placeholder="RTN o DNI">
 <button
 type="button"
 id="btnUbicacion"
+class="btn-secundario"
 onclick="obtenerUbicacion()">
 
 📍 Obtener ubicación
@@ -203,17 +229,37 @@ onclick="obtenerUbicacion()">
 
 <button
 id="btnGuardar"
+class="btn-guardar"
 onclick="guardarCliente()">
 
 💾 Guardar Cliente
 
 </button>
 
+<button id="btnCancelarEdicion" class="btn-cancelar-edicion" onclick="limpiarFormulario()">
+✕ Cancelar edición
+</button>
+
+</section>
+
+<section class="tarjeta">
+<div class="titulo-seccion">
+<div>
+<h2>Directorio de clientes</h2>
+<p>Busque por nombre o número de teléfono.</p>
+</div>
 </div>
 
-<div id="listaClientes">
+<div class="herramientas">
+<input id="buscar" placeholder="🔍 Buscar cliente..." oninput="filtrarClientes()">
+<span id="contadorClientes" class="contador">0 clientes</span>
+</div>
+
+<div id="listaClientes"></div>
+</section>
 
 </div>
+</main>
 
 <script>
 
@@ -278,19 +324,29 @@ function mostrarClientes(clientes){
 
     clientes.forEach(cliente=>{
 
+        const tipo=cliente.tipo_cliente || "Cliente Final";
+
+        const claseTipo=
+            tipo==="Tienda"
+            ? "tienda"
+            : tipo==="Delivery"
+            ? "delivery"
+            : "";
+
         html += `
 
 <div class="cliente">
 
-<h3>${cliente.nombre}</h3>
+<div class="cliente-cabecera">
+<h3>${escaparHTML(cliente.nombre)}</h3>
+<span class="tipo ${claseTipo}">${escaparHTML(tipo)}</span>
+</div>
 
-<p><b>📞</b> ${cliente.telefono}</p>
-
-<p><b>🏘️</b> ${cliente.municipio || ""}</p>
-
-<p><b>📍</b> ${cliente.barrio || ""}</p>
-
-<p><b>Tipo:</b> ${cliente.tipo_cliente}</p>
+<div class="datos-cliente">
+<div class="dato"><span>📞</span><span>${escaparHTML(cliente.telefono)}</span></div>
+<div class="dato"><span>🏘️</span><span>${escaparHTML(cliente.municipio || "Sin municipio")}</span></div>
+<div class="dato"><span>📍</span><span>${escaparHTML(cliente.barrio || "Sin barrio")}</span></div>
+</div>
 
 <div class="botones">
 
@@ -300,11 +356,13 @@ onclick="editarCliente('${cliente.id}')">
 </button>
 
 <button
+class="eliminar"
 onclick="eliminarCliente('${cliente.id}')">
 🗑️ Eliminar
 </button>
 
 <button
+class="mapa"
 onclick="abrirMapa(${cliente.latitud ?? "null"},${cliente.longitud ?? "null"})">
 📍 Mapa
 </button>
@@ -317,9 +375,35 @@ onclick="abrirMapa(${cliente.latitud ?? "null"},${cliente.longitud ?? "null"})">
 
     });
 
+    if(clientes.length===0){
+        html=`
+            <div class="vacio">
+                <div style="font-size:38px;margin-bottom:8px;">🔎</div>
+                <b>No encontramos clientes</b>
+                <div>Pruebe con otro nombre o número.</div>
+            </div>
+        `;
+    }
+
     document.getElementById(
         "listaClientes"
     ).innerHTML=html;
+
+    document.getElementById("contadorClientes").textContent=
+        clientes.length===1
+        ? "1 cliente"
+        : `${clientes.length} clientes`;
+
+}
+
+function escaparHTML(valor){
+
+    return String(valor ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
 
 }
 
@@ -346,6 +430,10 @@ function filtrarClientes(){
 }
 
 async function guardarCliente(){
+
+    const boton=document.getElementById("btnGuardar");
+
+    if(boton.disabled) return;
 
     const cliente={
 
@@ -394,6 +482,11 @@ async function guardarCliente(){
 
     let error;
 
+    boton.disabled=true;
+    boton.textContent=clienteEditando
+        ? "Actualizando..."
+        : "Guardando...";
+
     if(clienteEditando){
 
         ({error}=await supabaseClient
@@ -417,13 +510,19 @@ async function guardarCliente(){
     if(error){
 
         alert(error.message);
+        boton.disabled=false;
+        boton.innerHTML=clienteEditando
+            ? "💾 Actualizar Cliente"
+            : "💾 Guardar Cliente";
         return;
 
     }
 
     limpiarFormulario();
 
-    cargarClientes();
+    await cargarClientes();
+
+    alert("Cliente guardado correctamente.");
 
 }
 
@@ -489,6 +588,12 @@ if(cliente.latitud && cliente.longitud){
         "btnGuardar"
     ).innerHTML=
     "💾 Actualizar Cliente";
+
+    document.getElementById("tituloFormulario").textContent=
+        "✏️ Editar cliente";
+
+    document.getElementById("btnCancelarEdicion").style.display=
+        "block";
 
     window.scrollTo({
 
@@ -569,6 +674,14 @@ function limpiarFormulario(){
     document.getElementById("btnGuardar").innerHTML=
 
     "💾 Guardar Cliente";
+
+    document.getElementById("btnGuardar").disabled=false;
+
+    document.getElementById("tituloFormulario").textContent=
+        "➕ Nuevo cliente";
+
+    document.getElementById("btnCancelarEdicion").style.display=
+        "none";
 
     clienteEditando=null;
 
@@ -662,6 +775,16 @@ let listaClientes = [];
 
 let latitudCliente = null;
 let longitudCliente = null;
+
+["nombre","municipio","barrio","referencia"].forEach(id=>{
+
+    document.getElementById(id).addEventListener("input",evento=>{
+        const inicio=evento.target.selectionStart;
+        evento.target.value=evento.target.value.toUpperCase();
+        evento.target.setSelectionRange(inicio,inicio);
+    });
+
+});
 
 </script>
 
