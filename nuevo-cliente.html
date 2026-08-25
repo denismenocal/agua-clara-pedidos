@@ -18,152 +18,110 @@ href="img/favicon_64.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
-*{
-    box-sizing:border-box;
+:root{
+    --azul:#075985;
+    --celeste:#0ea5e9;
+    --verde:#059669;
+    --texto:#102a43;
+    --muted:#64748b;
+    --borde:#dbe7ef;
 }
+
+*{box-sizing:border-box;}
 
 body{
     margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f4f8fb;
-    color:#1f2937;
+    min-height:100vh;
+    font-family:Inter,Arial,Helvetica,sans-serif;
+    color:var(--texto);
+    background:linear-gradient(180deg,#dff5f7 0,#f5f9fc 310px);
 }
 
 header{
-    background:#0077b6;
     color:white;
-    padding:18px;
+    padding:22px max(18px,calc((100% - 820px)/2));
+    background:linear-gradient(135deg,#064e6f,#0284c7);
+    box-shadow:0 8px 28px rgba(7,89,133,.22);
 }
 
-header h2{
-    max-width:760px;
-    margin:auto;
-}
+.encabezado{display:flex;align-items:center;justify-content:space-between;gap:15px;}
+header h1{margin:0;font-size:clamp(26px,4vw,36px);}
+header p{margin:5px 0 0;color:#dff6ff;}
+.paso{padding:8px 12px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(255,255,255,.14);font-weight:700;white-space:nowrap;}
 
-main{
-    max-width:760px;
-    margin:auto;
-    padding:20px;
+main{max-width:820px;margin:auto;padding:22px 16px 70px;}
+
+.guia{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:14px 16px;
+    margin-bottom:16px;
+    border:1px solid #bae6fd;
+    border-radius:15px;
+    color:#075985;
+    background:#f0f9ff;
+    font-weight:700;
 }
+.guia span:first-child{font-size:23px;}
 
 .tarjeta{
-    background:white;
-    padding:22px;
-    border-radius:14px;
-    box-shadow:0 2px 10px rgba(0,0,0,.12);
+    background:rgba(255,255,255,.97);
+    padding:24px;
+    border:1px solid rgba(219,231,239,.92);
+    border-radius:21px;
+    box-shadow:0 12px 35px rgba(15,64,91,.1);
 }
+.titulo-formulario{margin-bottom:21px;padding-bottom:16px;border-bottom:1px solid var(--borde);}
+.titulo-formulario h2{margin:0 0 5px;font-size:21px;}
+.titulo-formulario p{margin:0;color:var(--muted);font-size:14px;}
 
-.campo{
-    margin-bottom:16px;
-}
+.campo{margin-bottom:17px;}
+label{display:block;margin-bottom:7px;font-size:14px;font-weight:800;color:#334155;}
+.obligatorio{color:#dc2626;}
 
-label{
-    display:block;
-    margin-bottom:7px;
-    font-weight:bold;
-}
+input,select,button{width:100%;padding:13px 14px;font-size:16px;border-radius:11px;}
+input,select{border:1px solid #cbd5e1;background:white;color:var(--texto);}
+input:focus,select:focus{outline:3px solid rgba(14,165,233,.15);border-color:var(--celeste);}
 
-.obligatorio{
-    color:#c1121f;
-}
-
-input,
-select,
-button{
-    width:100%;
-    padding:13px;
-    font-size:16px;
-    border-radius:8px;
-}
-
-input,
-select{
-    border:1px solid #b8c2cc;
-    background:white;
-}
-
-#nombre,
-#identificacion,
-#municipio,
-#barrio,
-#referencia{
-    text-transform:uppercase;
-}
+#nombre,#identificacion,#municipio,#barrio,#referencia,#nombreNegocio{text-transform:uppercase;}
 
 #campoNombreNegocio{
     display:none;
-    padding:14px;
+    padding:15px;
     border:1px solid #f6c453;
-    border-radius:10px;
+    border-radius:14px;
     background:#fffbeb;
 }
+#campoNombreNegocio small{display:block;margin-top:8px;color:#92400e;line-height:1.4;}
 
-#campoNombreNegocio small{
-    display:block;
-    margin-top:8px;
-    color:#92400e;
-}
-
-#nombreNegocio{
-    text-transform:uppercase;
-}
-
-.fila{
-    display:flex;
-    gap:14px;
-}
-
-.fila .campo{
-    flex:1;
-}
+.fila{display:flex;gap:14px;}
+.fila .campo{flex:1;}
 
 button{
     border:none;
-    background:#0077b6;
     color:white;
     cursor:pointer;
-    font-weight:bold;
+    font-weight:800;
+    background:linear-gradient(135deg,#0369a1,#0284c7);
+    transition:transform .15s,box-shadow .15s,opacity .15s;
 }
-
-button:hover{
-    background:#005f92;
-}
-
-button:disabled{
-    opacity:.7;
-    cursor:not-allowed;
-}
-
-.secundario{
-    background:#667085;
-}
-
-.acciones{
-    display:flex;
-    gap:12px;
-    margin-top:22px;
-}
-
-.estado{
-    min-height:22px;
-    margin-top:14px;
-    text-align:center;
-    font-weight:bold;
-}
+button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 18px rgba(2,132,199,.22);}
+button:disabled{opacity:.65;cursor:not-allowed;}
+#btnUbicacion{min-height:51px;background:linear-gradient(135deg,#075985,#0369a1);}
+#btnGuardar{min-height:52px;background:linear-gradient(135deg,#047857,#059669);}
+.secundario{background:white;color:#475569;border:1px solid #cbd5e1;}
+.acciones{display:flex;gap:12px;margin-top:22px;}
+.estado{min-height:22px;margin-top:15px;text-align:center;font-weight:bold;}
 
 @media(max-width:620px){
-
-    .fila,
-    .acciones{
-        flex-direction:column;
-        gap:0;
-    }
-
-    .acciones{
-        gap:10px;
-    }
-
+    header{padding:18px 15px;}
+    header p{font-size:13px;}
+    .paso{font-size:12px;padding:7px 9px;}
+    main{padding:15px 10px 50px;}
+    .tarjeta{padding:17px;border-radius:18px;}
+    .fila,.acciones{flex-direction:column;gap:0;}
+    .acciones{gap:10px;}
 }
 
 </style>
@@ -173,18 +131,34 @@ button:disabled{
 <body>
 
 <header>
-<h2>➕ Nuevo cliente</h2>
+<div class="encabezado">
+<div>
+<h1>➕ Nuevo cliente</h1>
+<p>Registre un cliente sin perder la factura en proceso.</p>
+</div>
+<span class="paso">Facturación</span>
+</div>
 </header>
 
 <main>
 
+<div class="guia">
+<span>👤</span>
+<span>Complete los datos del cliente. Los campos con * son obligatorios.</span>
+</div>
+
 <div class="tarjeta">
+
+<div class="titulo-formulario">
+<h2>Información del cliente</h2>
+<p>Los datos se utilizarán para identificarlo en futuras facturas.</p>
+</div>
 
 <div class="campo">
 <label for="nombre">
 Nombre completo <span class="obligatorio">*</span>
 </label>
-<input id="nombre" autocomplete="name">
+<input id="nombre" placeholder="Ej. MARÍA LÓPEZ" autocomplete="name">
 </div>
 
 <div class="fila">
@@ -193,12 +167,12 @@ Nombre completo <span class="obligatorio">*</span>
 <label for="telefono">
 Teléfono <span class="obligatorio">*</span>
 </label>
-<input id="telefono" inputmode="tel" autocomplete="tel">
+<input id="telefono" placeholder="Ej. 9999-9999" inputmode="tel" autocomplete="tel">
 </div>
 
 <div class="campo">
 <label for="identificacion">RTN o DNI</label>
-<input id="identificacion" inputmode="numeric">
+<input id="identificacion" placeholder="Identificación" inputmode="numeric">
 </div>
 
 </div>
@@ -209,14 +183,14 @@ Teléfono <span class="obligatorio">*</span>
 <label for="municipio">
 Municipio <span class="obligatorio">*</span>
 </label>
-<input id="municipio">
+<input id="municipio" placeholder="Municipio">
 </div>
 
 <div class="campo">
 <label for="barrio">
 Barrio o aldea <span class="obligatorio">*</span>
 </label>
-<input id="barrio">
+<input id="barrio" placeholder="Barrio o aldea">
 </div>
 
 </div>
