@@ -1,262 +1,370 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
-    <title>Agua Clara La Muralla</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0077b6">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
 
-     <link rel="icon"
-      href="img/favicon_64.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#075985">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Menú Principal | Agua Clara</title>
 
-    
-    <style>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/favicon_64.png">
 
-        body{
-            font-family:Arial;
-            padding:20px;
-            text-align:center;
-        }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        button{
-            width:100%;
-            padding:20px;
-            margin-top:10px;
-            font-size:20px;
-            border:none;
-            border-radius:10px;
-        }
+<style>
 
-        .titulo{
-            margin-bottom:20px;
-        }
+:root{
+    --azul:#0077b6;
+    --azul-oscuro:#034d75;
+    --fondo:#edf6fa;
+    --texto:#17324d;
+    --gris:#667085;
+    --borde:#dbe7ed;
+    --rojo:#c1121f;
+}
 
-        body{
-    font-family:Arial;
-    background:#f4f8fb;
+*{box-sizing:border-box}
+
+body{
     margin:0;
-    padding:20px;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--texto);
+    background:
+        radial-gradient(circle at top right,#c8edf8 0,transparent 30%),
+        var(--fondo);
 }
 
-.logo{
-    width:120px;
-    margin-bottom:10px;
-}
+button{font:inherit}
 
-.menu-btn{
-
-    width:100%;
-
-    padding:20px;
-
-    margin-bottom:15px;
-
-    font-size:22px;
-
-    border:none;
-
-    border-radius:12px;
-
-    background:#0077b6;
-
+.cabecera{
+    padding:24px 18px 76px;
     color:white;
-
-    cursor:pointer;
+    background:linear-gradient(135deg,var(--azul),var(--azul-oscuro));
+    border-radius:0 0 36px 36px;
+    box-shadow:0 5px 24px rgba(3,77,117,.22);
 }
 
-.salir-btn{
+.cabecera-interior{
+    max-width:1050px;
+    margin:auto;
+}
 
-    width:100%;
+.barra-superior{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+}
 
-    padding:20px;
+.marca{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
 
-    font-size:22px;
+.marca img{
+    width:68px;
+    height:68px;
+    object-fit:contain;
+    filter:drop-shadow(0 6px 12px rgba(0,0,0,.18));
+}
 
-    border:none;
+.marca h1{
+    margin:0;
+    font-size:clamp(24px,5vw,34px);
+}
 
+.marca p{
+    margin:4px 0 0;
+    opacity:.88;
+}
+
+.fecha{
+    padding:10px 13px;
+    text-align:right;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
     border-radius:12px;
+}
 
-    background:#dc3545;
+.fecha strong,.fecha span{display:block}
+.fecha span{margin-top:2px;opacity:.85;font-size:13px}
 
+main{
+    width:min(1050px,calc(100% - 28px));
+    margin:-52px auto 40px;
+}
+
+.perfil{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:18px;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:18px;
+    box-shadow:0 10px 32px rgba(3,77,117,.13);
+}
+
+.avatar{
+    display:grid;
+    place-items:center;
+    width:58px;
+    height:58px;
+    flex:none;
     color:white;
+    background:linear-gradient(135deg,#0a9bd3,#00689e);
+    border-radius:17px;
+    font-size:28px;
+}
 
+.perfil-info{flex:1;min-width:0}
+.perfil-info h2{margin:0 0 5px;font-size:21px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.perfil-info p{margin:0;color:var(--gris);font-size:14px}
+
+.rol{
+    padding:7px 11px;
+    color:#075985;
+    background:#e0f2fe;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.encabezado-modulos{
+    display:flex;
+    justify-content:space-between;
+    align-items:end;
+    gap:12px;
+    margin:24px 2px 13px;
+}
+
+.encabezado-modulos h2{margin:0;font-size:22px}
+.encabezado-modulos p{margin:4px 0 0;color:var(--gris);font-size:14px}
+
+.modulos{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+}
+
+.modulo{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    min-height:145px;
+    padding:18px;
+    text-align:left;
+    color:var(--texto);
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:18px;
+    box-shadow:0 7px 24px rgba(3,77,117,.08);
     cursor:pointer;
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
 }
 
-        input,
-select,
-textarea,
-button {
-
-    font-size: 18px;
-    padding: 14px;
-    box-sizing: border-box;
-
+.modulo:hover{
+    transform:translateY(-3px);
+    border-color:#9dcede;
+    box-shadow:0 13px 32px rgba(3,77,117,.14);
 }
 
+.modulo-icono{
+    display:grid;
+    place-items:center;
+    width:52px;
+    height:52px;
+    flex:none;
+    border-radius:15px;
+    font-size:26px;
+}
 
-    </style>
+.modulo-contenido{flex:1}
+.modulo h3{margin:2px 0 7px;font-size:18px}
+.modulo p{margin:0;color:var(--gris);font-size:14px;line-height:1.42}
+.flecha{display:block;margin-top:12px;color:var(--azul);font-weight:bold;font-size:13px}
+
+.pedidos .modulo-icono{background:#e0f2fe}
+.cierres .modulo-icono{background:#e8f7ef}
+.reportes .modulo-icono{background:#f1eafe}
+.facturacion .modulo-icono{background:#fff4d6}
+.mayoristas .modulo-icono{background:#fce8ef}
+.clientes .modulo-icono{background:#e9f3ff}
+
+.pie{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    margin-top:22px;
+    padding:16px 18px;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:15px;
+}
+
+.estado-sesion{color:var(--gris);font-size:14px}
+
+.btn-salir{
+    min-height:44px;
+    padding:10px 16px;
+    color:white;
+    background:var(--rojo);
+    border:0;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.cargando{
+    grid-column:1/-1;
+    padding:45px;
+    text-align:center;
+    color:var(--gris);
+    background:white;
+    border-radius:18px;
+}
+
+@media(max-width:820px){.modulos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+@media(max-width:560px){
+    .cabecera{padding-top:18px}
+    .marca img{width:54px;height:54px}
+    .marca p,.fecha span{display:none}
+    .fecha{padding:8px 10px}
+    .perfil{padding:15px}
+    .avatar{width:50px;height:50px}
+    .rol{display:none}
+    .modulos{grid-template-columns:1fr}
+    .modulo{min-height:125px}
+    .pie{align-items:stretch;flex-direction:column}
+}
+
+</style>
 
 </head>
 
 <body>
 
-    <img src="img/logo_menu_192.webp"
-     style="width:100px;">
+<header class="cabecera">
+<div class="cabecera-interior">
+<div class="barra-superior">
+<div class="marca">
+<img src="img/logo_menu_192.webp" alt="Agua Clara">
+<div><h1>Agua Clara La Muralla</h1><p>Centro de operaciones</p></div>
+</div>
+<div class="fecha"><strong id="horaActual">--:--</strong><span id="fechaActual">Cargando fecha</span></div>
+</div>
+</div>
+</header>
 
-<h1 class="titulo">
-💧 Agua Clara La Muralla
-</h1>
+<main>
 
-<h3 id="usuario"></h3>
+<section class="perfil">
+<div class="avatar" id="avatarUsuario">👤</div>
+<div class="perfil-info"><h2 id="nombreUsuario">Cargando usuario...</h2><p id="datosUsuario">Preparando tus módulos</p></div>
+<span id="rolUsuario" class="rol"></span>
+</section>
 
-<div id="menu"></div>
+<div class="encabezado-modulos">
+<div><h2>¿Qué deseas hacer?</h2><p>Selecciona uno de los módulos disponibles.</p></div>
+</div>
+
+<section id="menu" class="modulos">
+<div class="cargando">Cargando opciones...</div>
+</section>
+
+<footer class="pie">
+<span class="estado-sesion">🔒 Sesión protegida con Supabase</span>
+<button class="btn-salir" onclick="cerrarSesion()">🚪 Cerrar sesión</button>
+</footer>
+
+</main>
 
 <script>
 
-const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
-const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+const SUPABASE_URL="https://ayzddkcxeswjfpinwvth.supabase.co";
+const SUPABASE_KEY="sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const supabaseClient =
-    supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+const MODULOS=[
+    {clase:"pedidos",icono:"📦",titulo:"Pedidos y Reparto",descripcion:"Recibe pedidos, contacta clientes y controla las entregas.",pagina:"admin.html",roles:["administrador","chofer"]},
+    {clase:"cierres",icono:"🚚",titulo:"Cierre de Viajes",descripcion:"Registra carga, ventas, devoluciones y efectivo del viaje.",pagina:"cierres.html",roles:["administrador","chofer"]},
+    {clase:"reportes",icono:"📊",titulo:"Reportes",descripcion:"Analiza viajes, ventas, diferencias y movimiento de productos.",pagina:"reportes.html",roles:["administrador"]},
+    {clase:"facturacion",icono:"🧾",titulo:"Facturación",descripcion:"Emite facturas y registra ventas por cliente y vendedor.",pagina:"facturacion.html",roles:["administrador"]},
+    {clase:"mayoristas",icono:"🏪",titulo:"Clientes Mayoristas",descripcion:"Configura tiendas, precios especiales y estado comercial.",pagina:"mayoristas.html",roles:["administrador"]},
+    {clase:"clientes",icono:"👥",titulo:"Clientes",descripcion:"Consulta el directorio completo de clientes registrados.",pagina:"lista-clientes.html",roles:["administrador"]}
+];
+
+window.onload=iniciar;
+
+async function iniciar(){
+    actualizarReloj();
+    setInterval(actualizarReloj,30000);
+    await cargarMenu();
+}
 
 async function cargarMenu(){
+    const {data:sesion}=await supabaseClient.auth.getSession();
+    if(!sesion.session){location.href="login.html";return}
 
-    const { data } =
-        await supabaseClient.auth
-        .getSession();
+    const {data:perfil,error}=await supabaseClient.from("usuarios")
+        .select("nombre,rol,camion").eq("id",sesion.session.user.id).single();
 
-    if(!data.session){
-        window.location.href="login.html";
+    if(error||!perfil){
+        alert("No fue posible cargar el perfil del usuario.");
+        await supabaseClient.auth.signOut();
+        location.href="login.html";
         return;
     }
 
-    const { data: perfil } =
-        await supabaseClient
-        .from("usuarios")
-        .select("*")
-        .eq(
-            "id",
-            data.session.user.id
-        )
-        .single();
-
-    document.getElementById(
-        "usuario"
-    ).innerHTML =
-        perfil.nombre;
-
-    let html = "";
-
-    if(perfil.rol==="administrador"){
-
-        html += `
-
-<button class="menu-btn"
-onclick="location.href='admin.html'">
-
-📦 Pedidos
-
-</button>
-
-<button class="menu-btn"
-onclick="location.href='cierres.html'">
-
-🚚 Cierres
-
-</button>
-
-<button class="menu-btn"
-onclick="location.href='reportes.html'">
-
-📊 Reportes
-
-</button>
-
-<button class="menu-btn"
-onclick="location.href='facturacion.html'">
-
-🧾 Facturación
-
-</button>
-
-<button class="menu-btn"
-onclick="location.href='mayoristas.html'">
-
-🏪 Clientes Mayoristas
-
-</button>
-
-<button class="menu-btn"
-onclick="location.href='lista-clientes.html'">
-
-👥 Clientes
-
-</button>
-
-`;
+    if(!["administrador","chofer"].includes(perfil.rol)){
+        alert("El usuario no tiene un rol autorizado.");
+        await supabaseClient.auth.signOut();
+        location.href="login.html";
+        return;
     }
 
-    if(perfil.rol==="chofer"){
+    const esChofer=perfil.rol==="chofer";
+    document.getElementById("avatarUsuario").textContent=esChofer?"🚚":"👤";
+    document.getElementById("nombreUsuario").textContent="Hola, "+(perfil.nombre||"Usuario");
+    document.getElementById("datosUsuario").textContent=
+        (esChofer?"Repartidor":"Administrador")+(perfil.camion?" · "+perfil.camion:"");
+    document.getElementById("rolUsuario").textContent=esChofer?"REPARTIDOR":"ADMINISTRADOR";
 
-       html += `
+    const disponibles=MODULOS.filter(modulo=>modulo.roles.includes(perfil.rol));
+    document.getElementById("menu").innerHTML=disponibles.map(modulo=>`
+        <button class="modulo ${modulo.clase}" onclick="location.href='${modulo.pagina}'">
+            <span class="modulo-icono">${modulo.icono}</span>
+            <span class="modulo-contenido">
+                <h3>${modulo.titulo}</h3>
+                <p>${modulo.descripcion}</p>
+                <span class="flecha">Abrir módulo →</span>
+            </span>
+        </button>
+    `).join("");
+}
 
-<button class="menu-btn"
-onclick="location.href='admin.html'">
-
-📦 Pedidos
-
-</button>
-
-<button class="menu-btn"
-onclick="location.href='cierres.html'">
-
-🚚 Cierres
-
-</button>
-
-`;
-    }
-
-    html += `
-
-<button class="salir-btn"
-onclick="cerrarSesion()">
-
-🚪 Cerrar sesión
-
-</button>
-
-`;
-
-    document.getElementById(
-        "menu"
-    ).innerHTML = html;
+function actualizarReloj(){
+    const ahora=new Date();
+    document.getElementById("horaActual").textContent=ahora.toLocaleTimeString("es-HN",{hour:"2-digit",minute:"2-digit"});
+    document.getElementById("fechaActual").textContent=ahora.toLocaleDateString("es-HN",{weekday:"long",day:"numeric",month:"long"});
 }
 
 async function cerrarSesion(){
-
-    await supabaseClient.auth
-        .signOut();
-
-    window.location.href =
-        "login.html";
+    await supabaseClient.auth.signOut();
+    location.href="login.html";
 }
-
-cargarMenu();
 
 </script>
 
-    <script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js");
-}
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
 </script>
 
 </body>
