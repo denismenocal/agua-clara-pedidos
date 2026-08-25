@@ -228,7 +228,8 @@ id="resultadoBusqueda">
 <div class="col">
 
 <button
-onclick="location.href='nuevo-cliente.html'">
+id="btnNuevoCliente"
+onclick="abrirNuevoCliente()">
 
 ➕ Nuevo Cliente
 
@@ -239,6 +240,7 @@ onclick="location.href='nuevo-cliente.html'">
 <div class="col">
 
 <button
+id="btnConsumidorFinal"
 onclick="seleccionarConsumidorFinal()">
 
 👤 Consumidor Final
@@ -748,6 +750,14 @@ ${cliente.telefono}
 
         async function seleccionarCliente(id){
 
+    if(venta.productos.length>0){
+        alert(
+            "No puede cambiar el cliente porque la factura ya " +
+            "tiene productos. Elimine todos los productos primero."
+        );
+        return;
+    }
+
     clienteSeleccionado =
         listaClientes.find(c=>c.id===id);
 
@@ -810,6 +820,14 @@ await cargarDatosComerciales(
 
         function seleccionarConsumidorFinal(){
 
+    if(venta.productos.length>0){
+        alert(
+            "No puede cambiar el cliente porque la factura ya " +
+            "tiene productos. Elimine todos los productos primero."
+        );
+        return;
+    }
+
     clienteSeleccionado={
         id:null,
         nombre:"CONSUMIDOR FINAL",
@@ -848,6 +866,20 @@ await cargarDatosComerciales(
 
     document.getElementById("precioBotellon").value=
         "Según producto";
+
+}
+
+        function abrirNuevoCliente(){
+
+    if(venta.productos.length>0){
+        alert(
+            "Elimine todos los productos antes de registrar " +
+            "otro cliente."
+        );
+        return;
+    }
+
+    location.href="nuevo-cliente.html";
 
 }
 
@@ -996,6 +1028,14 @@ ${producto.nombre}
 
         function pedirCantidad(id){
 
+    if(!venta.cliente){
+        alert(
+            "Seleccione un cliente o presione Consumidor Final " +
+            "antes de agregar productos."
+        );
+        return;
+    }
+
     productoSeleccionado =
         productos.find(p=>p.id===id);
 
@@ -1119,6 +1159,8 @@ ${producto.nombre}
 
     actualizarDetalle();
 
+    actualizarBloqueoCliente();
+
 }
 
         async function cargarConfiguracion(){
@@ -1221,6 +1263,29 @@ onclick="eliminarProducto(${index})">
     );
 
     actualizarDetalle();
+
+    actualizarBloqueoCliente();
+
+}
+
+        function actualizarBloqueoCliente(){
+
+    const bloqueado=venta.productos.length>0;
+
+    document.getElementById("buscarCliente").disabled=
+        bloqueado;
+
+    document.getElementById("btnNuevoCliente").disabled=
+        bloqueado;
+
+    document.getElementById("btnConsumidorFinal").disabled=
+        bloqueado;
+
+    if(bloqueado){
+        document.getElementById(
+            "resultadoBusqueda"
+        ).innerHTML="";
+    }
 
 }
 
