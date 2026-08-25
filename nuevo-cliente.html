@@ -343,6 +343,20 @@ async function guardarCliente(){
         return;
     }
 
+    if(
+        cliente.tipo_cliente==="Tienda" &&
+        (latitudCliente===null || longitudCliente===null)
+    ){
+
+        alert(
+            "Para registrar una tienda debe obtener su ubicación GPS."
+        );
+
+        document.getElementById("btnUbicacion").focus();
+        return;
+
+    }
+
     const boton=document.getElementById("btnGuardar");
     const estado=document.getElementById("estado");
 
