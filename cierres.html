@@ -657,11 +657,11 @@ const supabaseClient = supabase.createClient(
 
         async function verificarSesion() {
 
-    const { data } =
+    const { data, error:errorUsuario } =
         await supabaseClient.auth
-        .getSession();
+        .getUser();
 
-    if (!data.session) {
+    if (errorUsuario || !data.user) {
         window.location.href =
             "login.html";
         return false;
@@ -671,7 +671,7 @@ const supabaseClient = supabase.createClient(
         await supabaseClient
         .from("usuarios")
         .select("rol,nombre,camion")
-        .eq("id", data.session.user.id)
+        .eq("id", data.user.id)
         .single();
 
     if (!perfil || perfil.rol !== "administrador" &&
