@@ -1,311 +1,848 @@
 <!DOCTYPE html>
-<html>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<html lang="es">
+
 <head>
-    <title>Agua Clara La Muralla</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="icon"
-      href="img/favicon_64.png">
-    
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-        }
+<meta charset="UTF-8">
 
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-        }
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1">
 
-        button {
-            background: #0077cc;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
+<meta name="theme-color" content="#0077b6">
 
-        h1 {
-            text-align: center;
-        }
-    </style>
+<title>Pedir Agua | Agua Clara La Muralla</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/favicon_64.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+:root{
+    --azul:#0077b6;
+    --azul-oscuro:#034d75;
+    --celeste:#e8f7fc;
+    --verde:#198754;
+    --rojo:#c1121f;
+    --texto:#17324d;
+    --borde:#d7e4ec;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--texto);
+    background:
+        radial-gradient(circle at top right,#bde9f7 0,transparent 34%),
+        linear-gradient(180deg,#effaff 0%,#f7fbfd 55%,#e7f5fa 100%);
+}
+
+.cabecera{
+    padding:28px 20px 70px;
+    text-align:center;
+    color:white;
+    background:linear-gradient(135deg,var(--azul),var(--azul-oscuro));
+    border-radius:0 0 38px 38px;
+}
+
+.logo{
+    width:86px;
+    height:86px;
+    object-fit:contain;
+    filter:drop-shadow(0 7px 12px rgba(0,0,0,.18));
+}
+
+.cabecera h1{
+    margin:10px 0 6px;
+    font-size:clamp(27px,7vw,38px);
+}
+
+.cabecera p{
+    margin:0;
+    opacity:.92;
+    font-size:17px;
+}
+
+main{
+    width:min(620px,calc(100% - 28px));
+    margin:-45px auto 40px;
+}
+
+.tarjeta{
+    margin-bottom:18px;
+    padding:22px;
+    background:white;
+    border:1px solid rgba(215,228,236,.8);
+    border-radius:20px;
+    box-shadow:0 12px 35px rgba(3,77,117,.12);
+}
+
+.titulo-paso{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.numero-paso{
+    display:grid;
+    place-items:center;
+    width:38px;
+    height:38px;
+    flex:none;
+    color:white;
+    background:var(--azul);
+    border-radius:50%;
+    font-weight:bold;
+}
+
+.titulo-paso h2{
+    margin:0;
+    font-size:21px;
+}
+
+.titulo-paso p{
+    margin:3px 0 0;
+    color:#60758a;
+    font-size:14px;
+}
+
+label{
+    display:block;
+    margin:0 0 7px;
+    font-weight:bold;
+}
+
+input,
+button{
+    width:100%;
+    min-height:52px;
+    padding:13px 15px;
+    font-size:17px;
+    border-radius:12px;
+}
+
+input{
+    margin-bottom:14px;
+    color:var(--texto);
+    background:white;
+    border:1px solid var(--borde);
+    outline:none;
+}
+
+input:focus{
+    border-color:var(--azul);
+    box-shadow:0 0 0 4px rgba(0,119,182,.11);
+}
+
+input[readonly]{
+    background:#f3f7f9;
+}
+
+button{
+    border:0;
+    color:white;
+    background:var(--azul);
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#00659b;
+}
+
+button:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.telefono-contenedor{
+    position:relative;
+}
+
+.telefono-contenedor input{
+    padding-right:75px;
+    font-size:23px;
+    letter-spacing:2px;
+}
+
+.digitos{
+    position:absolute;
+    top:17px;
+    right:15px;
+    color:#71869a;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.estado{
+    display:none;
+    margin:2px 0 4px;
+    padding:12px 14px;
+    border-radius:11px;
+    line-height:1.35;
+}
+
+.estado.visible{
+    display:block;
+}
+
+.estado.cargando{
+    color:#075985;
+    background:#e0f2fe;
+}
+
+.estado.exito{
+    color:#146c43;
+    background:#e8f7ef;
+}
+
+.estado.aviso{
+    color:#8a5800;
+    background:#fff4d6;
+}
+
+.estado.error{
+    color:#a20d1a;
+    background:#fdebed;
+}
+
+.campo-mayuscula{
+    text-transform:uppercase;
+}
+
+.ubicacion{
+    margin:2px 0 14px;
+    background:#0d8a75;
+}
+
+.ubicacion.lista{
+    background:var(--verde);
+}
+
+.cantidad-control{
+    display:grid;
+    grid-template-columns:58px 1fr 58px;
+    gap:10px;
+    margin-bottom:14px;
+}
+
+.cantidad-control button{
+    padding:0;
+    font-size:28px;
+}
+
+.cantidad-control input{
+    margin:0;
+    text-align:center;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.btn-pedido{
+    min-height:60px;
+    font-size:19px;
+    background:linear-gradient(135deg,#008bc7,#006da6);
+}
+
+.oculto{
+    display:none;
+}
+
+.nota{
+    margin:12px 0 0;
+    color:#71869a;
+    text-align:center;
+    font-size:13px;
+}
+
+.confirmacion{
+    text-align:center;
+}
+
+.confirmacion .icono{
+    font-size:52px;
+}
+
+.confirmacion h2{
+    margin:10px 0 8px;
+    color:var(--verde);
+}
+
+@media(max-width:480px){
+
+    .tarjeta{
+        padding:18px;
+    }
+
+    .cabecera{
+        padding-top:22px;
+    }
+
+}
+
+</style>
+
 </head>
 
-    
-    
 <body>
 
+<header class="cabecera">
+
+<img
+class="logo"
+src="img/logo_menu_192.webp"
+alt="Agua Clara La Muralla">
+
 <h1>Agua Clara La Muralla</h1>
+<p>Tu pedido de agua, rápido y sencillo</p>
 
-<h3>Registro de Cliente</h3>
+</header>
 
-<input type="text" id="telefono" placeholder="Número de celular">
+<main>
 
-<button onclick="buscarCliente()">
-Buscar Cliente
+<section class="tarjeta" id="clienteTarjeta">
+
+<div class="titulo-paso">
+<span class="numero-paso">1</span>
+<div>
+<h2>Escribe tu celular</h2>
+<p>Te buscaremos automáticamente al completar 8 dígitos.</p>
+</div>
+</div>
+
+<label for="telefono">Número de celular</label>
+
+<div class="telefono-contenedor">
+<input
+id="telefono"
+type="tel"
+inputmode="numeric"
+autocomplete="tel"
+maxlength="8"
+placeholder="99999999"
+oninput="telefonoCambiado()">
+<span id="contadorDigitos" class="digitos">0/8</span>
+</div>
+
+<div id="estadoCliente" class="estado"></div>
+
+<div id="datosCliente" class="oculto">
+
+<label for="nombre">Nombre completo</label>
+<input
+id="nombre"
+class="campo-mayuscula"
+autocomplete="name">
+
+<label for="municipio">Municipio</label>
+<input id="municipio" class="campo-mayuscula">
+
+<label for="barrio">Barrio o aldea</label>
+<input id="barrio" class="campo-mayuscula">
+
+<label for="referencia">Referencia de la vivienda</label>
+<input
+id="referencia"
+class="campo-mayuscula"
+placeholder="Ejemplo: casa azul frente a la escuela">
+
+<button
+type="button"
+id="btnUbicacion"
+class="ubicacion"
+onclick="obtenerUbicacion()">
+📍 Compartir mi ubicación
 </button>
 
-<input type="text" id="nombre" placeholder="Nombre completo">
+<div id="gps" class="estado"></div>
 
-<input type="text" id="barrio" placeholder="Barrio">
-
-<input type="text" id="referencia" placeholder="Referencia de la vivienda">
-
-<button onclick="obtenerUbicacion()">
-Obtener Ubicación
-</button>
-
-<p id="gps"></p>
-
-<button id="btnGuardarCliente"
-        onclick="guardarCliente()">
-Guardar Cliente
-</button>
-
-    <hr>
-
-<div id="pedidoSection" style="display:none;">
-
-<hr>
-
-<h3>Pedido de Agua</h3>
-
-<input type="number"
-       id="cantidad"
-       placeholder="Cantidad de botellones">
-
-<input type="text"
-       id="comentario"
-       placeholder="Comentario (opcional)">
-
-<button onclick="guardarPedido()">
-    Enviar Pedido
+<button
+type="button"
+id="btnGuardarCliente"
+onclick="guardarCliente()">
+Guardar mis datos y continuar
 </button>
 
 </div>
 
-</body>
+</section>
+
+<section id="pedidoSection" class="tarjeta oculto">
+
+<div class="titulo-paso">
+<span class="numero-paso">2</span>
+<div>
+<h2>¿Cuántos botellones necesitas?</h2>
+<p>Selecciona la cantidad y confirma tu pedido.</p>
+</div>
+</div>
+
+<div class="cantidad-control">
+<button type="button" onclick="cambiarCantidad(-1)">−</button>
+<input
+type="number"
+id="cantidad"
+inputmode="numeric"
+min="1"
+step="1"
+value="1">
+<button type="button" onclick="cambiarCantidad(1)">+</button>
+</div>
+
+<label for="comentario">Comentario opcional</label>
+<input
+id="comentario"
+placeholder="Ejemplo: entregar después de las 2:00 p. m.">
+
+<button
+type="button"
+id="btnPedido"
+class="btn-pedido"
+onclick="guardarPedido()">
+💧 Enviar pedido
+</button>
+
+<p class="nota">Confirmaremos tu pedido usando el número registrado.</p>
+
+</section>
+
+<section id="confirmacion" class="tarjeta confirmacion oculto">
+<div class="icono">✅</div>
+<h2>¡Pedido enviado!</h2>
+<p>Recibimos tu solicitud correctamente.</p>
+<button type="button" onclick="nuevoPedido()">
+Hacer otro pedido
+</button>
+</section>
+
+</main>
 
 <script>
 
-const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
-const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+const SUPABASE_URL=
+"https://ayzddkcxeswjfpinwvth.supabase.co";
 
-const supabaseClient = supabase.createClient(
+const SUPABASE_KEY=
+"sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+
+const supabaseClient=supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
-let latitud = null;
-let longitud = null;
-let cliente_id = null;
+let latitud=null;
+let longitud=null;
+let cliente_id=null;
+let telefonoConsultado="";
+let consultaActual=0;
 
-function obtenerUbicacion() {
-    navigator.geolocation.getCurrentPosition(
-        function(posicion) {
+document.addEventListener("input",evento=>{
 
-            latitud = posicion.coords.latitude;
-            longitud = posicion.coords.longitude;
+    if(evento.target.classList.contains("campo-mayuscula")){
+        evento.target.value=
+            evento.target.value.toLocaleUpperCase("es-HN");
+    }
 
-            document.getElementById("gps").innerHTML =
-                "Ubicación capturada correctamente";
+});
 
-        },
-        function(error) {
-            alert("No fue posible obtener la ubicación");
+function telefonoCambiado(){
+
+    const campo=document.getElementById("telefono");
+    const telefono=campo.value.replace(/\D/g,"").slice(0,8);
+
+    campo.value=telefono;
+
+    document.getElementById("contadorDigitos").innerHTML=
+        telefono.length + "/8";
+
+    if(telefono!==telefonoConsultado){
+        reiniciarCliente();
+
+        if(telefono.length<8){
+            telefonoConsultado="";
         }
-    );
+    }
+
+    if(telefono.length===8){
+        buscarCliente(telefono);
+    }else{
+        mostrarEstadoCliente(
+            telefono.length===0
+            ? ""
+            : "Faltan " + (8-telefono.length) + " dígitos.",
+            "cargando"
+        );
+    }
+
 }
 
-async function buscarCliente() {
+async function buscarCliente(telefono){
 
-    const telefono =
-        document.getElementById("telefono").value;
+    if(telefono===telefonoConsultado){
+        return;
+    }
 
-    const { data, error } = await supabaseClient
+    telefonoConsultado=telefono;
+    const numeroConsulta=++consultaActual;
+
+    mostrarEstadoCliente("Buscando tu registro...","cargando");
+
+    const telefonoConGuion=
+        telefono.slice(0,4) + "-" + telefono.slice(4);
+
+    const { data,error }=await supabaseClient
         .from("clientes")
         .select("*")
-        .eq("telefono", telefono)
+        .in("telefono",[telefono,telefonoConGuion])
         .limit(1);
 
-    if (error) {
-        alert("Error buscando cliente");
-        console.log(error);
+    if(numeroConsulta!==consultaActual){
         return;
     }
 
-    if (data.length > 0) {
+    if(error){
+        console.error(error);
+        telefonoConsultado="";
+        mostrarEstadoCliente(
+            "No pudimos verificar el número. Intenta nuevamente.",
+            "error"
+        );
+        return;
+    }
 
-        document.getElementById("nombre").value =
-            data[0].nombre || "";
+    if(data.length>0){
+        cargarClienteExistente(data[0]);
+    }else{
+        prepararRegistroNuevo();
+    }
 
-        document.getElementById("barrio").value =
-            data[0].barrio || "";
-
-        document.getElementById("referencia").value =
-            data[0].referencia || "";
-
-        cliente_id = data[0].id;
-        
-        latitud = data[0].latitud;
-        longitud = data[0].longitud;
-
-        document.getElementById("btnGuardarCliente").style.display = "none";
-        document.getElementById("pedidoSection").style.display = "block";
-
-        alert("Cliente encontrado");
-
-    } else {
-
-    document.getElementById("btnGuardarCliente").style.display = "block";
-    document.getElementById("pedidoSection").style.display = "none";
-
-    alert("Cliente no encontrado. Puede registrarlo.");
 }
-}    
 
-async function guardarCliente() {
+function cargarClienteExistente(cliente){
 
-    const telefono =
-        document.getElementById("telefono").value;
+    cliente_id=cliente.id;
+    latitud=cliente.latitud;
+    longitud=cliente.longitud;
 
-    const nombre =
-        document.getElementById("nombre").value;
+    document.getElementById("nombre").value=cliente.nombre || "";
+    document.getElementById("municipio").value=cliente.municipio || "";
+    document.getElementById("barrio").value=cliente.barrio || "";
+    document.getElementById("referencia").value=
+        cliente.referencia || "";
 
-    const barrio =
-        document.getElementById("barrio").value;
+    mostrarDatosCliente(true);
 
-    const referencia =
-        document.getElementById("referencia").value;
+    document.getElementById("btnGuardarCliente").classList.add("oculto");
+    document.getElementById("btnUbicacion").classList.add("oculto");
 
-    document.getElementById("pedidoSection").style.display = "none";
-cliente_id = null;
+    mostrarEstadoCliente(
+        "✅ Cliente encontrado. Hola, " + (cliente.nombre || "cliente") + ".",
+        "exito"
+    );
 
-    const { data: existe } = await supabaseClient
+    document.getElementById("pedidoSection").classList.remove("oculto");
+    document.getElementById("cantidad").focus();
+
+}
+
+function prepararRegistroNuevo(){
+
+    cliente_id=null;
+    latitud=null;
+    longitud=null;
+
+    limpiarDatosCliente();
+    mostrarDatosCliente(false);
+
+    document.getElementById("btnGuardarCliente").classList.remove("oculto");
+    document.getElementById("btnUbicacion").classList.remove("oculto");
+
+    mostrarEstadoCliente(
+        "Este número aún no está registrado. Completa tus datos para continuar.",
+        "aviso"
+    );
+
+    document.getElementById("nombre").focus();
+
+}
+
+function mostrarDatosCliente(soloLectura){
+
+    document.getElementById("datosCliente").classList.remove("oculto");
+
+    ["nombre","municipio","barrio","referencia"].forEach(id=>{
+        document.getElementById(id).readOnly=soloLectura;
+    });
+
+}
+
+function reiniciarCliente(){
+
+    consultaActual++;
+    cliente_id=null;
+    latitud=null;
+    longitud=null;
+
+    document.getElementById("datosCliente").classList.add("oculto");
+    document.getElementById("pedidoSection").classList.add("oculto");
+    document.getElementById("confirmacion").classList.add("oculto");
+
+    limpiarDatosCliente();
+
+}
+
+function limpiarDatosCliente(){
+
+    ["nombre","municipio","barrio","referencia"].forEach(id=>{
+        const campo=document.getElementById(id);
+        campo.value="";
+        campo.readOnly=false;
+    });
+
+    const boton=document.getElementById("btnUbicacion");
+    boton.disabled=false;
+    boton.classList.remove("lista");
+    boton.innerHTML="📍 Compartir mi ubicación";
+
+    mostrarEstado("gps","","");
+
+}
+
+function mostrarEstadoCliente(mensaje,tipo){
+    mostrarEstado("estadoCliente",mensaje,tipo);
+}
+
+function mostrarEstado(id,mensaje,tipo){
+
+    const elemento=document.getElementById(id);
+    elemento.className="estado";
+    elemento.innerHTML=mensaje;
+
+    if(mensaje){
+        elemento.classList.add("visible",tipo);
+    }
+
+}
+
+function obtenerUbicacion(){
+
+    if(!navigator.geolocation){
+        mostrarEstado(
+            "gps",
+            "Este dispositivo no permite obtener la ubicación.",
+            "error"
+        );
+        return;
+    }
+
+    const boton=document.getElementById("btnUbicacion");
+    boton.disabled=true;
+    boton.innerHTML="Obteniendo ubicación...";
+
+    navigator.geolocation.getCurrentPosition(
+
+        posicion=>{
+
+            latitud=posicion.coords.latitude;
+            longitud=posicion.coords.longitude;
+            boton.innerHTML="✅ Ubicación registrada";
+            boton.classList.add("lista");
+
+            mostrarEstado(
+                "gps",
+                "Ubicación capturada correctamente.",
+                "exito"
+            );
+
+        },
+
+        error=>{
+
+            boton.disabled=false;
+            boton.innerHTML="📍 Intentar obtener ubicación nuevamente";
+
+            const mensajes={
+                1:"Permiso de ubicación denegado. Actívalo en el navegador.",
+                2:"No fue posible determinar tu ubicación.",
+                3:"La ubicación tardó demasiado. Intenta nuevamente."
+            };
+
+            mostrarEstado(
+                "gps",
+                mensajes[error.code] || "No fue posible obtener la ubicación.",
+                "error"
+            );
+
+        },
+
+        {
+            enableHighAccuracy:true,
+            timeout:15000,
+            maximumAge:60000
+        }
+
+    );
+
+}
+
+async function guardarCliente(){
+
+    const telefono=document.getElementById("telefono").value;
+    const nombre=document.getElementById("nombre").value.trim();
+    const municipio=document.getElementById("municipio").value.trim();
+    const barrio=document.getElementById("barrio").value.trim();
+    const referencia=document.getElementById("referencia").value.trim();
+
+    if(telefono.length!==8 || !nombre || !municipio || !barrio){
+        mostrarEstadoCliente(
+            "Completa teléfono, nombre, municipio y barrio.",
+            "error"
+        );
+        return;
+    }
+
+    if(latitud===null || longitud===null){
+        mostrarEstado(
+            "gps",
+            "Comparte tu ubicación para poder realizar la entrega.",
+            "error"
+        );
+        return;
+    }
+
+    const boton=document.getElementById("btnGuardarCliente");
+    boton.disabled=true;
+    boton.innerHTML="Guardando datos...";
+
+    const { data,error }=await supabaseClient
         .from("clientes")
+        .insert({
+            telefono,
+            nombre,
+            municipio,
+            barrio,
+            referencia,
+            latitud,
+            longitud,
+            tipo_cliente:"Delivery"
+        })
         .select("id")
-        .eq("telefono", telefono)
-        .limit(1);
+        .single();
 
-    let error = null;
-    let accion = "";
+    if(error){
 
-    if (existe.length > 0) {
+        console.error(error);
+        boton.disabled=false;
+        boton.innerHTML="Guardar mis datos y continuar";
+        mostrarEstadoCliente(
+            "No fue posible guardar tus datos: " + error.message,
+            "error"
+        );
+        return;
 
-        accion = "actualizado";
-
-        const resultado = await supabaseClient
-            .from("clientes")
-            .update({
-                nombre,
-                barrio,
-                referencia,
-                latitud,
-                longitud
-            })
-            .eq("telefono", telefono);
-
-        error = resultado.error;
-
-    } else {
-
-        accion = "registrado";
-
-        const resultado = await supabaseClient
-            .from("clientes")
-            .insert([
-                {
-                    telefono,
-                    nombre,
-                    barrio,
-                    referencia,
-                    latitud,
-                    longitud
-                }
-            ]);
-
-        error = resultado.error;
     }
 
-    if (error) {
-    alert("Error: " + error.message);
-    console.log(error);
+    cliente_id=data.id;
+    boton.classList.add("oculto");
+    document.getElementById("btnUbicacion").classList.add("oculto");
+    mostrarDatosCliente(true);
 
-} else {
+    mostrarEstadoCliente(
+        "✅ Datos guardados correctamente. Ya puedes hacer tu pedido.",
+        "exito"
+    );
 
-    alert("Cliente " + accion + " correctamente");
+    document.getElementById("pedidoSection").classList.remove("oculto");
+    document.getElementById("cantidad").focus();
 
-    document.getElementById("telefono").value = "";
-    document.getElementById("nombre").value = "";
-    document.getElementById("barrio").value = "";
-    document.getElementById("referencia").value = "";
-
-    document.getElementById("gps").innerHTML = "";
-
-    latitud = null;
-    longitud = null;
-}
 }
 
-    async function guardarPedido() {
+function cambiarCantidad(cambio){
 
-    if (!cliente_id) {
-        alert("Primero busque un cliente");
+    const campo=document.getElementById("cantidad");
+    const actual=Math.max(1,parseInt(campo.value) || 1);
+    campo.value=Math.max(1,actual + cambio);
+
+}
+
+async function guardarPedido(){
+
+    if(!cliente_id){
+        mostrarEstadoCliente(
+            "Primero verifica o registra tu número de celular.",
+            "error"
+        );
         return;
     }
 
-    const cantidad =
-        parseInt(document.getElementById("cantidad").value);
+    const cantidad=parseInt(
+        document.getElementById("cantidad").value
+    );
 
-    const comentario =
-        document.getElementById("comentario").value;
+    const comentario=
+        document.getElementById("comentario").value.trim();
 
-    const { error } = await supabaseClient
+    if(!Number.isInteger(cantidad) || cantidad<1){
+        alert("Selecciona una cantidad válida de botellones.");
+        return;
+    }
+
+    const boton=document.getElementById("btnPedido");
+    boton.disabled=true;
+    boton.innerHTML="Enviando pedido...";
+
+    const { error }=await supabaseClient
         .from("pedidos")
-        .insert([
-            {
-                cliente_id: cliente_id,
-                cantidad: cantidad,
-                comentario: comentario
-            }
-        ]);
+        .insert({
+            cliente_id,
+            cantidad,
+            comentario
+        });
 
-    if (error) {
-    alert("Error: " + error.message);
-    console.log(error);
+    if(error){
 
-} else {
+        console.error(error);
+        boton.disabled=false;
+        boton.innerHTML="💧 Enviar pedido";
+        alert("No fue posible enviar el pedido: " + error.message);
+        return;
 
-    alert("Pedido enviado correctamente");
+    }
 
-    // Limpiar pedido
-    document.getElementById("cantidad").value = "";
-    document.getElementById("comentario").value = "";
+    document.getElementById("clienteTarjeta").classList.add("oculto");
+    document.getElementById("pedidoSection").classList.add("oculto");
+    document.getElementById("confirmacion").classList.remove("oculto");
 
-    // Limpiar datos del cliente
-    document.getElementById("telefono").value = "";
-    document.getElementById("nombre").value = "";
-    document.getElementById("barrio").value = "";
-    document.getElementById("referencia").value = "";
-    document.getElementById("gps").innerHTML = "";
-
-    // Limpiar variables
-    cliente_id = null;
-    latitud = null;
-    longitud = null;
-
-    // Ocultar sección de pedidos
-    document.getElementById("pedidoSection").style.display = "none";
-
-    // Regresar el cursor al teléfono
-    document.getElementById("telefono").focus();
 }
+
+function nuevoPedido(){
+
+    document.getElementById("telefono").value="";
+    document.getElementById("contadorDigitos").innerHTML="0/8";
+    document.getElementById("cantidad").value=1;
+    document.getElementById("comentario").value="";
+    document.getElementById("btnPedido").disabled=false;
+    document.getElementById("btnPedido").innerHTML="💧 Enviar pedido";
+
+    telefonoConsultado="";
+    reiniciarCliente();
+
+    document.getElementById("clienteTarjeta").classList.remove("oculto");
+    mostrarEstadoCliente("","");
+    document.getElementById("telefono").focus();
+
 }
 
 </script>
+
+</body>
 
 </html>
