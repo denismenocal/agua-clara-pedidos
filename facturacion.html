@@ -516,13 +516,34 @@ window.onload = async()=>{
 
     await cargarProductos();
 
-    const clienteNuevo = new URLSearchParams(
+    const parametros = new URLSearchParams(
         window.location.search
-    ).get("cliente");
+    );
+
+    const clienteNuevo = parametros.get("cliente");
+
+    const tiendaPendiente = parametros.get(
+        "tiendaPendiente"
+    );
 
     if(clienteNuevo){
 
         await seleccionarCliente(clienteNuevo);
+
+        history.replaceState(
+            {},
+            "",
+            "facturacion.html"
+        );
+
+    }
+
+    if(tiendaPendiente){
+
+        alert(
+            "La tienda fue guardada, pero debe configurarse y " +
+            "activarse en Mayoristas antes de facturarle."
+        );
 
         history.replaceState(
             {},
@@ -624,7 +645,27 @@ document.getElementById(
 
     }
 
-    listaClientes = data;
+    const { data:mayoristasActivos, error:errorMayoristas } =
+        await supabaseClient
+        .from("clientes_mayoristas")
+        .select("cliente_id")
+        .eq("activo",true);
+
+    if(errorMayoristas){
+
+        alert(errorMayoristas.message);
+        return;
+
+    }
+
+    const tiendasActivas = new Set(
+        mayoristasActivos.map(item=>item.cliente_id)
+    );
+
+    listaClientes = data.filter(cliente=>
+        cliente.tipo_cliente!=="Tienda" ||
+        tiendasActivas.has(cliente.id)
+    );
 
 }
 
@@ -709,6 +750,34 @@ ${cliente.telefono}
     clienteSeleccionado =
         listaClientes.find(c=>c.id===id);
 
+    if(!clienteSeleccionado){
+        alert(
+            "Este cliente no está disponible para facturación."
+        );
+        return;
+    }
+
+    if(clienteSeleccionado.tipo_cliente==="Tienda"){
+
+        const { data:configuracionTienda, error } =
+            await supabaseClient
+            .from("clientes_mayoristas")
+            .select("id")
+            .eq("cliente_id",clienteSeleccionado.id)
+            .eq("activo",true)
+            .maybeSingle();
+
+        if(error || !configuracionTienda){
+
+            alert(
+                "Esta tienda está pendiente de configurar o inactiva."
+            );
+            return;
+
+        }
+
+    }
+
     document.getElementById(
         "nombreCliente"
     ).value =
@@ -750,6 +819,8 @@ await cargarDatosComerciales(
         .select("*")
 
         .eq("cliente_id",cliente.id)
+
+        .eq("activo",true)
 
         .maybeSingle();
 
