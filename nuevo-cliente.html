@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1">
+
+<title>Nuevo cliente</title>
+
+<link
+rel="icon"
+href="img/favicon_64.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f4f8fb;
+    color:#1f2937;
+}
+
+header{
+    background:#0077b6;
+    color:white;
+    padding:18px;
+}
+
+header h2{
+    max-width:760px;
+    margin:auto;
+}
+
+main{
+    max-width:760px;
+    margin:auto;
+    padding:20px;
+}
+
+.tarjeta{
+    background:white;
+    padding:22px;
+    border-radius:14px;
+    box-shadow:0 2px 10px rgba(0,0,0,.12);
+}
+
+.campo{
+    margin-bottom:16px;
+}
+
+label{
+    display:block;
+    margin-bottom:7px;
+    font-weight:bold;
+}
+
+.obligatorio{
+    color:#c1121f;
+}
+
+input,
+select,
+button{
+    width:100%;
+    padding:13px;
+    font-size:16px;
+    border-radius:8px;
+}
+
+input,
+select{
+    border:1px solid #b8c2cc;
+    background:white;
+}
+
+.fila{
+    display:flex;
+    gap:14px;
+}
+
+.fila .campo{
+    flex:1;
+}
+
+button{
+    border:none;
+    background:#0077b6;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#005f92;
+}
+
+button:disabled{
+    opacity:.7;
+    cursor:not-allowed;
+}
+
+.secundario{
+    background:#667085;
+}
+
+.acciones{
+    display:flex;
+    gap:12px;
+    margin-top:22px;
+}
+
+.estado{
+    min-height:22px;
+    margin-top:14px;
+    text-align:center;
+    font-weight:bold;
+}
+
+@media(max-width:620px){
+
+    .fila,
+    .acciones{
+        flex-direction:column;
+        gap:0;
+    }
+
+    .acciones{
+        gap:10px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h2>➕ Nuevo cliente</h2>
+</header>
+
+<main>
+
+<div class="tarjeta">
+
+<div class="campo">
+<label for="nombre">
+Nombre completo <span class="obligatorio">*</span>
+</label>
+<input id="nombre" autocomplete="name">
+</div>
+
+<div class="fila">
+
+<div class="campo">
+<label for="telefono">
+Teléfono <span class="obligatorio">*</span>
+</label>
+<input id="telefono" inputmode="tel" autocomplete="tel">
+</div>
+
+<div class="campo">
+<label for="identificacion">RTN o DNI</label>
+<input id="identificacion" inputmode="numeric">
+</div>
+
+</div>
+
+<div class="fila">
+
+<div class="campo">
+<label for="municipio">
+Municipio <span class="obligatorio">*</span>
+</label>
+<input id="municipio">
+</div>
+
+<div class="campo">
+<label for="barrio">
+Barrio o aldea <span class="obligatorio">*</span>
+</label>
+<input id="barrio">
+</div>
+
+</div>
+
+<div class="campo">
+<label for="referencia">Referencia de la dirección</label>
+<input
+id="referencia"
+placeholder="Ejemplo: casa azul frente a la escuela">
+</div>
+
+<div class="campo">
+<label for="tipoCliente">Tipo de cliente</label>
+<select id="tipoCliente">
+<option value="Cliente Final">👤 Cliente final</option>
+<option value="Delivery">🚚 Delivery</option>
+<option value="Tienda">🏪 Tienda</option>
+</select>
+</div>
+
+<button
+type="button"
+id="btnUbicacion"
+onclick="obtenerUbicacion()">
+📍 Obtener ubicación
+</button>
+
+<div class="acciones">
+
+<button
+type="button"
+class="secundario"
+onclick="volverFacturacion()">
+← Cancelar
+</button>
+
+<button
+type="button"
+id="btnGuardar"
+onclick="guardarCliente()">
+💾 Guardar cliente
+</button>
+
+</div>
+
+<div id="estado" class="estado"></div>
+
+</div>
+
+</main>
+
+<script>
+
+const SUPABASE_URL =
+"https://ayzddkcxeswjfpinwvth.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let latitudCliente=null;
+let longitudCliente=null;
+let guardando=false;
+
+window.onload=verificarSesion;
+
+async function verificarSesion(){
+
+    const { data } =
+        await supabaseClient.auth.getSession();
+
+    if(!data.session){
+        location.href="login.html";
+    }
+
+}
+
+function volverFacturacion(){
+    location.href="facturacion.html";
+}
+
+function obtenerUbicacion(){
+
+    if(!navigator.geolocation){
+        alert("Este dispositivo no soporta GPS.");
+        return;
+    }
+
+    const boton=document.getElementById("btnUbicacion");
+    boton.disabled=true;
+    boton.innerHTML="Obteniendo ubicación...";
+
+    navigator.geolocation.getCurrentPosition(
+
+        posicion=>{
+
+            latitudCliente=posicion.coords.latitude;
+            longitudCliente=posicion.coords.longitude;
+            boton.innerHTML="✅ Ubicación registrada";
+
+        },
+
+        ()=>{
+
+            boton.disabled=false;
+            boton.innerHTML="📍 Obtener ubicación";
+            alert("No fue posible obtener la ubicación.");
+
+        },
+
+        {
+            enableHighAccuracy:true,
+            timeout:10000
+        }
+
+    );
+
+}
+
+async function guardarCliente(){
+
+    if(guardando){
+        return;
+    }
+
+    const cliente={
+        nombre:document.getElementById("nombre").value.trim(),
+        telefono:document.getElementById("telefono").value.trim(),
+        municipio:document.getElementById("municipio").value.trim(),
+        barrio:document.getElementById("barrio").value.trim(),
+        referencia:document.getElementById("referencia").value.trim(),
+        identificacion:document.getElementById(
+            "identificacion"
+        ).value.trim(),
+        tipo_cliente:document.getElementById("tipoCliente").value,
+        latitud:latitudCliente,
+        longitud:longitudCliente
+    };
+
+    if(
+        !cliente.nombre ||
+        !cliente.telefono ||
+        !cliente.municipio ||
+        !cliente.barrio
+    ){
+        alert("Complete los campos obligatorios.");
+        return;
+    }
+
+    const boton=document.getElementById("btnGuardar");
+    const estado=document.getElementById("estado");
+
+    guardando=true;
+    boton.disabled=true;
+    boton.innerHTML="Guardando...";
+    estado.innerHTML="";
+
+    const { data, error } =
+        await supabaseClient
+        .from("clientes")
+        .insert(cliente)
+        .select("id")
+        .single();
+
+    if(error){
+
+        console.error(error);
+        estado.style.color="#c1121f";
+        estado.innerHTML="No se pudo guardar: " + error.message;
+        boton.disabled=false;
+        boton.innerHTML="💾 Guardar cliente";
+        guardando=false;
+        return;
+
+    }
+
+    estado.style.color="#198754";
+    estado.innerHTML="Cliente guardado correctamente.";
+
+    location.href=
+        "facturacion.html?cliente=" +
+        encodeURIComponent(data.id);
+
+}
+
+</script>
+
+</body>
+
+</html>
