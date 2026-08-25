@@ -1,287 +1,1111 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
-    
-    <title>Panel Administrativo</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0077b6">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon"
-      href="img/favicon_64.png">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
 
-    <style>
-        
-        body {
-            font-family: Arial;
-            padding: 20px;
-        }
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1">
 
-        .pedido {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-        }
+<meta name="theme-color" content="#075985">
 
-        button {
-            padding: 10px;
-        }
+<title>Pedidos y Reparto | Agua Clara</title>
 
-        input,
-select,
-textarea,
-button {
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/favicon_64.png">
 
-    font-size: 18px;
-    padding: 14px;
-    box-sizing: border-box;
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+:root{
+    --azul:#0077b6;
+    --azul-oscuro:#075985;
+    --fondo:#edf6fa;
+    --texto:#17324d;
+    --gris:#667085;
+    --borde:#dbe7ed;
+    --verde:#198754;
+    --naranja:#e97912;
+    --rojo:#c1121f;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--texto);
+    background:var(--fondo);
+}
+
+button,
+input{
+    font:inherit;
+}
+
+.cabecera{
+    padding:18px;
+    color:white;
+    background:linear-gradient(135deg,#0077b6,#034d75);
+    box-shadow:0 4px 20px rgba(3,77,117,.2);
+}
+
+.cabecera-interior{
+    max-width:1100px;
+    margin:auto;
+}
+
+.barra-superior{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+}
+
+.marca{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.marca img{
+    width:54px;
+    height:54px;
+    object-fit:contain;
+}
+
+.marca h1{
+    margin:0;
+    font-size:clamp(22px,5vw,32px);
+}
+
+.marca p{
+    margin:3px 0 0;
+    opacity:.88;
+}
+
+.acciones-cabecera{
+    display:flex;
+    gap:8px;
+}
+
+.btn-icono{
+    width:46px;
+    height:46px;
+    padding:0;
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:12px;
+    color:white;
+    background:rgba(255,255,255,.12);
+    cursor:pointer;
+    font-size:20px;
+}
+
+.perfil{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:18px;
+    padding:13px 15px;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:14px;
+    background:rgba(255,255,255,.12);
+}
+
+.perfil-icono{
+    display:grid;
+    place-items:center;
+    width:44px;
+    height:44px;
+    flex:none;
+    color:var(--azul-oscuro);
+    background:white;
+    border-radius:50%;
+    font-size:22px;
+}
+
+.perfil strong,
+.perfil span{
+    display:block;
+}
+
+.perfil span{
+    margin-top:3px;
+    opacity:.85;
+    font-size:14px;
+}
+
+main{
+    width:min(1100px,calc(100% - 28px));
+    margin:20px auto 40px;
+}
+
+.alerta{
+    display:none;
+    margin-bottom:16px;
+    padding:14px;
+    color:white;
+    background:var(--verde);
+    border-radius:12px;
+    box-shadow:0 7px 20px rgba(25,135,84,.2);
+    font-weight:bold;
+}
+
+.alerta.visible{
+    display:block;
+}
+
+.resumen{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-bottom:16px;
+}
+
+.resumen-item{
+    padding:16px;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:15px;
+    box-shadow:0 5px 18px rgba(3,77,117,.07);
+}
+
+.resumen-item span{
+    display:block;
+    color:var(--gris);
+    font-size:14px;
+}
+
+.resumen-item strong{
+    display:block;
+    margin-top:6px;
+    font-size:28px;
+}
+
+.resumen-item.pendiente strong{
+    color:var(--naranja);
+}
+
+.resumen-item.ruta strong{
+    color:var(--azul);
+}
+
+.resumen-item.entregado strong{
+    color:var(--verde);
+}
+
+.herramientas{
+    padding:15px;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:16px;
+    box-shadow:0 5px 18px rgba(3,77,117,.07);
+}
+
+.busqueda{
+    width:100%;
+    min-height:50px;
+    padding:12px 15px;
+    border:1px solid var(--borde);
+    border-radius:11px;
+    outline:none;
+    font-size:16px;
+}
+
+.busqueda:focus{
+    border-color:var(--azul);
+    box-shadow:0 0 0 4px rgba(0,119,182,.1);
+}
+
+.filtros{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:12px;
+}
+
+.filtro{
+    min-height:46px;
+    padding:10px;
+    border:1px solid var(--borde);
+    border-radius:10px;
+    color:var(--texto);
+    background:#f7fafb;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.filtro.activo{
+    color:white;
+    background:var(--azul);
+    border-color:var(--azul);
+}
+
+.encabezado-lista{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:20px 2px 12px;
+}
+
+.encabezado-lista h2{
+    margin:0;
+    font-size:21px;
+}
+
+.actualizacion{
+    color:var(--gris);
+    font-size:13px;
+}
+
+.lista-pedidos{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:15px;
+}
+
+.pedido{
+    overflow:hidden;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:18px;
+    box-shadow:0 7px 24px rgba(3,77,117,.08);
+}
+
+.pedido-cabecera{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:17px;
+    background:#f8fbfc;
+    border-bottom:1px solid var(--borde);
+}
+
+.pedido-cabecera h3{
+    margin:0 0 5px;
+    font-size:19px;
+}
+
+.pedido-hora{
+    color:var(--gris);
+    font-size:13px;
+}
+
+.cantidad{
+    min-width:74px;
+    text-align:center;
+}
+
+.cantidad strong{
+    display:block;
+    color:var(--azul);
+    font-size:30px;
+    line-height:1;
+}
+
+.cantidad span{
+    color:var(--gris);
+    font-size:12px;
+}
+
+.pedido-cuerpo{
+    padding:17px;
+}
+
+.dato{
+    display:flex;
+    gap:9px;
+    margin-bottom:10px;
+    line-height:1.35;
+}
+
+.dato-icono{
+    width:22px;
+    flex:none;
+    text-align:center;
+}
+
+.comentario{
+    margin:14px 0;
+    padding:12px;
+    background:#fff8e7;
+    border-left:4px solid #f2b134;
+    border-radius:8px;
+    line-height:1.4;
+}
+
+.estado-etiqueta{
+    display:inline-block;
+    margin-bottom:14px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.estado-Pendiente{
+    color:#8a4b00;
+    background:#fff0d8;
+}
+
+.estado-En-ruta{
+    color:#075985;
+    background:#e0f2fe;
+}
+
+.estado-Entregado{
+    color:#146c43;
+    background:#e8f7ef;
+}
+
+.contacto{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-bottom:10px;
+}
+
+.btn-accion{
+    min-height:44px;
+    padding:9px;
+    border:0;
+    border-radius:10px;
+    color:white;
+    background:var(--azul);
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-accion.llamar{
+    background:#52677b;
+}
+
+.btn-accion.whatsapp{
+    background:#1c9c52;
+}
+
+.btn-accion.mapa{
+    background:#7c4dcc;
+}
+
+.btn-accion.principal{
+    width:100%;
+    min-height:52px;
+    font-size:16px;
+}
+
+.btn-accion.ruta{
+    background:var(--naranja);
+}
+
+.btn-accion.entregado{
+    background:var(--verde);
+}
+
+.btn-accion.secundario{
+    margin-top:8px;
+    color:var(--gris);
+    background:#edf2f5;
+}
+
+.btn-accion:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.vacio{
+    grid-column:1/-1;
+    padding:50px 20px;
+    text-align:center;
+    background:white;
+    border:1px dashed #b8cbd5;
+    border-radius:18px;
+}
+
+.vacio .icono{
+    font-size:48px;
+}
+
+.vacio h3{
+    margin:12px 0 5px;
+}
+
+.vacio p{
+    margin:0;
+    color:var(--gris);
+}
+
+@media(max-width:760px){
+
+    .lista-pedidos{
+        grid-template-columns:1fr;
+    }
 
 }
 
-    </style>
+@media(max-width:520px){
+
+    .marca p{
+        display:none;
+    }
+
+    .resumen-item{
+        padding:12px;
+    }
+
+    .resumen-item strong{
+        font-size:24px;
+    }
+
+    .resumen-item span{
+        font-size:12px;
+    }
+
+    .filtro{
+        font-size:13px;
+    }
+
+    .contacto{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-    <div style="display:flex;gap:10px;margin-bottom:15px;">
+<header class="cabecera">
 
-<button onclick="location.href='menu.html'">
-🏠 Menú
-</button>
+<div class="cabecera-interior">
 
-<button onclick="cerrarSesion()">
-🚪 Salir
+<div class="barra-superior">
+
+<div class="marca">
+<img src="img/logo_menu_192.webp" alt="Agua Clara">
+<div>
+<h1>Pedidos y Reparto</h1>
+<p>Agua Clara La Muralla</p>
+</div>
+</div>
+
+<div class="acciones-cabecera">
+<button
+class="btn-icono"
+type="button"
+title="Actualizar"
+onclick="actualizarTodo(true)">
+↻
 </button>
+<button
+class="btn-icono"
+type="button"
+title="Menú"
+onclick="location.href='menu.html'">
+⌂
+</button>
+<button
+class="btn-icono"
+type="button"
+title="Cerrar sesión"
+onclick="cerrarSesion()">
+⇥
+</button>
+</div>
 
 </div>
 
-    <div id="alertaPedidos"
-     style="
-     display:none;
-     background:#28a745;
-     color:white;
-     padding:10px;
-     border-radius:8px;
-     margin-bottom:10px;">
+<div class="perfil">
+<div class="perfil-icono">🚚</div>
+<div>
+<strong id="nombreUsuario">Cargando usuario...</strong>
+<span id="datosReparto">Preparando panel de reparto</span>
+</div>
 </div>
 
-<h1>Pedidos Agua Clara</h1>
+</div>
 
-    <h2 id="contadorPedidos">
-0 pedidos
-</h2>
+</header>
 
-    <button onclick="cargarPedidos('Pendiente')">
-    Pendientes
-    </button>
+<main>
 
-    <button onclick="cargarPedidos('En ruta')">
-    En ruta
-    </button>
+<div id="alertaPedidos" class="alerta">
+🔔 Nuevo pedido recibido
+</div>
 
-    <button onclick="cargarPedidos('Entregado')">
-    Entregados
-    </button>
+<section class="resumen">
+<div class="resumen-item pendiente">
+<span>Pendientes</span>
+<strong id="totalPendientes">0</strong>
+</div>
+<div class="resumen-item ruta">
+<span>En ruta</span>
+<strong id="totalRuta">0</strong>
+</div>
+<div class="resumen-item entregado">
+<span>Entregados hoy</span>
+<strong id="totalEntregados">0</strong>
+</div>
+</section>
 
-<hr>
+<section class="herramientas">
 
-<div id="listaPedidos"></div>
+<input
+id="buscarPedido"
+class="busqueda"
+placeholder="🔍 Buscar cliente, teléfono o barrio..."
+oninput="mostrarPedidos()">
 
-  <script>
+<div class="filtros">
+<button
+id="filtroPendiente"
+class="filtro activo"
+onclick="cambiarFiltro('Pendiente')">
+Pendientes
+</button>
+<button
+id="filtroEnRuta"
+class="filtro"
+onclick="cambiarFiltro('En ruta')">
+En ruta
+</button>
+<button
+id="filtroEntregado"
+class="filtro"
+onclick="cambiarFiltro('Entregado')">
+Entregados
+</button>
+</div>
 
-const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
-const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+</section>
 
-const supabaseClient = supabase.createClient(
+<div class="encabezado-lista">
+<h2 id="tituloLista">Pedidos pendientes</h2>
+<span id="ultimaActualizacion" class="actualizacion"></span>
+</div>
+
+<section id="listaPedidos" class="lista-pedidos">
+<div class="vacio">
+<div class="icono">⏳</div>
+<h3>Cargando pedidos...</h3>
+</div>
+</section>
+
+</main>
+
+<script>
+
+const SUPABASE_URL=
+"https://ayzddkcxeswjfpinwvth.supabase.co";
+
+const SUPABASE_KEY=
+"sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+
+const supabaseClient=supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
-      async function verificarSesion() {
+let estadoActual="Pendiente";
+let pedidosActuales=[];
+let conteoPendientesAnterior=null;
+let actualizando=false;
 
-    const { data } =
-        await supabaseClient.auth
-        .getSession();
+window.onload=iniciar;
 
-    if (!data.session) {
-        window.location.href =
-            "login.html";
+async function iniciar(){
+
+    if(!await verificarSesion()){
         return;
     }
 
-    const { data: perfil } =
+    await actualizarTodo(false);
+
+    setInterval(()=>{
+        if(!document.hidden){
+            actualizarTodo(false);
+        }
+    },12000);
+
+}
+
+async function verificarSesion(){
+
+    const { data:sesion }=
+        await supabaseClient.auth.getSession();
+
+    if(!sesion.session){
+        location.href="login.html";
+        return false;
+    }
+
+    const { data:perfil,error }=
         await supabaseClient
         .from("usuarios")
-        .select("rol")
-        .eq("id", data.session.user.id)
+        .select("nombre,rol,camion")
+        .eq("id",sesion.session.user.id)
         .single();
 
-    if (!perfil || perfil.rol !== "administrador" &&
-                   perfil.rol !== "chofer") {
-
+    if(
+        error ||
+        !perfil ||
+        !["administrador","chofer"].includes(perfil.rol)
+    ){
         alert("Acceso denegado");
+        location.href="login.html";
+        return false;
+    }
 
-        window.location.href =
-            "login.html";
+    document.getElementById("nombreUsuario").innerHTML=
+        escapar(perfil.nombre || "Usuario");
 
+    const rol=perfil.rol==="chofer" ? "Repartidor" : "Administrador";
+
+    document.getElementById("datosReparto").innerHTML=
+        escapar(rol + (perfil.camion ? " · " + perfil.camion : ""));
+
+    return true;
+
+}
+
+async function cerrarSesion(){
+
+    await supabaseClient.auth.signOut();
+    location.href="login.html";
+
+}
+
+async function actualizarTodo(manual){
+
+    if(actualizando){
         return;
     }
+
+    actualizando=true;
+
+    try{
+
+        const hoy=new Date().toLocaleDateString("en-CA");
+        const inicioHoy=new Date(hoy + "T00:00:00-06:00").toISOString();
+
+        const [pendientes,ruta,entregados]=await Promise.all([
+            consultarPedidos("Pendiente"),
+            consultarPedidos("En ruta"),
+            consultarPedidos("Entregado",inicioHoy)
+        ]);
+
+        if(
+            pendientes.error ||
+            ruta.error ||
+            entregados.error
+        ){
+            throw pendientes.error || ruta.error || entregados.error;
+        }
+
+        document.getElementById("totalPendientes").innerHTML=
+            pendientes.data.length;
+
+        document.getElementById("totalRuta").innerHTML=
+            ruta.data.length;
+
+        document.getElementById("totalEntregados").innerHTML=
+            entregados.data.length;
+
+        if(
+            conteoPendientesAnterior!==null &&
+            pendientes.data.length>conteoPendientesAnterior
+        ){
+            notificarNuevoPedido();
+        }
+
+        conteoPendientesAnterior=pendientes.data.length;
+
+        const grupos={
+            "Pendiente":pendientes.data,
+            "En ruta":ruta.data,
+            "Entregado":entregados.data
+        };
+
+        pedidosActuales=grupos[estadoActual] || [];
+        mostrarPedidos();
+
+        document.getElementById("ultimaActualizacion").innerHTML=
+            "Actualizado " + new Date().toLocaleTimeString(
+                "es-HN",
+                { hour:"2-digit",minute:"2-digit" }
+            );
+
+        if(manual){
+            mostrarAlerta("✅ Pedidos actualizados",1800);
+        }
+
+    }catch(error){
+
+        console.error(error);
+        mostrarAlerta(
+            "No fue posible actualizar: " + error.message,
+            3500,
+            true
+        );
+
+    }finally{
+        actualizando=false;
+    }
+
 }
 
-verificarSesion();
+async function consultarPedidos(estado,desde=null){
 
-verificarSesion();
+    let consulta=supabaseClient
+        .from("pedidos")
+        .select(`
+            *,
+            clientes (
+                nombre,
+                telefono,
+                municipio,
+                barrio,
+                referencia,
+                latitud,
+                longitud
+            )
+        `)
+        .eq("estado",estado);
 
-      async function cerrarSesion() {
+    if(desde){
+        consulta=consulta.gte("fecha",desde);
+    }
 
-    await supabaseClient.auth
-        .signOut();
+    consulta=consulta.order(
+        "fecha",
+        { ascending:estado!=="Entregado" }
+    );
 
-    window.location.href =
-        "login.html";
+    return await consulta;
+
 }
 
-verificarSesion();
-      
-      let estadoActual = "Pendiente";
-      let ultimoConteo = -1;
+function cambiarFiltro(estado){
 
-async function cargarPedidos(estado = 'Pendiente') {
-    estadoActual = estado;
+    estadoActual=estado;
 
-    const { data, error } = await supabaseClient
-    .from("pedidos")
-    .select(`
-    *,
-    clientes (
-        nombre,
-        telefono,
-        barrio,
-        referencia,
-        latitud,
-        longitud
-    )
-`)
-    .eq("estado", estado)
-    .order("fecha", { ascending: false });
+    const ids={
+        "Pendiente":"filtroPendiente",
+        "En ruta":"filtroEnRuta",
+        "Entregado":"filtroEntregado"
+    };
 
-    if (error) {
-    alert("Error: " + error.message);
-    console.log(error);
-    return;
-}
-
-    const totalPedidos = data.length;
-
-document.getElementById(
-    "contadorPedidos"
-).innerText =
-    totalPedidos + " pedidos";
-
-    if (
-    ultimoConteo >= 0 &&
-    estado === "Pendiente" &&
-    totalPedidos > ultimoConteo
-)
-    {
-
-    document.getElementById(
-        "alertaPedidos"
-    ).style.display = "block";
-
-    document.getElementById(
-        "alertaPedidos"
-    ).innerText =
-        "🔔 Nuevo pedido recibido";
-        new Audio(
-'https://actions.google.com/sounds/v1/alarms/beep_short.ogg'
-).play();
-
-    setTimeout(() => {
-
-        document.getElementById(
-            "alertaPedidos"
-        ).style.display = "none";
-
-    }, 5000);
-}
-
-ultimoConteo = totalPedidos;
-
-    let html = "";
-
-    data.forEach(pedido => {
-
-        html += `
-    <div class="pedido">
-        <h3>${pedido.clientes.nombre}</h3>
-
-        <p><b>Teléfono:</b> ${pedido.clientes.telefono}</p>
-
-        <p><b>Barrio:</b> ${pedido.clientes.barrio}</p>
-
-        <p><b>Referencia:</b> ${pedido.clientes.referencia}</p>
-
-        <p><b>Botellones:</b> ${pedido.cantidad}</p>
-
-        <p><b>Comentario:</b> ${pedido.comentario || ""}</p>
-
-        <p><b>Estado:</b> ${pedido.estado}</p>
-
-        <button onclick="
-window.open(
-'https://www.google.com/maps?q=${pedido.clientes.latitud},${pedido.clientes.longitud}',
-'_blank'
-)">
-📍 Abrir mapa
-</button>
-        
-        <button onclick="cambiarEstado('${pedido.id}', 'En ruta')">
-         En ruta
-        </button>
-
-        <button onclick="cambiarEstado('${pedido.id}', 'Entregado')">
-        Entregado
-        </button>
-
-    </div>
-`;
+    document.querySelectorAll(".filtro").forEach(boton=>{
+        boton.classList.remove("activo");
     });
 
-    document.getElementById("listaPedidos").innerHTML = html;
+    document.getElementById(ids[estado]).classList.add("activo");
+
+    const titulos={
+        "Pendiente":"Pedidos pendientes",
+        "En ruta":"Pedidos en ruta",
+        "Entregado":"Pedidos entregados hoy"
+    };
+
+    document.getElementById("tituloLista").innerHTML=titulos[estado];
+    document.getElementById("buscarPedido").value="";
+
+    actualizarTodo(false);
+
 }
 
-cargarPedidos();
+function mostrarPedidos(){
 
-      async function cambiarEstado(id, estado) {
+    const texto=document.getElementById("buscarPedido")
+        .value.trim().toLocaleLowerCase("es-HN");
 
-    const { error } = await supabaseClient
-        .from("pedidos")
-        .update({
-            estado: estado
-        })
-        .eq("id", id);
+    const filtrados=pedidosActuales.filter(pedido=>{
 
-    if (error) {
-        alert("Error: " + error.message);
+        const cliente=pedido.clientes || {};
+
+        return [
+            cliente.nombre,
+            cliente.telefono,
+            cliente.municipio,
+            cliente.barrio,
+            cliente.referencia
+        ].some(valor=>
+            String(valor || "")
+                .toLocaleLowerCase("es-HN")
+                .includes(texto)
+        );
+
+    });
+
+    const contenedor=document.getElementById("listaPedidos");
+
+    if(filtrados.length===0){
+
+        contenedor.innerHTML=`
+            <div class="vacio">
+                <div class="icono">${texto ? "🔍" : "💧"}</div>
+                <h3>${texto ? "Sin coincidencias" : "No hay pedidos aquí"}</h3>
+                <p>${texto
+                    ? "Prueba con otro nombre, teléfono o barrio."
+                    : "Los pedidos aparecerán automáticamente."
+                }</p>
+            </div>
+        `;
+
         return;
+
     }
 
-    cargarPedidos(estadoActual);
+    contenedor.innerHTML=filtrados.map(crearTarjetaPedido).join("");
+
 }
 
-      setInterval(() => {
-    cargarPedidos(estadoActual);
-}, 10000);
+function crearTarjetaPedido(pedido){
+
+    const cliente=pedido.clientes || {};
+    const telefono=String(cliente.telefono || "").replace(/\D/g,"");
+    const telefonoWhatsApp=
+        telefono.startsWith("504") ? telefono : "504" + telefono;
+
+    const tieneUbicacion=
+        cliente.latitud!==null &&
+        cliente.latitud!==undefined &&
+        cliente.longitud!==null &&
+        cliente.longitud!==undefined;
+
+    const claseEstado="estado-" + pedido.estado.replaceAll(" ","-");
+
+    let accionEstado="";
+
+    if(pedido.estado==="Pendiente"){
+        accionEstado=`
+            <button
+            class="btn-accion principal ruta"
+            onclick="cambiarEstado('${pedido.id}','En ruta',this)">
+            🚚 Iniciar entrega
+            </button>
+        `;
+    }else if(pedido.estado==="En ruta"){
+        accionEstado=`
+            <button
+            class="btn-accion principal entregado"
+            onclick="cambiarEstado('${pedido.id}','Entregado',this)">
+            ✅ Marcar como entregado
+            </button>
+            <button
+            class="btn-accion principal secundario"
+            onclick="cambiarEstado('${pedido.id}','Pendiente',this)">
+            ↩ Volver a pendiente
+            </button>
+        `;
+    }
+
+    const comentario=pedido.comentario
+        ? `<div class="comentario">
+            <b>📝 Indicaciones:</b><br>
+            ${escapar(pedido.comentario)}
+           </div>`
+        : "";
+
+    const mapa=tieneUbicacion
+        ? `<button
+            class="btn-accion mapa"
+            onclick="abrirRuta(${Number(cliente.latitud)},${Number(cliente.longitud)})">
+            📍 Ruta
+           </button>`
+        : `<button class="btn-accion mapa" disabled>Sin GPS</button>`;
+
+    return `
+        <article class="pedido">
+            <div class="pedido-cabecera">
+                <div>
+                    <h3>${escapar(cliente.nombre || "Cliente")}</h3>
+                    <div class="pedido-hora">
+                        ${formatearFecha(pedido.fecha)}
+                    </div>
+                </div>
+                <div class="cantidad">
+                    <strong>${Number(pedido.cantidad || 0)}</strong>
+                    <span>botellones</span>
+                </div>
+            </div>
+
+            <div class="pedido-cuerpo">
+                <span class="estado-etiqueta ${claseEstado}">
+                    ${escapar(pedido.estado)}
+                </span>
+
+                <div class="dato">
+                    <span class="dato-icono">📞</span>
+                    <span>${escapar(cliente.telefono || "Sin teléfono")}</span>
+                </div>
+
+                <div class="dato">
+                    <span class="dato-icono">🏘️</span>
+                    <span>${escapar([
+                        cliente.barrio,
+                        cliente.municipio
+                    ].filter(Boolean).join(", ") || "Sin ubicación escrita")}</span>
+                </div>
+
+                <div class="dato">
+                    <span class="dato-icono">🏠</span>
+                    <span>${escapar(cliente.referencia || "Sin referencia")}</span>
+                </div>
+
+                ${comentario}
+
+                <div class="contacto">
+                    <button
+                    class="btn-accion llamar"
+                    onclick="location.href='tel:${telefono}'"
+                    ${telefono ? "" : "disabled"}>
+                    📞 Llamar
+                    </button>
+
+                    <button
+                    class="btn-accion whatsapp"
+                    onclick="abrirWhatsApp('${telefonoWhatsApp}')"
+                    ${telefono ? "" : "disabled"}>
+                    💬 WhatsApp
+                    </button>
+
+                    ${mapa}
+                </div>
+
+                ${accionEstado}
+            </div>
+        </article>
+    `;
+
+}
+
+async function cambiarEstado(id,nuevoEstado,boton){
+
+    if(boton){
+        boton.disabled=true;
+        boton.innerHTML="Guardando...";
+    }
+
+    const { error }=await supabaseClient
+        .from("pedidos")
+        .update({ estado:nuevoEstado })
+        .eq("id",id);
+
+    if(error){
+
+        console.error(error);
+        alert("No fue posible cambiar el estado: " + error.message);
+
+        if(boton){
+            boton.disabled=false;
+        }
+
+        return;
+
+    }
+
+    await actualizarTodo(false);
+
+}
+
+function abrirRuta(latitud,longitud){
+
+    window.open(
+        "https://www.google.com/maps/dir/?api=1&destination=" +
+        encodeURIComponent(latitud + "," + longitud),
+        "_blank"
+    );
+
+}
+
+function abrirWhatsApp(numero){
+
+    window.open(
+        "https://wa.me/" + encodeURIComponent(numero),
+        "_blank"
+    );
+
+}
+
+function formatearFecha(valor){
+
+    if(!valor){
+        return "Hora no disponible";
+    }
+
+    return new Date(valor).toLocaleString(
+        "es-HN",
+        {
+            day:"2-digit",
+            month:"short",
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+
+}
+
+function notificarNuevoPedido(){
+
+    mostrarAlerta("🔔 Nuevo pedido recibido",5000);
+
+    try{
+        const contexto=new AudioContext();
+        const oscilador=contexto.createOscillator();
+        const volumen=contexto.createGain();
+        oscilador.connect(volumen);
+        volumen.connect(contexto.destination);
+        oscilador.frequency.value=880;
+        volumen.gain.value=.08;
+        oscilador.start();
+        oscilador.stop(contexto.currentTime+.18);
+    }catch(error){
+        console.info("Sonido no disponible",error);
+    }
+
+}
+
+function mostrarAlerta(mensaje,duracion,error=false){
+
+    const alerta=document.getElementById("alertaPedidos");
+    alerta.innerHTML=mensaje;
+    alerta.style.background=error ? "#c1121f" : "#198754";
+    alerta.classList.add("visible");
+
+    setTimeout(()=>{
+        alerta.classList.remove("visible");
+    },duracion);
+
+}
+
+function escapar(valor){
+
+    return String(valor || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
 
 </script>
 
-    <script>
-if ("serviceWorker" in navigator) {
+<script>
+if("serviceWorker" in navigator){
     navigator.serviceWorker.register("sw.js");
 }
 </script>
 
 </body>
+
 </html>
