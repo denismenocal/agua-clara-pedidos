@@ -409,9 +409,18 @@ async function guardarCliente(){
     estado.style.color="#198754";
     estado.innerHTML="Cliente guardado correctamente.";
 
-    location.href=
-        "facturacion.html?cliente=" +
-        encodeURIComponent(data.id);
+    if(cliente.tipo_cliente==="Tienda"){
+
+        location.href=
+            "facturacion.html?tiendaPendiente=1";
+
+    }else{
+
+        location.href=
+            "facturacion.html?cliente=" +
+            encodeURIComponent(data.id);
+
+    }
 
 }
 
