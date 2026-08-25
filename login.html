@@ -107,7 +107,7 @@ button {
            id="clave"
            placeholder="Contraseña">
 
-    <button onclick="login()">
+    <button id="btnLogin" onclick="login()">
         Iniciar Sesión
     </button>
 
@@ -126,47 +126,65 @@ const supabaseClient =
         SUPABASE_KEY
     );
 
-verificarSesion();
-
 async function login() {
+
+    const boton=document.getElementById("btnLogin");
+
+    if(boton.disabled) return;
 
     const email =
         document.getElementById(
             "correo"
-        ).value;
+        ).value.trim();
 
     const password =
         document.getElementById(
             "clave"
         ).value;
 
-    const { error } =
+    if(!email || !password){
+        alert("Ingrese el correo y la contraseña.");
+        return;
+    }
+
+    boton.disabled=true;
+    boton.textContent="Ingresando...";
+
+    const { data:acceso, error } =
         await supabaseClient.auth
         .signInWithPassword({
             email,
             password
         });
 
-    if (error) {
+if (error) {
     alert(error.message);
+    boton.disabled=false;
+    boton.textContent="Iniciar Sesión";
     return;
 }
 
-const { data: usuario } =
-    await supabaseClient.auth
-    .getUser();
+if(!acceso.user){
+    alert("No fue posible identificar al usuario.");
+    boton.disabled=false;
+    boton.textContent="Iniciar Sesión";
+    return;
+}
 
 const { data: perfil, error: errorPerfil } =
     await supabaseClient
     .from("usuarios")
     .select("*")
-    .eq("id", usuario.user.id)
+    .eq("id", acceso.user.id)
     .single();
 
 if (errorPerfil) {
     alert(
         "El usuario no tiene rol asignado."
     );
+    await supabaseClient.auth.signOut();
+    boton.disabled=false;
+    boton.textContent="Iniciar Sesión";
     return;
 }
 
