@@ -83,6 +83,14 @@ select{
     background:white;
 }
 
+#nombre,
+#identificacion,
+#municipio,
+#barrio,
+#referencia{
+    text-transform:uppercase;
+}
+
 .fila{
     display:flex;
     gap:14px;
@@ -259,6 +267,20 @@ let longitudCliente=null;
 let guardando=false;
 
 window.onload=verificarSesion;
+
+document.addEventListener("input",evento=>{
+
+    if(
+        evento.target.matches(
+            "#nombre, #identificacion, #municipio, " +
+            "#barrio, #referencia"
+        )
+    ){
+        evento.target.value=
+            evento.target.value.toLocaleUpperCase("es-HN");
+    }
+
+});
 
 async function verificarSesion(){
 
