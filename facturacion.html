@@ -1277,8 +1277,14 @@ onclick="eliminarProducto(${index})">
         return;
     }
 
-    if(!venta.cliente){
-        alert("Seleccione un cliente antes de guardar la factura.");
+    if(
+        !venta.cliente ||
+        !document.getElementById("nombreCliente").value.trim()
+    ){
+        alert(
+            "Seleccione un cliente o presione Consumidor Final " +
+            "antes de guardar la factura."
+        );
         return;
     }
 
