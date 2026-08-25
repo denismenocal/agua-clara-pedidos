@@ -91,6 +91,24 @@ select{
     text-transform:uppercase;
 }
 
+#campoNombreNegocio{
+    display:none;
+    padding:14px;
+    border:1px solid #f6c453;
+    border-radius:10px;
+    background:#fffbeb;
+}
+
+#campoNombreNegocio small{
+    display:block;
+    margin-top:8px;
+    color:#92400e;
+}
+
+#nombreNegocio{
+    text-transform:uppercase;
+}
+
 .fila{
     display:flex;
     gap:14px;
@@ -212,10 +230,22 @@ placeholder="Ejemplo: casa azul frente a la escuela">
 
 <div class="campo">
 <label for="tipoCliente">Tipo de cliente</label>
-<select id="tipoCliente">
+<select id="tipoCliente" onchange="actualizarCampoNegocio()">
 <option value="Cliente Final">👤 Cliente final</option>
 <option value="Tienda">🏪 Tienda</option>
 </select>
+</div>
+
+<div id="campoNombreNegocio" class="campo">
+<label for="nombreNegocio">
+Nombre del negocio <span class="obligatorio">*</span>
+</label>
+<input
+id="nombreNegocio"
+placeholder="Ejemplo: PULPERÍA LA BENDICIÓN">
+<small>
+La tienda quedará pendiente de configurar y activar en Mayoristas.
+</small>
 </div>
 
 <button
@@ -273,7 +303,7 @@ document.addEventListener("input",evento=>{
     if(
         evento.target.matches(
             "#nombre, #identificacion, #municipio, " +
-            "#barrio, #referencia"
+            "#barrio, #referencia, #nombreNegocio"
         )
     ){
         evento.target.value=
@@ -313,6 +343,18 @@ async function verificarAdministrador(){
 
 function volverFacturacion(){
     location.href="facturacion.html";
+}
+
+function actualizarCampoNegocio(){
+
+    const esTienda=
+        document.getElementById("tipoCliente").value==="Tienda";
+
+    document.getElementById("campoNombreNegocio").style.display=
+        esTienda ? "block" : "none";
+
+    document.getElementById("nombreNegocio").required=esTienda;
+
 }
 
 function obtenerUbicacion(){
@@ -373,6 +415,9 @@ async function guardarCliente(){
         longitud:longitudCliente
     };
 
+    const nombreNegocio=
+        document.getElementById("nombreNegocio").value.trim();
+
     if(
         !cliente.nombre ||
         !cliente.telefono ||
@@ -381,6 +426,14 @@ async function guardarCliente(){
     ){
         alert("Complete los campos obligatorios.");
         return;
+    }
+
+    if(cliente.tipo_cliente==="Tienda" && !nombreNegocio){
+
+        alert("Ingrese el nombre del negocio.");
+        document.getElementById("nombreNegocio").focus();
+        return;
+
     }
 
     if(
@@ -429,6 +482,32 @@ async function guardarCliente(){
 
     if(cliente.tipo_cliente==="Tienda"){
 
+        const { error:errorMayorista }=
+            await supabaseClient
+            .from("clientes_mayoristas")
+            .insert({
+                cliente_id:data.id,
+                nombre_tienda:nombreNegocio,
+                tipo_precio:"precio_pulperia_zona1",
+                precio_botellon:0,
+                activo:false
+            });
+
+        if(errorMayorista){
+
+            console.error(errorMayorista);
+            estado.style.color="#c1121f";
+            estado.innerHTML=
+                "El cliente fue guardado, pero no se pudo guardar " +
+                "el negocio: " + errorMayorista.message;
+            boton.disabled=false;
+            boton.innerHTML="👥 Revisar cliente guardado";
+            boton.onclick=()=>location.href="clientes.html";
+            guardando=false;
+            return;
+
+        }
+
         location.href=
             "facturacion.html?tiendaPendiente=1";
 
@@ -441,6 +520,8 @@ async function guardarCliente(){
     }
 
 }
+
+actualizarCampoNegocio();
 
 </script>
 
