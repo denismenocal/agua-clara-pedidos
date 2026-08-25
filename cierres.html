@@ -12,319 +12,638 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
-        
-        body 
-        
-        {
-            font-family: Arial;
-            padding: 20px;
-            max-width: 700px;
-            margin: auto;
-        }
+<style>
 
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
+:root{
+    --azul:#0077b6;
+    --azul-oscuro:#034d75;
+    --fondo:#edf6fa;
+    --texto:#17324d;
+    --gris:#667085;
+    --borde:#dbe7ed;
+    --verde:#198754;
+    --rojo:#c1121f;
+}
 
-        button {
-            padding: 12px;
-            width: 100%;
-        }
-
-        h3 {
-            background: #eee;
-            padding: 8px;
-        }
-
-        input,
-     select,
-     textarea,
-     button {
-
-    font-size:18px;
+*{
     box-sizing:border-box;
+}
 
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--texto);
+    background:var(--fondo);
+}
+
+.cabecera{
+    padding:18px;
+    color:white;
+    background:linear-gradient(135deg,var(--azul),var(--azul-oscuro));
+    box-shadow:0 4px 20px rgba(3,77,117,.2);
+}
+
+.cabecera-interior{
+    max-width:1050px;
+    margin:auto;
+}
+
+.barra-superior{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.marca{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.marca img{
+    width:54px;
+    height:54px;
+    object-fit:contain;
+}
+
+.marca h1{
+    margin:0;
+    font-size:clamp(23px,5vw,32px);
+}
+
+.marca p{
+    margin:3px 0 0;
+    opacity:.88;
+}
+
+.acciones-cabecera{
+    display:flex;
+    gap:8px;
+}
+
+.btn-icono{
+    width:46px;
+    height:46px;
+    padding:0;
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:12px;
+    color:white;
+    background:rgba(255,255,255,.12);
+    cursor:pointer;
+    font-size:20px;
+}
+
+.perfil{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:17px;
+    padding:13px 15px;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:14px;
+    background:rgba(255,255,255,.12);
+}
+
+.perfil-icono{
+    display:grid;
+    place-items:center;
+    width:44px;
+    height:44px;
+    flex:none;
+    color:var(--azul-oscuro);
+    background:white;
+    border-radius:50%;
+    font-size:22px;
+}
+
+.perfil strong,
+.perfil span{
+    display:block;
+}
+
+.perfil span{
+    margin-top:3px;
+    opacity:.86;
+    font-size:14px;
+}
+
+main{
+    width:min(1050px,calc(100% - 28px));
+    margin:20px auto 42px;
+}
+
+.pasos{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:16px;
+}
+
+.paso{
+    padding:12px;
+    text-align:center;
+    color:var(--gris);
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:12px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.paso span{
+    display:block;
+    margin-bottom:4px;
+    color:var(--azul);
+    font-size:20px;
+}
+
+.tarjeta{
+    margin-bottom:16px;
+    padding:20px;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:18px;
+    box-shadow:0 7px 24px rgba(3,77,117,.08);
+}
+
+.titulo-seccion{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:0 0 17px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--borde);
+    font-size:20px;
+}
+
+.titulo-seccion span{
+    display:grid;
+    place-items:center;
+    width:38px;
+    height:38px;
+    border-radius:11px;
+    background:#e6f5fb;
+}
+
+.rejilla{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.rejilla.tres{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.campo-completo{
+    grid-column:1/-1;
+}
+
+label{
+    display:block;
+    margin:0 0 7px;
+    font-size:14px;
+    font-weight:bold;
+}
+
+input,
+select,
+textarea,
+button{
+    width:100%;
+    padding:13px 14px;
+    border-radius:11px;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+input,
+select,
+textarea{
+    border:1px solid var(--borde);
+    color:var(--texto);
+    background:white;
+    outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:var(--azul);
+    box-shadow:0 0 0 4px rgba(0,119,182,.1);
+}
+
+input[readonly]{
+    color:#3d5266;
+    background:#f0f5f7;
+}
+
+textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+button{
+    border:0;
+    color:white;
+    background:var(--azul);
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#00679e;
+}
+
+.btn-cargar{
+    min-height:52px;
+    background:#0d8a75;
+}
+
+.resumen-facturas{
+    margin:12px 0 0;
+    padding:12px 14px;
+    color:#075985;
+    background:#e8f7fc;
+    border-radius:11px;
+    line-height:1.45;
+}
+
+.resumen-facturas:empty{
+    display:none;
+}
+
+.grupo-productos{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:16px;
+}
+
+.resumen-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.resumen-item{
+    padding:14px;
+    text-align:center;
+    background:#f5fafc;
+    border:1px solid var(--borde);
+    border-radius:13px;
+}
+
+.resumen-item span{
+    display:block;
+    color:var(--gris);
+    font-size:13px;
+}
+
+.resumen-item strong{
+    display:block;
+    margin-top:6px;
+    color:var(--azul);
+    font-size:26px;
+}
+
+.totales{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:15px;
+}
+
+.total{
+    padding:16px;
+    border-radius:14px;
+    background:#e8f7fc;
+}
+
+.total.diferencia{
+    background:#fff4d6;
+}
+
+.total > span{
+    display:block;
+    color:var(--gris);
+    font-size:13px;
+}
+
+.total strong{
+    display:block;
+    margin-top:5px;
+    font-size:28px;
+}
+
+.btn-guardar{
+    min-height:60px;
+    margin-top:16px;
+    background:linear-gradient(135deg,#198754,#087048);
+    font-size:18px;
+}
+
+@media(max-width:760px){
+
+    .grupo-productos{
+        grid-template-columns:1fr;
     }
 
-    input:not([type="time"]),
-    select,
-    textarea,
-    button {
-
-    padding:14px;
+    .rejilla.tres{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
 
 }
 
-    </style>
+@media(max-width:560px){
+
+    .marca p{
+        display:none;
+    }
+
+    .rejilla,
+    .rejilla.tres{
+        grid-template-columns:1fr;
+    }
+
+    .resumen-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .tarjeta{
+        padding:17px;
+    }
+
+}
+
+</style>
 </head>
 <body>
 
-    <div style="display:flex;gap:10px;margin-bottom:15px;">
+<header class="cabecera">
+<div class="cabecera-interior">
 
-<button onclick="location.href='menu.html'">
-🏠 Menú
-</button>
-
-<button onclick="cerrarSesion()">
-🚪 Salir
-</button>
-        </div>
-
+<div class="barra-superior">
+<div class="marca">
+<img src="img/logo_menu_192.webp" alt="Agua Clara">
+<div>
 <h1>Cierre de Viajes</h1>
+<p>Control de carga, ventas y devolución</p>
+</div>
+</div>
 
-<h3>Información General</h3>
-
-<label>🚚 Camión asignado</label>
-<input
-id="camion"
-readonly
-placeholder="Camión del usuario">
-
-<label>👤 Conductor</label>
-<input
-id="chofer"
-readonly
-placeholder="Usuario conectado">
-
-<label>
-🧾 Usuario vendedor de facturación
-</label>
-
-<select id="usuario_vendedor">
-    <option value="">
-        Seleccione usuario vendedor
-    </option>
-</select>
-
-<select id="numero_viaje">
-
-     <option value="">
-        Seleccione viaje
-    </option>
-
-    <option value="1">
-        Primer Viaje
-    </option>
-
-    <option value="2">
-        Segundo Viaje
-    </option>
-
-    <option value="3">
-        Tercer Viaje
-    </option>
-
-    <option value="4">
-        Cuarto Viaje
-    </option>
-
-</select>
-
-    <label>
-🚚 Hora de salida del camión
-</label>
-<input type="time"
-       id="hora_salida"
-       placeholder="Hora de salida">
-
-    <label>
-🏭 Hora de regreso a planta
-</label>
-<input type="time"
-       id="hora_regreso"
-       placeholder="Hora de llegada">
-
+<div class="acciones-cabecera">
 <button
+class="btn-icono"
+type="button"
+title="Menú"
+onclick="location.href='menu.html'">⌂</button>
+<button
+class="btn-icono"
+type="button"
+title="Cerrar sesión"
+onclick="cerrarSesion()">⇥</button>
+</div>
+</div>
+
+<div class="perfil">
+<div class="perfil-icono">🚚</div>
+<div>
+<strong id="nombrePerfil">Cargando conductor...</strong>
+<span id="datosPerfil">Consultando camión asignado</span>
+</div>
+</div>
+
+</div>
+</header>
+
+<main>
+
+<div class="pasos">
+<div class="paso"><span>1</span>Datos del viaje</div>
+<div class="paso"><span>2</span>Carga y ventas</div>
+<div class="paso"><span>3</span>Revisar y guardar</div>
+</div>
+
+<section class="tarjeta">
+<h2 class="titulo-seccion"><span>🧭</span> Información del viaje</h2>
+
+<div class="rejilla">
+<div>
+<label for="camion">Camión asignado</label>
+<input id="camion" readonly placeholder="Camión del usuario">
+</div>
+
+<div>
+<label for="chofer">Conductor</label>
+<input id="chofer" readonly placeholder="Usuario conectado">
+</div>
+
+<div>
+<label for="usuario_vendedor">Usuario vendedor de facturación</label>
+<select id="usuario_vendedor">
+<option value="">Seleccione usuario vendedor</option>
+</select>
+</div>
+
+<div>
+<label for="numero_viaje">Número de viaje</label>
+<select id="numero_viaje">
+<option value="">Seleccione viaje</option>
+<option value="1">Primer viaje</option>
+<option value="2">Segundo viaje</option>
+<option value="3">Tercer viaje</option>
+<option value="4">Cuarto viaje</option>
+</select>
+</div>
+
+<div>
+<label for="hora_salida">Hora de salida del camión</label>
+<input type="time" id="hora_salida">
+</div>
+
+<div>
+<label for="hora_regreso">Hora de regreso a planta</label>
+<input type="time" id="hora_regreso">
+</div>
+
+<div class="campo-completo">
+<button
+class="btn-cargar"
 type="button"
 onclick="cargarVentasFacturadas()">
 🔄 Cargar ventas facturadas del viaje
 </button>
+<p id="resumen_facturas" class="resumen-facturas"></p>
+</div>
+</div>
+</section>
 
-<p id="resumen_facturas"></p>
+<section class="tarjeta">
+<h2 class="titulo-seccion"><span>💧</span> Botellones</h2>
 
-<h3>Botellones</h3>
+<div class="rejilla tres">
+<div>
+<label for="botellones_cargados">Botellones cargados</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="botellones_cargados" placeholder="0">
+</div>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="botellones_cargados"
-    placeholder="Botellones Cargados">
+<div>
+<label for="zona1_publico">Zona 1 público · L 40</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="zona1_publico" placeholder="0">
+</div>
 
- <input 
-     type="number"
-      inputmode="numeric"
-      pattern="[0-9]*"
-      min="0"
-      step="1"
-      id="zona1_publico"
-       placeholder="Zona 1 público Lps.40">
+<div>
+<label for="zona1_pulperia">Zona 1 pulpería · L 35</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="zona1_pulperia" placeholder="0">
+</div>
 
- <input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-       id="zona1_pulperia"
-       placeholder="Zona 1 pulpería Lps.35">
+<div>
+<label for="zona2_publico">Zona 2 público · L 35</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="zona2_publico" placeholder="0">
+</div>
 
-  <input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-       id="zona2_publico"
-       placeholder="Zona 2 público Lps.35">
+<div>
+<label for="zona2_pulperia">Zona 2 pulpería · L 30</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="zona2_pulperia" placeholder="0">
+</div>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-       id="zona2_pulperia"
-       placeholder="Zona 2 pulpería Lps.30">
+<div>
+<label for="botellon_nuevo">Botellón nuevo + agua · L 150</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="botellon_nuevo" placeholder="0">
+</div>
 
-    <input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-        id="botellon_nuevo"
-       placeholder="Botellón nuevo + agua Lps.150">
+<div class="campo-completo">
+<label for="botellones_vacios">Botellones vacíos recibidos</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="botellones_vacios" placeholder="0">
+</div>
+</div>
+</section>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="botellones_vacios"
-       placeholder="Botellones vacíos recibidos">
+<div class="grupo-productos">
 
-<h3>Agua en bolsa</h3>
+<section class="tarjeta">
+<h2 class="titulo-seccion"><span>🛍️</span> Agua en bolsa</h2>
+<div class="rejilla tres">
+<div>
+<label for="agua_cargada">Paquetes cargados</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="agua_cargada" placeholder="0">
+</div>
+<div>
+<label for="agua_vendida">Paquetes vendidos</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="agua_vendida" placeholder="0">
+</div>
+<div>
+<label for="agua_regalada">Paquetes regalados</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="agua_regalada" placeholder="0">
+</div>
+</div>
+</section>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="agua_cargada"
-       placeholder="Paquetes cargados">
+<div>
+<section class="tarjeta">
+<h2 class="titulo-seccion"><span>🧃</span> Juguitos</h2>
+<div class="rejilla">
+<div>
+<label for="juguitos_cargados">Cargados</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="juguitos_cargados" placeholder="0">
+</div>
+<div>
+<label for="juguitos_vendidos">Vendidos</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="juguitos_vendidos" placeholder="0">
+</div>
+</div>
+</section>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="agua_vendida"
-       placeholder="Paquetes vendidos">
+<section class="tarjeta">
+<h2 class="titulo-seccion"><span>🧊</span> Hielo</h2>
+<div class="rejilla">
+<div>
+<label for="hielo_cargado">Cargado</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="hielo_cargado" placeholder="0">
+</div>
+<div>
+<label for="hielo_vendido">Vendido</label>
+<input type="number" inputmode="numeric" min="0" step="1"
+id="hielo_vendido" placeholder="0">
+</div>
+</div>
+</section>
+</div>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="agua_regalada"
-       placeholder="Paquetes regalados">
+</div>
 
-<h3>Juguitos</h3>
+<section class="tarjeta">
+<h2 class="titulo-seccion"><span>💵</span> Caja y observaciones</h2>
+<div class="rejilla">
+<div>
+<label for="efectivo_entregado">Efectivo entregado</label>
+<input type="number" inputmode="decimal" min="0" step="0.01"
+id="efectivo_entregado" placeholder="L 0.00">
+</div>
+<div>
+<label for="observaciones">Observaciones</label>
+<textarea id="observaciones" placeholder="Notas del viaje"></textarea>
+</div>
+</div>
+</section>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="juguitos_cargados"
-       placeholder="Cargados">
+<section class="tarjeta">
+<h2 class="titulo-seccion"><span>📊</span> Resumen del cierre</h2>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="juguitos_vendidos"
-       placeholder="Vendidos">
+<div class="resumen-grid">
+<div class="resumen-item">
+<span>Botellones devueltos</span>
+<strong id="botellones_devueltos">0</strong>
+</div>
+<div class="resumen-item">
+<span>Agua devuelta</span>
+<strong id="agua_devuelta">0</strong>
+</div>
+<div class="resumen-item">
+<span>Juguitos devueltos</span>
+<strong id="juguitos_devueltos">0</strong>
+</div>
+<div class="resumen-item">
+<span>Hielo devuelto</span>
+<strong id="hielo_devuelto">0</strong>
+</div>
+</div>
 
-<h3>Hielo</h3>
+<div class="totales">
+<div class="total">
+<span>Total de venta</span>
+<strong>L <span id="total_venta">0.00</span></strong>
+</div>
+<div class="total diferencia">
+<span>Diferencia de caja</span>
+<strong>L <span id="diferencia">0.00</span></strong>
+</div>
+</div>
 
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="hielo_cargado"
-       placeholder="Cargado">
-
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-    id="hielo_vendido"
-       placeholder="Vendido">
-
-<h3>Caja</h3>
-
-<input
-    type="number"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    min="0"
-    step="1"
-       id="efectivo_entregado"
-       placeholder="Efectivo entregado">
-
-<textarea id="observaciones"
-          placeholder="Observaciones"></textarea>
-
-    <h3>Resumen</h3>
-
-<p>Botellones devueltos:
-    <span id="botellones_devueltos">0</span>
-</p>
-
-<p>Agua devuelta:
-    <span id="agua_devuelta">0</span>
-</p>
-
-<p>Juguitos devueltos:
-    <span id="juguitos_devueltos">0</span>
-</p>
-
-<p>Hielo devuelto:
-    <span id="hielo_devuelto">0</span>
-</p>
-
-<hr>
-
-<p>Total venta:
-    <b>L <span id="total_venta">0.00</span></b>
-</p>
-
-<p>Diferencia:
-    <b>L <span id="diferencia">0.00</span></b>
-</p>
-
-<button onclick="guardarViaje()">
-    Guardar cierre
+<button
+id="btnGuardarCierre"
+class="btn-guardar"
+onclick="guardarViaje()">
+✅ Guardar cierre de viaje
 </button>
+</section>
+
+</main>
 
     <script>
 
@@ -371,6 +690,13 @@ const supabaseClient = supabase.createClient(
 
     document.getElementById("camion").value=
         perfil.camion || "";
+
+    document.getElementById("nombrePerfil").textContent=
+        perfil.nombre || "Usuario";
+
+    document.getElementById("datosPerfil").textContent=
+        (perfil.rol==="chofer" ? "Repartidor" : "Administrador") +
+        (perfil.camion ? " · " + perfil.camion : " · Sin camión");
 
     if(!perfil.camion){
         alert(
