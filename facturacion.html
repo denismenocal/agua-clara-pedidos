@@ -16,117 +16,156 @@ content="width=device-width, initial-scale=1">
 href="img/favicon_64.png">
 
 <style>
+:root{
+    --azul:#075985;
+    --azul-claro:#0ea5e9;
+    --celeste:#e0f2fe;
+    --verde:#059669;
+    --rojo:#dc2626;
+    --texto:#102a43;
+    --muted:#64748b;
+    --borde:#dbe7ef;
+}
+
+*{box-sizing:border-box;}
 
 body{
-
-    font-family:Arial;
+    font-family:Inter,Arial,sans-serif;
     margin:0;
-    background:#f4f8fb;
-
+    color:var(--texto);
+    background:linear-gradient(180deg,#dff5f7 0,#f5f9fc 280px);
 }
 
 header{
-
-    background:#0077b6;
+    background:linear-gradient(135deg,#064e6f,#0284c7);
     color:white;
-    padding:15px;
-
+    padding:22px max(18px,calc((100% - 1120px)/2));
+    box-shadow:0 8px 28px rgba(7,89,133,.22);
 }
 
-h2{
+.encabezado{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+}
 
+.encabezado h1{margin:0;font-size:clamp(25px,4vw,36px);}
+.encabezado p{margin:5px 0 0;color:#dff6ff;}
+.volver{
+    width:auto;
+    min-width:110px;
     margin:0;
-
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);
 }
 
-.contenedor{
+.contenedor{max-width:1120px;margin:auto;padding:22px 16px 120px;}
 
-    padding:15px;
-
+.estado-factura{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    padding:14px 16px;
+    margin-bottom:16px;
+    border:1px solid #bae6fd;
+    border-radius:15px;
+    background:#f0f9ff;
+    color:#075985;
+    font-weight:700;
 }
+.estado-factura.guardada{background:#ecfdf5;border-color:#a7f3d0;color:#047857;}
+.estado-icono{font-size:24px;}
 
 .tarjeta{
-
-    background:white;
-    border-radius:12px;
-    padding:15px;
-    margin-bottom:15px;
-    box-shadow:0 2px 8px rgba(0,0,0,.10);
-
+    background:rgba(255,255,255,.96);
+    border:1px solid rgba(219,231,239,.9);
+    border-radius:20px;
+    padding:20px;
+    margin-bottom:16px;
+    box-shadow:0 10px 30px rgba(15,64,91,.08);
 }
+.tarjeta h3{margin:0 0 15px;font-size:19px;}
 
-input,
-select,
-button{
-
+input,select,button{
     width:100%;
-    padding:12px;
-    margin-top:8px;
-    margin-bottom:12px;
+    padding:13px 14px;
+    margin-top:7px;
+    margin-bottom:11px;
     font-size:16px;
-    box-sizing:border-box;
-
+    border-radius:11px;
 }
+input,select{border:1px solid #cbd5e1;background:#fff;color:var(--texto);}
+input[readonly]{background:#f8fafc;color:#334155;}
+input:focus{outline:3px solid rgba(14,165,233,.16);border-color:var(--azul-claro);}
 
 button{
-
-    background:#0077b6;
-    color:white;
     border:none;
-    border-radius:8px;
-    cursor:pointer;
-
-}
-
-button:hover{
-
-    background:#005f92;
-
-}
-
-.fila{
-
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-
-}
-
-.col{
-
-    flex:1;
-
-}
-
-table{
-
-    width:100%;
-    border-collapse:collapse;
-
-}
-
-th{
-
-    background:#0077b6;
+    background:linear-gradient(135deg,#0369a1,#0284c7);
     color:white;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .15s,box-shadow .15s,opacity .15s;
+}
+button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 18px rgba(2,132,199,.22);}
+button:disabled{opacity:.5;cursor:not-allowed;}
 
+.fila{display:flex;gap:12px;flex-wrap:wrap;}
+.col{flex:1;min-width:190px;}
+
+#listaProductos button{
+    flex:1;
+    min-width:190px;
+    min-height:92px;
+    font-size:18px;
+    background:linear-gradient(145deg,#075985,#0369a1);
 }
 
-td,
-th{
+#resultadoBusqueda{position:relative;z-index:3;border-radius:12px;overflow:hidden;box-shadow:0 8px 20px rgba(15,23,42,.09);}
 
-    border:1px solid #ddd;
-    padding:8px;
-    text-align:center;
+.tabla-contenedor{overflow-x:auto;border:1px solid var(--borde);border-radius:14px;}
+table{width:100%;border-collapse:collapse;min-width:570px;}
+th{background:#075985;color:white;}
+td,th{padding:12px 9px;text-align:center;border-bottom:1px solid var(--borde);}
+td{background:white;}
+td button{width:auto;margin:0;padding:9px 12px;background:#fee2e2;color:#b91c1c;}
 
+.resumen{background:linear-gradient(135deg,#effaff,#fff);}
+.total{font-size:24px;color:#0369a1;font-weight:800;margin-top:5px;}
+.total-principal{color:#047857;font-size:30px;}
+
+.acciones{
+    position:sticky;
+    bottom:10px;
+    z-index:8;
+    padding:10px;
+    border-radius:17px;
+    background:rgba(255,255,255,.94);
+    box-shadow:0 10px 35px rgba(15,64,91,.2);
+    backdrop-filter:blur(10px);
+}
+.acciones button{min-height:52px;margin:0;}
+.btn-imprimir{background:linear-gradient(135deg,#047857,#059669);}
+.btn-cancelar{background:#fff;color:#b91c1c;border:1px solid #fecaca;}
+
+@media(max-width:650px){
+    header{padding:18px 16px;}
+    .encabezado{align-items:flex-start;}
+    .encabezado p{font-size:14px;}
+    .volver{min-width:auto;width:48px;font-size:0;padding:13px 8px;}
+    .volver::after{content:"←";font-size:22px;}
+    .contenedor{padding:16px 10px 110px;}
+    .tarjeta{padding:16px;border-radius:17px;}
+    .col{min-width:145px;}
+    .acciones .col{min-width:100%;}
 }
 
-.total{
-
-    font-size:22px;
-    color:#0077b6;
-    font-weight:bold;
-
+@media print{
+    body{background:white;}
+    header,.estado-factura,.acciones,#buscarCliente,#resultadoBusqueda,
+    #btnNuevoCliente,#btnConsumidorFinal,#listaProductos,.tarjeta:has(#listaProductos){display:none!important;}
+    .contenedor{padding:0;max-width:none;}
+    .tarjeta{box-shadow:none;border:1px solid #ddd;break-inside:avoid;}
 }
 
 </style>
@@ -136,16 +175,21 @@ th{
 <body>
 
 <header>
-
-<h2>
-
-🧾 Facturación
-
-</h2>
-
+<div class="encabezado">
+<div>
+<h1>🧾 Facturación</h1>
+<p>Seleccione el cliente, agregue productos y emita la factura.</p>
+</div>
+<button class="volver" onclick="location.href='menu.html'">← Menú</button>
+</div>
 </header>
 
 <div class="contenedor">
+
+<div id="estadoFactura" class="estado-factura">
+<span class="estado-icono">①</span>
+<span>Comience seleccionando un cliente o Consumidor Final.</span>
+</div>
 
 <div class="tarjeta">
 
@@ -350,6 +394,7 @@ Detalle
 
 </h3>
 
+<div class="tabla-contenedor">
 <table>
 
 <thead>
@@ -375,10 +420,11 @@ Detalle
 </tbody>
 
 </table>
+</div>
 
 </div>
 
-<div class="tarjeta">
+<div class="tarjeta resumen">
 
 <div class="fila">
 
@@ -416,7 +462,7 @@ L 0.00
 
 <div
 id="total"
-class="total">
+class="total total-principal">
 
 L 0.00
 
@@ -428,7 +474,7 @@ L 0.00
 
 </div>
 
-<div class="fila">
+<div class="fila acciones">
 
 <div class="col">
 
@@ -445,6 +491,7 @@ onclick="guardarFactura()">
 <div class="col">
 
 <button
+class="btn-imprimir"
 onclick="imprimirFactura()">
 
 🖨 Imprimir
@@ -456,6 +503,7 @@ onclick="imprimirFactura()">
 <div class="col">
 
 <button
+class="btn-cancelar"
 onclick="cancelarFactura()">
 
 ❌ Cancelar
@@ -506,6 +554,40 @@ let cai={};
 let facturaGuardada=null;
 
 let guardandoFactura=false;
+
+function actualizarGuiaFactura(){
+
+    const estado=document.getElementById("estadoFactura");
+
+    if(facturaGuardada){
+        estado.className="estado-factura guardada";
+        estado.innerHTML=`
+            <span class="estado-icono">✓</span>
+            <span>Factura guardada. Puede imprimirla o iniciar una nueva factura.</span>
+        `;
+        return;
+    }
+
+    estado.className="estado-factura";
+
+    if(!venta.cliente){
+        estado.innerHTML=`
+            <span class="estado-icono">①</span>
+            <span>Comience seleccionando un cliente o Consumidor Final.</span>
+        `;
+    }else if(venta.productos.length===0){
+        estado.innerHTML=`
+            <span class="estado-icono">②</span>
+            <span>Cliente seleccionado. Ahora agregue los productos.</span>
+        `;
+    }else{
+        estado.innerHTML=`
+            <span class="estado-icono">③</span>
+            <span>Revise el detalle y guarde la factura.</span>
+        `;
+    }
+
+}
 
 window.onload = async()=>{
 
@@ -902,6 +984,8 @@ await cargarDatosComerciales(
 
     mostrarProductos();
 
+    actualizarGuiaFactura();
+
 }
 
         function abrirNuevoCliente(){
@@ -1002,6 +1086,8 @@ await cargarDatosComerciales(
 
     mostrarProductos();
 
+    actualizarGuiaFactura();
+
 }
 
         async function cargarProductos(){
@@ -1027,6 +1113,8 @@ await cargarDatosComerciales(
     productos = data;
 
     mostrarProductos();
+
+    actualizarGuiaFactura();
 
 }
 
@@ -1372,20 +1460,30 @@ onclick="eliminarProducto(${index})">
 
     const bloqueado=venta.productos.length>0;
 
+    const facturaEmitida=Boolean(facturaGuardada);
+
     document.getElementById("buscarCliente").disabled=
-        bloqueado;
+        bloqueado || facturaEmitida;
 
     document.getElementById("btnNuevoCliente").disabled=
-        bloqueado;
+        bloqueado || facturaEmitida;
 
     document.getElementById("btnConsumidorFinal").disabled=
-        bloqueado;
+        bloqueado || facturaEmitida;
+
+    document.querySelectorAll("#listaProductos button")
+        .forEach(boton=>boton.disabled=facturaEmitida);
+
+    document.querySelectorAll("#detalleFactura button")
+        .forEach(boton=>boton.disabled=facturaEmitida);
 
     if(bloqueado){
         document.getElementById(
             "resultadoBusqueda"
         ).innerHTML="";
     }
+
+    actualizarGuiaFactura();
 
 }
 
@@ -1462,7 +1560,12 @@ onclick="eliminarProducto(${index})">
 
         async function guardarFactura(){
 
-    if(guardandoFactura || facturaGuardada){
+    if(facturaGuardada){
+        nuevaFactura();
+        return;
+    }
+
+    if(guardandoFactura){
         return;
     }
 
@@ -1590,7 +1693,10 @@ onclick="eliminarProducto(${index})">
 
         cai.numero_actual=numeroActual + 1;
         facturaGuardada=factura;
-        boton.innerHTML="✅ Factura guardada";
+        boton.disabled=false;
+        boton.innerHTML="➕ Nueva factura";
+
+        actualizarBloqueoCliente();
 
         alert("Factura guardada correctamente.");
 
@@ -1609,10 +1715,16 @@ onclick="eliminarProducto(${index})">
 
 }
 
+        function nuevaFactura(){
+
+    location.href="facturacion.html";
+
+}
+
         function imprimirFactura(){
 
-    if(venta.productos.length===0){
-        alert("Agregue productos antes de imprimir.");
+    if(!facturaGuardada){
+        alert("Guarde la factura antes de imprimirla.");
         return;
     }
 
@@ -1621,6 +1733,11 @@ onclick="eliminarProducto(${index})">
 }
 
         function cancelarFactura(){
+
+    if(facturaGuardada){
+        location.href="menu.html";
+        return;
+    }
 
     if(
         venta.productos.length>0 &&
