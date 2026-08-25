@@ -88,6 +88,24 @@
     <option>Cristian</option>
 </select>
 
+<label>
+🧾 Usuario vendedor de facturación
+</label>
+
+<select id="usuario_vendedor">
+    <option value="">
+        Seleccione usuario vendedor
+    </option>
+</select>
+
+<button
+type="button"
+onclick="cargarVentasFacturadas()">
+🔄 Cargar ventas facturadas de hoy
+</button>
+
+<p id="resumen_facturas"></p>
+
 <select id="numero_viaje">
 
      <option value="">
@@ -325,7 +343,7 @@ const supabaseClient = supabase.createClient(
     if (!data.session) {
         window.location.href =
             "login.html";
-        return;
+        return false;
     }
 
     const { data: perfil } =
@@ -343,11 +361,21 @@ const supabaseClient = supabase.createClient(
         window.location.href =
             "login.html";
 
-        return;
+        return false;
     }
+
+    return true;
 }
 
-verificarSesion();
+(async()=>{
+
+    if(!await verificarSesion()){
+        return;
+    }
+
+    await cargarUsuariosVendedores();
+
+})();
 
         async function cerrarSesion() {
 
@@ -359,6 +387,105 @@ verificarSesion();
 }
 
         
+        async function cargarUsuariosVendedores(){
+
+    const { data, error } =
+        await supabaseClient
+        .from("usuarios")
+        .select("id,nombre,rol")
+        .eq("rol","administrador")
+        .order("nombre");
+
+    if(error){
+        alert("No fue posible cargar los vendedores: " + error.message);
+        return;
+    }
+
+    const selector=document.getElementById("usuario_vendedor");
+
+    selector.innerHTML=`
+        <option value="">Seleccione usuario vendedor</option>
+        ${data.map(usuario=>`
+            <option value="${usuario.id}">
+                ${usuario.nombre}
+            </option>
+        `).join("")}
+    `;
+
+    const { data:sesion }=
+        await supabaseClient.auth.getSession();
+
+    if(
+        sesion.session &&
+        data.some(usuario=>usuario.id===sesion.session.user.id)
+    ){
+        selector.value=sesion.session.user.id;
+    }
+
+}
+
+        async function cargarVentasFacturadas(){
+
+    const usuarioId=
+        document.getElementById("usuario_vendedor").value;
+
+    if(!usuarioId){
+        alert("Seleccione el usuario vendedor.");
+        return;
+    }
+
+    const fechaHoy=new Date().toLocaleDateString("en-CA");
+    const inicio=new Date(fechaHoy + "T00:00:00-06:00");
+    const fin=new Date(inicio);
+    fin.setDate(fin.getDate()+1);
+
+    const { data, error }=
+        await supabaseClient
+        .from("facturas")
+        .select(
+            "id,total,zona1_pulperia,zona2_pulperia"
+        )
+        .eq("usuario_id",usuarioId)
+        .eq("estado","emitida")
+        .gte("fecha",inicio.toISOString())
+        .lt("fecha",fin.toISOString());
+
+    if(error){
+        alert("No fue posible cargar las facturas: " + error.message);
+        return;
+    }
+
+    const acumulado=data.reduce(
+        (total,factura)=>({
+            zona1:
+                total.zona1 +
+                Number(factura.zona1_pulperia || 0),
+            zona2:
+                total.zona2 +
+                Number(factura.zona2_pulperia || 0),
+            venta:
+                total.venta +
+                Number(factura.total || 0)
+        }),
+        { zona1:0, zona2:0, venta:0 }
+    );
+
+    document.getElementById("zona1_pulperia").value=
+        acumulado.zona1;
+
+    document.getElementById("zona2_pulperia").value=
+        acumulado.zona2;
+
+    document.getElementById("resumen_facturas").innerHTML=
+        `<b>${data.length} facturas emitidas</b><br>` +
+        `Pulpería Z1: ${acumulado.zona1} | ` +
+        `Pulpería Z2: ${acumulado.zona2}<br>` +
+        `Total facturado: L ${acumulado.venta.toFixed(2)}`;
+
+    calcularTotales();
+
+}
+
         function calcularTotales() {
 
     const botellones_cargados =
