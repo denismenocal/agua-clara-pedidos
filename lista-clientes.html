@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1">
+
+<title>Consulta de clientes</title>
+
+<link rel="icon" href="img/favicon_64.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f4f8fb;
+    color:#1f2937;
+}
+
+header{
+    background:#0077b6;
+    color:white;
+    padding:18px;
+}
+
+header h2{
+    max-width:1200px;
+    margin:auto;
+}
+
+main{
+    max-width:1200px;
+    margin:auto;
+    padding:18px;
+}
+
+.acciones{
+    display:flex;
+    gap:12px;
+    margin-bottom:16px;
+}
+
+input,
+button{
+    padding:13px;
+    border-radius:8px;
+    font-size:16px;
+}
+
+input{
+    flex:1;
+    min-width:0;
+    border:1px solid #b8c2cc;
+}
+
+button{
+    border:none;
+    background:#0077b6;
+    color:white;
+    cursor:pointer;
+}
+
+.tarjeta{
+    background:white;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.12);
+    overflow:hidden;
+}
+
+.tabla-contenedor{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:980px;
+}
+
+th,
+td{
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:left;
+    vertical-align:top;
+}
+
+th{
+    background:#0077b6;
+    color:white;
+    position:sticky;
+    top:0;
+}
+
+tbody tr:hover{
+    background:#f1f8fc;
+}
+
+.contador{
+    padding:14px;
+    font-weight:bold;
+    color:#0077b6;
+}
+
+.vacio{
+    padding:28px;
+    text-align:center;
+    color:#667085;
+}
+
+@media(max-width:620px){
+
+    .acciones{
+        flex-direction:column;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h2>👥 Consulta de clientes</h2>
+</header>
+
+<main>
+
+<div class="acciones">
+
+<button onclick="location.href='menu.html'">
+← Menú
+</button>
+
+<input
+id="buscar"
+placeholder="Buscar por nombre, teléfono, RTN o ubicación..."
+oninput="filtrarClientes()">
+
+</div>
+
+<div class="tarjeta">
+
+<div id="contador" class="contador">Cargando clientes...</div>
+
+<div class="tabla-contenedor">
+
+<table>
+
+<thead>
+<tr>
+<th>Nombre</th>
+<th>Teléfono</th>
+<th>RTN o DNI</th>
+<th>Tipo</th>
+<th>Municipio</th>
+<th>Barrio o aldea</th>
+<th>Referencia</th>
+</tr>
+</thead>
+
+<tbody id="listaClientes"></tbody>
+
+</table>
+
+</div>
+
+<div id="sinResultados" class="vacio" hidden>
+No se encontraron clientes.
+</div>
+
+</div>
+
+</main>
+
+<script>
+
+const SUPABASE_URL=
+"https://ayzddkcxeswjfpinwvth.supabase.co";
+
+const SUPABASE_KEY=
+"sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+
+const supabaseClient=supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let clientes=[];
+
+window.onload=iniciar;
+
+async function iniciar(){
+
+    if(!await verificarAdministrador()){
+        return;
+    }
+
+    await cargarClientes();
+
+}
+
+async function verificarAdministrador(){
+
+    const { data:sesion }=
+        await supabaseClient.auth.getSession();
+
+    if(!sesion.session){
+        location.href="login.html";
+        return false;
+    }
+
+    const { data:perfil, error }=
+        await supabaseClient
+        .from("usuarios")
+        .select("rol")
+        .eq("id",sesion.session.user.id)
+        .single();
+
+    if(error || !perfil || perfil.rol!=="administrador"){
+
+        alert("Acceso exclusivo para administradores.");
+        location.href="menu.html";
+        return false;
+
+    }
+
+    return true;
+
+}
+
+async function cargarClientes(){
+
+    const { data, error }=
+        await supabaseClient
+        .from("clientes")
+        .select(
+            "nombre,telefono,identificacion,tipo_cliente," +
+            "municipio,barrio,referencia"
+        )
+        .order("nombre");
+
+    if(error){
+
+        alert("No fue posible cargar los clientes: " + error.message);
+        return;
+
+    }
+
+    clientes=data || [];
+    mostrarClientes(clientes);
+
+}
+
+function filtrarClientes(){
+
+    const texto=document.getElementById("buscar")
+        .value.trim().toLocaleLowerCase("es-HN");
+
+    const filtrados=clientes.filter(cliente=>
+        [
+            cliente.nombre,
+            cliente.telefono,
+            cliente.identificacion,
+            cliente.tipo_cliente,
+            cliente.municipio,
+            cliente.barrio,
+            cliente.referencia
+        ].some(valor=>
+            String(valor || "")
+                .toLocaleLowerCase("es-HN")
+                .includes(texto)
+        )
+    );
+
+    mostrarClientes(filtrados);
+
+}
+
+function mostrarClientes(datos){
+
+    document.getElementById("contador").innerHTML=
+        datos.length +
+        (datos.length===1 ? " cliente" : " clientes");
+
+    document.getElementById("sinResultados").hidden=
+        datos.length!==0;
+
+    document.getElementById("listaClientes").innerHTML=
+        datos.map(cliente=>`
+            <tr>
+                <td>${escapar(cliente.nombre)}</td>
+                <td>${escapar(cliente.telefono)}</td>
+                <td>${escapar(cliente.identificacion)}</td>
+                <td>${escapar(cliente.tipo_cliente)}</td>
+                <td>${escapar(cliente.municipio)}</td>
+                <td>${escapar(cliente.barrio)}</td>
+                <td>${escapar(cliente.referencia)}</td>
+            </tr>
+        `).join("");
+
+}
+
+function escapar(valor){
+
+    return String(valor || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+</script>
+
+</body>
+
+</html>
