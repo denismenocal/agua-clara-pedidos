@@ -900,6 +900,8 @@ await cargarDatosComerciales(
     document.getElementById("precioBotellon").value=
         "Según producto";
 
+    mostrarProductos();
+
 }
 
         function abrirNuevoCliente(){
@@ -998,6 +1000,8 @@ await cargarDatosComerciales(
 
     }
 
+    mostrarProductos();
+
 }
 
         async function cargarProductos(){
@@ -1028,9 +1032,67 @@ await cargarDatosComerciales(
 
         function mostrarProductos(){
 
+    const contenedor=document.getElementById(
+        "listaProductos"
+    );
+
+    if(!venta.cliente){
+
+        contenedor.innerHTML=`
+            <p style="width:100%;color:#667085;">
+                Seleccione un cliente o Consumidor Final
+                para mostrar los productos disponibles.
+            </p>
+        `;
+
+        return;
+
+    }
+
     let html = "";
 
-    productos.forEach(producto=>{
+    const productosVisibles=productos.filter(producto=>{
+
+        const nombre=producto.nombre.toLowerCase();
+        const clave=String(
+            producto.precio_configuracion || ""
+        ).toLowerCase();
+
+        const esBotellon=nombre.includes("botell");
+
+        if(!esBotellon){
+            return true;
+        }
+
+        const esPulperia=
+            nombre.includes("pulper") ||
+            clave.includes("pulperia");
+
+        if(!venta.mayorista){
+            return !esPulperia;
+        }
+
+        if(!esPulperia){
+            return false;
+        }
+
+        const zonaAsignada=
+            venta.tipoPrecio.includes("zona2")
+            ? "zona2"
+            : "zona1";
+
+        const zonaProducto=
+            nombre.includes("z2") ||
+            nombre.includes("zona 2") ||
+            clave.includes("zona2")
+            ? "zona2"
+            : "zona1";
+
+        return zonaProducto===zonaAsignada;
+
+    });
+
+    productosVisibles.forEach(producto=>{
 
         html += `
 
@@ -1053,9 +1115,11 @@ ${producto.nombre}
 
     });
 
-    document.getElementById(
-        "listaProductos"
-    ).innerHTML = html;
+    contenedor.innerHTML = html || `
+        <p style="width:100%;color:#c1121f;">
+            No hay productos configurados para este tipo de cliente.
+        </p>
+    `;
 
 }
 
