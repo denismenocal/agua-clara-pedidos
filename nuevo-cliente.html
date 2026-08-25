@@ -266,7 +266,7 @@ let latitudCliente=null;
 let longitudCliente=null;
 let guardando=false;
 
-window.onload=verificarSesion;
+window.onload=verificarAdministrador;
 
 document.addEventListener("input",evento=>{
 
@@ -282,14 +282,32 @@ document.addEventListener("input",evento=>{
 
 });
 
-async function verificarSesion(){
+async function verificarAdministrador(){
 
     const { data } =
         await supabaseClient.auth.getSession();
 
     if(!data.session){
         location.href="login.html";
+        return false;
     }
+
+    const { data:perfil, error } =
+        await supabaseClient
+        .from("usuarios")
+        .select("rol")
+        .eq("id",data.session.user.id)
+        .single();
+
+    if(error || !perfil || perfil.rol!=="administrador"){
+
+        alert("Acceso exclusivo para administradores.");
+        location.href="menu.html";
+        return false;
+
+    }
+
+    return true;
 
 }
 
