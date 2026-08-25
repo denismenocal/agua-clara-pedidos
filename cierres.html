@@ -78,15 +78,17 @@
 
 <h3>Información General</h3>
 
-<select id="camion">
-    <option>JAC 1</option>
-    <option>JAC 2</option>
-</select>
+<label>🚚 Camión asignado</label>
+<input
+id="camion"
+readonly
+placeholder="Camión del usuario">
 
-<select id="chofer">
-    <option>Erick Hernández</option>
-    <option>Cristian</option>
-</select>
+<label>👤 Conductor</label>
+<input
+id="chofer"
+readonly
+placeholder="Usuario conectado">
 
 <label>
 🧾 Usuario vendedor de facturación
@@ -97,14 +99,6 @@
         Seleccione usuario vendedor
     </option>
 </select>
-
-<button
-type="button"
-onclick="cargarVentasFacturadas()">
-🔄 Cargar ventas facturadas de hoy
-</button>
-
-<p id="resumen_facturas"></p>
 
 <select id="numero_viaje">
 
@@ -143,6 +137,14 @@ onclick="cargarVentasFacturadas()">
 <input type="time"
        id="hora_regreso"
        placeholder="Hora de llegada">
+
+<button
+type="button"
+onclick="cargarVentasFacturadas()">
+🔄 Cargar ventas facturadas del viaje
+</button>
+
+<p id="resumen_facturas"></p>
 
 <h3>Botellones</h3>
 
@@ -349,7 +351,7 @@ const supabaseClient = supabase.createClient(
     const { data: perfil } =
         await supabaseClient
         .from("usuarios")
-        .select("rol")
+        .select("rol,nombre,camion")
         .eq("id", data.session.user.id)
         .single();
 
@@ -362,6 +364,18 @@ const supabaseClient = supabase.createClient(
             "login.html";
 
         return false;
+    }
+
+    document.getElementById("chofer").value=
+        perfil.nombre || "";
+
+    document.getElementById("camion").value=
+        perfil.camion || "";
+
+    if(!perfil.camion){
+        alert(
+            "El usuario conectado no tiene un camión asignado."
+        );
     }
 
     return true;
@@ -434,16 +448,37 @@ const supabaseClient = supabase.createClient(
         return;
     }
 
+    const horaSalida=
+        document.getElementById("hora_salida").value;
+
+    const horaRegreso=
+        document.getElementById("hora_regreso").value;
+
+    if(!horaSalida || !horaRegreso){
+        alert(
+            "Ingrese la hora de salida y la hora de regreso " +
+            "antes de cargar las facturas."
+        );
+        return;
+    }
+
     const fechaHoy=new Date().toLocaleDateString("en-CA");
-    const inicio=new Date(fechaHoy + "T00:00:00-06:00");
-    const fin=new Date(inicio);
-    fin.setDate(fin.getDate()+1);
+    const inicio=new Date(
+        fechaHoy + "T" + horaSalida + ":00-06:00"
+    );
+    const fin=new Date(
+        fechaHoy + "T" + horaRegreso + ":00-06:00"
+    );
+
+    if(fin<=inicio){
+        fin.setDate(fin.getDate()+1);
+    }
 
     const { data, error }=
         await supabaseClient
         .from("facturas")
         .select(
-            "id,total,zona1_pulperia,zona2_pulperia"
+            "id,zona1_pulperia,zona2_pulperia"
         )
         .eq("usuario_id",usuarioId)
         .eq("estado","emitida")
@@ -462,12 +497,9 @@ const supabaseClient = supabase.createClient(
                 Number(factura.zona1_pulperia || 0),
             zona2:
                 total.zona2 +
-                Number(factura.zona2_pulperia || 0),
-            venta:
-                total.venta +
-                Number(factura.total || 0)
+                Number(factura.zona2_pulperia || 0)
         }),
-        { zona1:0, zona2:0, venta:0 }
+        { zona1:0, zona2:0 }
     );
 
     document.getElementById("zona1_pulperia").value=
@@ -479,8 +511,7 @@ const supabaseClient = supabase.createClient(
     document.getElementById("resumen_facturas").innerHTML=
         `<b>${data.length} facturas emitidas</b><br>` +
         `Pulpería Z1: ${acumulado.zona1} | ` +
-        `Pulpería Z2: ${acumulado.zona2}<br>` +
-        `Total facturado: L ${acumulado.venta.toFixed(2)}`;
+        `Pulpería Z2: ${acumulado.zona2}`;
 
     calcularTotales();
 
@@ -611,6 +642,13 @@ async function guardarViaje() {
 
     const chofer =
         document.getElementById("chofer").value;
+
+    if(!camion || !chofer){
+        alert(
+            "El usuario conectado debe tener nombre y camión asignado."
+        );
+        return;
+    }
 
     const numero_viaje =
     parseInt(
@@ -843,14 +881,14 @@ for (let campo of camposObligatorios) {
     } else {
         alert("Cierre guardado correctamente");
         document.querySelectorAll(
-        "input, textarea"
+        "input:not([readonly]), textarea"
         ).forEach(campo => {
         campo.value = "";
         });
 
-        document.getElementById("camion").selectedIndex = 0;
-        document.getElementById("chofer").selectedIndex = 0;
         document.getElementById("numero_viaje").selectedIndex = 0;
+
+        document.getElementById("resumen_facturas").innerHTML="";
 
         calcularTotales();
     }
@@ -864,6 +902,29 @@ for (let campo of camposObligatorios) {
         calcularTotales
     );
 });
+
+["hora_salida","hora_regreso"].forEach(id=>{
+
+    document.getElementById(id).addEventListener(
+        "change",
+        limpiarVentasFacturadas
+    );
+
+});
+
+document.getElementById("usuario_vendedor").addEventListener(
+    "change",
+    limpiarVentasFacturadas
+);
+
+function limpiarVentasFacturadas(){
+
+    document.getElementById("zona1_pulperia").value="";
+    document.getElementById("zona2_pulperia").value="";
+    document.getElementById("resumen_facturas").innerHTML="";
+    calcularTotales();
+
+}
 
 </script>
 
