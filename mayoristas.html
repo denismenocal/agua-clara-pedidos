@@ -184,7 +184,7 @@ SUPABASE_KEY
 let listaTiendas=[];
 let configuracion = {};
 
-    async function verificarSesion(){
+    async function verificarAdministrador(){
 
     const { data } =
         await supabaseClient.auth.getSession();
@@ -192,9 +192,26 @@ let configuracion = {};
     if(!data.session){
 
         window.location.href="login.html";
-        return;
+        return false;
 
     }
+
+    const { data:perfil, error } =
+        await supabaseClient
+        .from("usuarios")
+        .select("rol")
+        .eq("id",data.session.user.id)
+        .single();
+
+    if(error || !perfil || perfil.rol!=="administrador"){
+
+        alert("Acceso exclusivo para administradores.");
+        window.location.href="menu.html";
+        return false;
+
+    }
+
+    return true;
 
 }
 
@@ -1005,7 +1022,9 @@ actualizarPrecioPublico();
 
     (async ()=>{
 
-    await verificarSesion();
+    if(!await verificarAdministrador()){
+        return;
+    }
 
     await cargarConfiguracion();
 
