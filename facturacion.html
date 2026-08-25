@@ -1182,6 +1182,9 @@ ${producto.nombre}
         precio:
         productoSeleccionado.precioVenta,
 
+        precioConfiguracion:
+        productoSeleccionado.precio_configuracion,
+
         total:
         cantidad *
         productoSeleccionado.precioVenta
@@ -1369,6 +1372,30 @@ onclick="eliminarProducto(${index})">
 
 }
 
+        function obtenerContadoresPulperia(){
+
+    const cantidadBotellones=venta.productos
+        .filter(item=>
+            item.nombre.toLowerCase().includes("botell")
+        )
+        .reduce(
+            (total,item)=>total + Number(item.cantidad),
+            0
+        );
+
+    return {
+        zona1_pulperia:
+            venta.tipoPrecio==="precio_pulperia_zona1"
+            ? cantidadBotellones
+            : 0,
+        zona2_pulperia:
+            venta.tipoPrecio==="precio_pulperia_zona2"
+            ? cantidadBotellones
+            : 0
+    };
+
+}
+
         async function guardarFactura(){
 
     if(guardandoFactura || facturaGuardada){
@@ -1422,6 +1449,9 @@ onclick="eliminarProducto(${index})">
 
     const totales=obtenerTotales();
 
+    const contadoresPulperia=
+        obtenerContadoresPulperia();
+
     try{
 
         const { data:factura, error:errorFactura } =
@@ -1446,7 +1476,11 @@ onclick="eliminarProducto(${index})">
                 total:totales.total,
                 cai_id:cai.id,
                 usuario_id:sesion.session.user.id,
-                estado:"emitida"
+                estado:"emitida",
+                zona1_pulperia:
+                    contadoresPulperia.zona1_pulperia,
+                zona2_pulperia:
+                    contadoresPulperia.zona2_pulperia
             })
             .select("id")
             .single();
