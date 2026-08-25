@@ -843,10 +843,11 @@ await cargarDatosComerciales(
 
     document.getElementById("nombreComercial").value="";
 
-    document.getElementById("tipoPrecio").value="Público";
+    document.getElementById("tipoPrecio").value=
+        "Público por zona";
 
     document.getElementById("precioBotellon").value=
-        "L " + venta.precioBotellon.toFixed(2);
+        "Según producto";
 
 }
 
@@ -923,13 +924,12 @@ await cargarDatosComerciales(
         document.getElementById(
             "tipoPrecio"
         ).value =
-        "Público";
+        "Público por zona";
 
         document.getElementById(
             "precioBotellon"
         ).value =
-        "L " +
-        venta.precioBotellon.toFixed(2);
+        "Según producto";
 
     }
 
@@ -1012,8 +1012,19 @@ ${producto.nombre}
         .includes("botell")
     ){
 
-        precio =
-        venta.precioBotellon;
+        if(venta.mayorista){
+
+            precio=venta.precioBotellon;
+
+        }else{
+
+            precio=Number(
+                configuracion[
+                    productoSeleccionado.precio_configuracion
+                ] ?? venta.precioBotellon ?? 0
+            );
+
+        }
 
     }else{
 
