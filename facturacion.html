@@ -227,7 +227,8 @@ id="resultadoBusqueda">
 
 <div class="col">
 
-<button>
+<button
+onclick="location.href='nuevo-cliente.html'">
 
 ➕ Nuevo Cliente
 
@@ -514,6 +515,22 @@ window.onload = async()=>{
     await cargarClientes();
 
     await cargarProductos();
+
+    const clienteNuevo = new URLSearchParams(
+        window.location.search
+    ).get("cliente");
+
+    if(clienteNuevo){
+
+        await seleccionarCliente(clienteNuevo);
+
+        history.replaceState(
+            {},
+            "",
+            "facturacion.html"
+        );
+
+    }
 
 }
 
