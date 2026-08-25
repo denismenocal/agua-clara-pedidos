@@ -509,6 +509,10 @@ let guardandoFactura=false;
 
 window.onload = async()=>{
 
+    if(!await verificarAdministrador()){
+        return;
+    }
+
     await cargarEmpresa();
 
     await cargarCAI();
@@ -555,6 +559,35 @@ window.onload = async()=>{
         );
 
     }
+
+}
+
+        async function verificarAdministrador(){
+
+    const { data:sesion } =
+        await supabaseClient.auth.getSession();
+
+    if(!sesion.session){
+        location.href="login.html";
+        return false;
+    }
+
+    const { data:perfil, error } =
+        await supabaseClient
+        .from("usuarios")
+        .select("rol")
+        .eq("id",sesion.session.user.id)
+        .single();
+
+    if(error || !perfil || perfil.rol!=="administrador"){
+
+        alert("Acceso exclusivo para administradores.");
+        location.href="menu.html";
+        return false;
+
+    }
+
+    return true;
 
 }
 
