@@ -238,7 +238,8 @@ onclick="location.href='nuevo-cliente.html'">
 
 <div class="col">
 
-<button>
+<button
+onclick="seleccionarConsumidorFinal()">
 
 👤 Consumidor Final
 
@@ -804,6 +805,48 @@ ${cliente.telefono}
 
 await cargarDatosComerciales(
     clienteSeleccionado);
+
+}
+
+        function seleccionarConsumidorFinal(){
+
+    clienteSeleccionado={
+        id:null,
+        nombre:"CONSUMIDOR FINAL",
+        identificacion:"99999999999999",
+        barrio:"",
+        tipo_cliente:"Cliente Final"
+    };
+
+    venta.cliente=clienteSeleccionado;
+    venta.mayorista=null;
+    venta.tipoPrecio="precio_publico_zona1";
+    venta.precioBotellon=Number(
+        configuracion.precio_publico_zona1 || 0
+    );
+
+    document.getElementById("buscarCliente").value=
+        "CONSUMIDOR FINAL";
+
+    document.getElementById("resultadoBusqueda").innerHTML="";
+
+    document.getElementById("nombreCliente").value=
+        "CONSUMIDOR FINAL";
+
+    document.getElementById("rtnCliente").value=
+        "99999999999999";
+
+    document.getElementById("direccionCliente").value="";
+
+    document.getElementById("tipoCliente").value=
+        "Cliente Final";
+
+    document.getElementById("nombreComercial").value="";
+
+    document.getElementById("tipoPrecio").value="Público";
+
+    document.getElementById("precioBotellon").value=
+        "L " + venta.precioBotellon.toFixed(2);
 
 }
 
