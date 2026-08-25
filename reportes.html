@@ -1,509 +1,627 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
-    
-    <title>Reportes de Viajes</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0077b6">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
 
-    <link rel="icon"
-      href="img/favicon_64.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#075985">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Reportes Administrativos | Agua Clara</title>
 
-    <style>
-        
-        body {
-            font-family: Arial;
-            padding: 20px;
-        }
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/favicon_64.png">
 
-        .viaje {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-        }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        select, input {
-            padding: 10px;
-            margin-bottom: 10px;
-            width: 100%;
-            box-sizing: border-box;
-        }
+<style>
 
-        input,
-select,
-textarea,
-button {
-
-    font-size: 18px;
-    padding: 14px;
-    box-sizing: border-box;
-
+:root{
+    --azul:#0077b6;
+    --azul-oscuro:#034d75;
+    --fondo:#edf6fa;
+    --texto:#17324d;
+    --gris:#667085;
+    --borde:#dbe7ed;
+    --verde:#198754;
+    --rojo:#c1121f;
+    --naranja:#e97912;
 }
-        
-    </style>
+
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--texto);
+    background:var(--fondo);
+}
+
+button,input,select{font:inherit}
+
+.cabecera{
+    padding:18px;
+    color:white;
+    background:linear-gradient(135deg,var(--azul),var(--azul-oscuro));
+    box-shadow:0 4px 20px rgba(3,77,117,.2);
+}
+
+.cabecera-interior{
+    max-width:1150px;
+    margin:auto;
+}
+
+.barra-superior{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.marca{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.marca img{
+    width:54px;
+    height:54px;
+    object-fit:contain;
+}
+
+.marca h1{
+    margin:0;
+    font-size:clamp(23px,5vw,32px);
+}
+
+.marca p{
+    margin:3px 0 0;
+    opacity:.88;
+}
+
+.acciones-cabecera{display:flex;gap:8px}
+
+.btn-icono{
+    width:46px;
+    height:46px;
+    padding:0;
+    color:white;
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:12px;
+    background:rgba(255,255,255,.12);
+    cursor:pointer;
+    font-size:20px;
+}
+
+.perfil{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:17px;
+    padding:13px 15px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:14px;
+}
+
+.perfil-icono{
+    display:grid;
+    place-items:center;
+    width:44px;
+    height:44px;
+    flex:none;
+    color:var(--azul-oscuro);
+    background:white;
+    border-radius:50%;
+    font-size:22px;
+}
+
+.perfil strong,.perfil span{display:block}
+.perfil span{margin-top:3px;opacity:.86;font-size:14px}
+
+main{
+    width:min(1150px,calc(100% - 28px));
+    margin:20px auto 42px;
+}
+
+.tarjeta{
+    padding:18px;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:17px;
+    box-shadow:0 7px 24px rgba(3,77,117,.08);
+}
+
+.filtros-rapidos{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-bottom:14px;
+}
+
+.periodo{
+    min-height:44px;
+    padding:10px;
+    color:var(--texto);
+    background:#f5fafc;
+    border:1px solid var(--borde);
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.periodo.activo{
+    color:white;
+    background:var(--azul);
+    border-color:var(--azul);
+}
+
+.filtros{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;
+    align-items:end;
+}
+
+label{
+    display:block;
+    margin-bottom:7px;
+    font-size:14px;
+    font-weight:bold;
+}
+
+input,select,.btn-buscar{
+    width:100%;
+    min-height:48px;
+    padding:11px 13px;
+    border-radius:10px;
+    font-size:16px;
+}
+
+input,select{
+    color:var(--texto);
+    background:white;
+    border:1px solid var(--borde);
+    outline:none;
+}
+
+input:focus,select:focus{
+    border-color:var(--azul);
+    box-shadow:0 0 0 4px rgba(0,119,182,.1);
+}
+
+.btn-buscar{
+    border:0;
+    color:white;
+    background:var(--azul);
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.titulo-bloque{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin:22px 2px 12px;
+}
+
+.titulo-bloque h2{margin:0;font-size:21px}
+.titulo-bloque span{color:var(--gris);font-size:13px}
+
+.resumen-financiero{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.indicador{
+    min-height:125px;
+    padding:18px;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:16px;
+    box-shadow:0 6px 20px rgba(3,77,117,.07);
+}
+
+.indicador .icono{font-size:25px}
+.indicador span{display:block;margin-top:10px;color:var(--gris);font-size:13px}
+.indicador strong{display:block;margin-top:5px;font-size:25px}
+.indicador.positivo strong{color:var(--verde)}
+.indicador.alerta strong{color:var(--rojo)}
+
+.resumen-productos{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:10px;
+}
+
+.producto-indicador{
+    padding:14px 10px;
+    text-align:center;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:14px;
+}
+
+.producto-indicador span{display:block;color:var(--gris);font-size:12px;line-height:1.3}
+.producto-indicador strong{display:block;margin-top:7px;color:var(--azul);font-size:24px}
+
+.lista-viajes{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.viaje{
+    overflow:hidden;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:17px;
+    box-shadow:0 7px 24px rgba(3,77,117,.08);
+}
+
+.viaje-cabecera{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:16px;
+    background:#f7fbfc;
+    border-bottom:1px solid var(--borde);
+}
+
+.viaje-cabecera h3{margin:0 0 5px;font-size:19px}
+.viaje-cabecera span{color:var(--gris);font-size:13px}
+.camion-etiqueta{padding:6px 9px;color:#075985!important;background:#e0f2fe;border-radius:999px;font-weight:bold}
+
+.viaje-cuerpo{padding:16px}
+.viaje-datos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.viaje-dato{padding:10px;background:#f5fafc;border-radius:10px}
+.viaje-dato span{display:block;color:var(--gris);font-size:11px}
+.viaje-dato strong{display:block;margin-top:4px;font-size:15px}
+
+.diferencia-ok{color:var(--verde)}
+.diferencia-alerta{color:var(--rojo)}
+
+.btn-detalle{
+    width:100%;
+    min-height:47px;
+    padding:11px;
+    color:white;
+    background:var(--azul);
+    border:0;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.vacio{
+    grid-column:1/-1;
+    padding:50px 20px;
+    text-align:center;
+    background:white;
+    border:1px dashed #b8cbd5;
+    border-radius:17px;
+}
+
+.vacio .icono{font-size:48px}
+.vacio h3{margin:12px 0 5px}
+.vacio p{margin:0;color:var(--gris)}
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    padding:18px;
+    background:rgba(10,32,48,.55);
+    overflow-y:auto;
+}
+
+.modal.visible{display:block}
+
+.modal-contenido{
+    width:min(760px,100%);
+    margin:25px auto;
+    background:white;
+    border-radius:19px;
+    box-shadow:0 24px 70px rgba(0,0,0,.28);
+    overflow:hidden;
+}
+
+.modal-cabecera{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:17px 20px;
+    color:white;
+    background:linear-gradient(135deg,var(--azul),var(--azul-oscuro));
+}
+
+.modal-cabecera h2{margin:0;font-size:21px}
+.cerrar-modal{width:40px;height:40px;padding:0;color:white;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:10px;cursor:pointer;font-size:22px}
+.modal-cuerpo{padding:20px}
+.detalle-seccion{margin-bottom:18px}
+.detalle-seccion h3{margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--borde);font-size:17px}
+.detalle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.detalle-item{padding:11px;background:#f5fafc;border-radius:10px}
+.detalle-item span{display:block;color:var(--gris);font-size:12px}
+.detalle-item strong{display:block;margin-top:4px}
+
+@media(max-width:850px){
+    .resumen-financiero{grid-template-columns:repeat(2,1fr)}
+    .resumen-productos{grid-template-columns:repeat(3,1fr)}
+}
+
+@media(max-width:720px){
+    .filtros{grid-template-columns:repeat(2,1fr)}
+    .lista-viajes{grid-template-columns:1fr}
+}
+
+@media(max-width:520px){
+    .marca p{display:none}
+    .resumen-financiero{grid-template-columns:1fr 1fr}
+    .indicador{min-height:110px;padding:14px}
+    .indicador strong{font-size:20px}
+    .resumen-productos{grid-template-columns:repeat(2,1fr)}
+    .viaje-datos{grid-template-columns:1fr}
+    .detalle-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+</style>
+
 </head>
 
 <body>
 
-     <div style="display:flex;gap:10px;margin-bottom:15px;">
+<header class="cabecera">
+<div class="cabecera-interior">
+<div class="barra-superior">
+<div class="marca">
+<img src="img/logo_menu_192.webp" alt="Agua Clara">
+<div><h1>Reportes Administrativos</h1><p>Rendimiento de viajes y ventas</p></div>
+</div>
+<div class="acciones-cabecera">
+<button class="btn-icono" title="Menú" onclick="location.href='menu.html'">⌂</button>
+<button class="btn-icono" title="Cerrar sesión" onclick="cerrarSesion()">⇥</button>
+</div>
+</div>
+<div class="perfil">
+<div class="perfil-icono">📊</div>
+<div><strong id="nombreAdministrador">Cargando administrador...</strong><span>Panel privado de análisis</span></div>
+</div>
+</div>
+</header>
 
-<button onclick="location.href='menu.html'">
-🏠 Menú
-</button>
+<main>
 
-<button onclick="cerrarSesion()">
-🚪 Salir
-</button>
-
+<section class="tarjeta">
+<div class="filtros-rapidos">
+<button id="periodoHoy" class="periodo activo" onclick="establecerPeriodo('hoy')">Hoy</button>
+<button id="periodoSemana" class="periodo" onclick="establecerPeriodo('semana')">Últimos 7 días</button>
+<button id="periodoMes" class="periodo" onclick="establecerPeriodo('mes')">Este mes</button>
 </div>
 
-<label>Desde</label>
+<div class="filtros">
+<div><label for="fechaInicio">Desde</label><input type="date" id="fechaInicio" onchange="periodoPersonalizado()"></div>
+<div><label for="fechaFin">Hasta</label><input type="date" id="fechaFin" onchange="periodoPersonalizado()"></div>
+<div><label for="camion">Camión</label><select id="camion"><option value="">Todos los camiones</option><option>JAC 1</option><option>JAC 2</option></select></div>
+<div><button class="btn-buscar" onclick="cargarViajes()">🔍 Generar reporte</button></div>
+</div>
+</section>
 
-<input
-    type="date"
-    id="fechaInicio">
+<div class="titulo-bloque"><h2>Resumen financiero</h2><span id="periodoMostrado"></span></div>
+<section class="resumen-financiero">
+<div class="indicador"><div class="icono">🚚</div><span>Viajes registrados</span><strong id="totalViajes">0</strong></div>
+<div class="indicador"><div class="icono">💰</div><span>Total vendido</span><strong id="totalVendido">L 0.00</strong></div>
+<div class="indicador"><div class="icono">💵</div><span>Efectivo recibido</span><strong id="totalEfectivo">L 0.00</strong></div>
+<div id="indicadorDiferencia" class="indicador positivo"><div class="icono">⚖️</div><span>Diferencia acumulada</span><strong id="totalDiferencia">L 0.00</strong></div>
+</section>
 
-<label>Hasta</label>
+<div class="titulo-bloque"><h2>Movimiento de productos</h2></div>
+<section class="resumen-productos">
+<div class="producto-indicador"><span>Botellones vendidos</span><strong id="botellonesVendidos">0</strong></div>
+<div class="producto-indicador"><span>Botellones nuevos</span><strong id="botellonesNuevos">0</strong></div>
+<div class="producto-indicador"><span>Vacíos recibidos</span><strong id="botellonesVacios">0</strong></div>
+<div class="producto-indicador"><span>Agua vendida</span><strong id="aguaVendida">0</strong></div>
+<div class="producto-indicador"><span>Agua regalada</span><strong id="aguaRegalada">0</strong></div>
+<div class="producto-indicador"><span>Juguitos vendidos</span><strong id="juguitosVendidos">0</strong></div>
+<div class="producto-indicador"><span>Hielo vendido</span><strong id="hieloVendido">0</strong></div>
+</section>
 
-<input
-    type="date"
-    id="fechaFin">
+<div class="titulo-bloque"><h2>Viajes del periodo</h2><span id="estadoCarga"></span></div>
+<section id="lista" class="lista-viajes"></section>
 
+</main>
 
-<select id="camion">
-    <option value="">Todos los camiones</option>
-    <option>JAC 1</option>
-    <option>JAC 2</option>
-</select>
-
-<button onclick="cargarViajes()">
-    Buscar
-</button>
-
-    <div id="resumen"
-     style="
-        border:1px solid #ccc;
-        padding:15px;
-        border-radius:10px;
-        margin-top:10px;
-        margin-bottom:10px;
-     ">
-     
-    <h3>Resumen Periodo</h3>
-
-    <div id="contenidoResumen">
-        Sin datos
-    </div>
-
+<div id="detalleViaje" class="modal" onclick="cerrarDetalleFondo(event)">
+<div class="modal-contenido">
+<div class="modal-cabecera"><h2 id="tituloDetalle">Detalle del viaje</h2><button class="cerrar-modal" onclick="cerrarDetalle()">×</button></div>
+<div id="contenidoDetalle" class="modal-cuerpo"></div>
+</div>
 </div>
 
-<hr>
+<script>
 
-<div id="lista"></div>
+const SUPABASE_URL="https://ayzddkcxeswjfpinwvth.supabase.co";
+const SUPABASE_KEY="sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-    <hr>
+let viajesActuales=[];
+let cargando=false;
 
-<div id="detalleViaje"
-     style="display:none;
-            border:1px solid #ccc;
-            padding:15px;
-            margin-top:20px;
-            border-radius:10px;">
+window.onload=iniciar;
 
-    <h2>Detalle del Viaje</h2>
+async function iniciar(){
+    if(!await verificarSesion())return;
+    establecerPeriodo("hoy");
+}
 
-    <div id="contenidoDetalle"></div>
+async function verificarSesion(){
+    const {data:sesion}=await supabaseClient.auth.getSession();
+    if(!sesion.session){location.href="login.html";return false}
 
-</div>
+    const {data:perfil,error}=await supabaseClient.from("usuarios")
+        .select("nombre,rol").eq("id",sesion.session.user.id).single();
 
-    <script>
+    if(error||!perfil||perfil.rol!=="administrador"){
+        alert("Acceso exclusivo para administradores.");
+        location.href="menu.html";
+        return false;
+    }
 
-const SUPABASE_URL = "https://ayzddkcxeswjfpinwvth.supabase.co";
-const SUPABASE_KEY = "sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+    document.getElementById("nombreAdministrador").textContent=perfil.nombre||"Administrador";
+    return true;
+}
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+async function cerrarSesion(){await supabaseClient.auth.signOut();location.href="login.html"}
 
-        async function verificarSesion() {
+function establecerPeriodo(periodo){
+    const hoy=new Date();
+    let inicio=new Date(hoy);
 
-    const { data } =
-        await supabaseClient.auth
-        .getSession();
+    if(periodo==="semana")inicio.setDate(hoy.getDate()-6);
+    if(periodo==="mes")inicio=new Date(hoy.getFullYear(),hoy.getMonth(),1);
 
-    if (!data.session) {
-        window.location.href =
-            "login.html";
+    document.getElementById("fechaInicio").value=formatoFecha(inicio);
+    document.getElementById("fechaFin").value=formatoFecha(hoy);
+
+    document.querySelectorAll(".periodo").forEach(b=>b.classList.remove("activo"));
+    const ids={hoy:"periodoHoy",semana:"periodoSemana",mes:"periodoMes"};
+    document.getElementById(ids[periodo]).classList.add("activo");
+    cargarViajes();
+}
+
+function periodoPersonalizado(){document.querySelectorAll(".periodo").forEach(b=>b.classList.remove("activo"))}
+
+async function cargarViajes(){
+    if(cargando)return;
+
+    const inicio=document.getElementById("fechaInicio").value;
+    const fin=document.getElementById("fechaFin").value;
+    const camion=document.getElementById("camion").value;
+
+    if(inicio&&fin&&inicio>fin){alert("La fecha inicial no puede ser posterior a la final.");return}
+
+    cargando=true;
+    document.getElementById("estadoCarga").textContent="Cargando...";
+    document.getElementById("lista").innerHTML='<div class="vacio"><div class="icono">⏳</div><h3>Preparando reporte...</h3></div>';
+
+    let consulta=supabaseClient.from("viajes").select("*").order("fecha",{ascending:false});
+    if(inicio)consulta=consulta.gte("fecha",inicio);
+    if(fin)consulta=consulta.lte("fecha",fin);
+    if(camion)consulta=consulta.eq("camion",camion);
+
+    const {data,error}=await consulta;
+    cargando=false;
+
+    if(error){
+        console.error(error);
+        document.getElementById("estadoCarga").textContent="Error al cargar";
+        alert("No fue posible generar el reporte: "+error.message);
         return;
     }
 
-    const { data: perfil } =
-        await supabaseClient
-        .from("usuarios")
-        .select("rol")
-        .eq(
-            "id",
-            data.session.user.id
-        )
-        .single();
-
-    if (
-        perfil.rol !==
-        "administrador"
-    ) {
-        alert(
-            "Acceso denegado"
-        );
-
-        window.location.href =
-            "login.html";
-    }
+    viajesActuales=data||[];
+    document.getElementById("estadoCarga").textContent=viajesActuales.length+" viajes";
+    document.getElementById("periodoMostrado").textContent=textoPeriodo(inicio,fin,camion);
+    actualizarResumen(viajesActuales);
+    mostrarViajes(viajesActuales);
 }
 
-verificarSesion();
+function actualizarResumen(viajes){
+    const totales=viajes.reduce((t,v)=>{
+        t.venta+=numero(v.total_venta);t.efectivo+=numero(v.efectivo_entregado);t.diferencia+=numero(v.diferencia);
+        t.botellones+=numero(v.zona1_publico)+numero(v.zona1_pulperia)+numero(v.zona2_publico)+numero(v.zona2_pulperia);
+        t.nuevos+=numero(v.botellon_nuevo);t.vacios+=numero(v.botellones_vacios);
+        t.agua+=numero(v.agua_vendida);t.regalada+=numero(v.agua_regalada);t.juguitos+=numero(v.juguitos_vendidos);t.hielo+=numero(v.hielo_vendido);
+        return t;
+    },{venta:0,efectivo:0,diferencia:0,botellones:0,nuevos:0,vacios:0,agua:0,regalada:0,juguitos:0,hielo:0});
 
-        async function cerrarSesion() {
+    document.getElementById("totalViajes").textContent=viajes.length;
+    document.getElementById("totalVendido").textContent=moneda(totales.venta);
+    document.getElementById("totalEfectivo").textContent=moneda(totales.efectivo);
+    document.getElementById("totalDiferencia").textContent=moneda(totales.diferencia);
+    document.getElementById("botellonesVendidos").textContent=totales.botellones;
+    document.getElementById("botellonesNuevos").textContent=totales.nuevos;
+    document.getElementById("botellonesVacios").textContent=totales.vacios;
+    document.getElementById("aguaVendida").textContent=totales.agua;
+    document.getElementById("aguaRegalada").textContent=totales.regalada;
+    document.getElementById("juguitosVendidos").textContent=totales.juguitos;
+    document.getElementById("hieloVendido").textContent=totales.hielo;
 
-    await supabaseClient.auth
-        .signOut();
-
-    window.location.href =
-        "login.html";
+    const indicador=document.getElementById("indicadorDiferencia");
+    indicador.classList.toggle("alerta",Math.abs(totales.diferencia)>.009);
+    indicador.classList.toggle("positivo",Math.abs(totales.diferencia)<=.009);
 }
 
-verificarSesion();
-
-async function cargarViajes() {
-
-    let consulta = supabaseClient
-        .from("viajes")
-        .select("*")
-        .order("fecha", { ascending: false });
-
-    const fechaInicio =
-    document.getElementById("fechaInicio").value;
-
-    const fechaFin =
-    document.getElementById("fechaFin").value;
-    
-    const camion =
-        document.getElementById("camion").value;
-
-    if (fechaInicio) {
-
-    consulta = consulta.gte(
-        "fecha",
-        fechaInicio
-    );
-
-}
-
-if (fechaFin) {
-
-    consulta = consulta.lte(
-        "fecha",
-        fechaFin
-    );
-
-}
-
-    if (!fechaInicio && !fechaFin) {
-
-    const hoy = new Date()
-        .toLocaleDateString('en-CA');
-
-    consulta = consulta.eq(
-        "fecha",
-        hoy
-    );
-
-}
-
-    if (camion) {
-        consulta = consulta.eq(
-            "camion",
-            camion
-        );
-    }
-
-    const { data, error } =
-        await consulta;
-
-    if (error) {
-        alert(
-            "Error: " +
-            error.message
-        );
+function mostrarViajes(viajes){
+    const lista=document.getElementById("lista");
+    if(!viajes.length){
+        lista.innerHTML='<div class="vacio"><div class="icono">📭</div><h3>Sin viajes en este periodo</h3><p>Cambia las fechas o el camión para ampliar la búsqueda.</p></div>';
         return;
     }
 
-    let totalVenta = 0;
-    let totalEfectivo = 0;
-    let totalDiferencia = 0;
-
-    let botellonesVendidos = 0;
-    let totalBotellonesNuevos = 0;
-    let botellonesVacios = 0;
-
-    let aguaVendida = 0;
-    let aguaRegalada = 0;
-
-    let juguitosVendidos = 0;
-    let hieloVendido = 0;
-
-    let html = "";
-
-    data.forEach(viaje => {
-
-        totalVenta += Number(viaje.total_venta || 0);
-
-totalEfectivo += Number(
-    viaje.efectivo_entregado || 0
-);
-
-totalDiferencia += Number(
-    viaje.diferencia || 0
-);
-
-botellonesVendidos +=
-    Number(viaje.zona1_publico || 0) +
-    Number(viaje.zona1_pulperia || 0) +
-    Number(viaje.zona2_publico || 0) +
-    Number(viaje.zona2_pulperia || 0);
-
-totalBotellonesNuevos +=
-    viaje.botellon_nuevo || 0;
-
-botellonesVacios += Number(
-    viaje.botellones_vacios || 0
-);
-
-aguaVendida += Number(
-    viaje.agua_vendida || 0
-);
-
-aguaRegalada += Number(
-    viaje.agua_regalada || 0
-);
-
-juguitosVendidos += Number(
-    viaje.juguitos_vendidos || 0
-);
-
-hieloVendido += Number(
-    viaje.hielo_vendido || 0
-);
-
-        html += `
-        <div class="viaje">
-
-            <h3>${viaje.camion}
-            - Viaje ${viaje.numero_viaje}</h3>
-
-            <p><b>Fecha:</b>
-            ${viaje.fecha}</p>
-
-            <p><b>Chofer:</b>
-            ${viaje.chofer}</p>
-
-            <p><b>Total:</b>
-            L ${viaje.total_venta}</p>
-
-            <p><b>Efectivo:</b>
-            L ${viaje.efectivo_entregado}</p>
-
-            <p><b>Diferencia:</b>
-            L ${viaje.diferencia}</p>
-
-            <button onclick="
-            verDetalle('${viaje.id}')
-            ">
-            Ver detalle
-            </button>
-
-        </div>
-        `;
-    });
-
-    document.getElementById(
-    "contenidoResumen"
-).innerHTML = `
-
-<p><b>Total vendido:</b>
-L ${totalVenta.toFixed(2)}</p>
-
-<p><b>Efectivo recibido:</b>
-L ${totalEfectivo.toFixed(2)}</p>
-
-<p><b>Diferencia:</b>
-L ${totalDiferencia.toFixed(2)}</p>
-
-<hr>
-
-<p><b>Botellones vendidos:</b>
-${botellonesVendidos}</p>
-
-<p><b>Botellones + Agua Nuevos vendidos:</b>
-${totalBotellonesNuevos}</p>
-
-<p><b>Botellones vacíos:</b>
-${botellonesVacios}</p>
-
-<p><b>Agua vendida:</b>
-${aguaVendida}</p>
-
-<p><b>Agua regalada:</b>
-${aguaRegalada}</p>
-
-<p><b>Juguitos vendidos:</b>
-${juguitosVendidos}</p>
-
-<p><b>Hielo vendido:</b>
-${hieloVendido}</p>
-
-`;
-
-    document.getElementById(
-        "lista"
-    ).innerHTML = html;
+    lista.innerHTML=viajes.map(v=>{
+        const diferencia=numero(v.diferencia);
+        const clase=Math.abs(diferencia)<=.009?"diferencia-ok":"diferencia-alerta";
+        return `<article class="viaje">
+            <div class="viaje-cabecera"><div><h3>Viaje ${escapar(v.numero_viaje)}</h3><span>${fechaLegible(v.fecha)} · ${escapar(v.chofer)}</span></div><span class="camion-etiqueta">${escapar(v.camion)}</span></div>
+            <div class="viaje-cuerpo">
+                <div class="viaje-datos">
+                    <div class="viaje-dato"><span>Venta</span><strong>${moneda(v.total_venta)}</strong></div>
+                    <div class="viaje-dato"><span>Efectivo</span><strong>${moneda(v.efectivo_entregado)}</strong></div>
+                    <div class="viaje-dato"><span>Diferencia</span><strong class="${clase}">${moneda(diferencia)}</strong></div>
+                </div>
+                <button class="btn-detalle" onclick="verDetalle('${v.id}')">Ver detalle completo</button>
+            </div>
+        </article>`;
+    }).join("");
 }
 
-async function verDetalle(id) {
+function verDetalle(id){
+    const v=viajesActuales.find(item=>item.id===id);
+    if(!v)return;
 
-    const { data, error } =
-        await supabaseClient
-        .from("viajes")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    let html = `
-
-    <p><b>Camión:</b>
-    ${data.camion}</p>
-
-    <p><b>Chofer:</b>
-    ${data.chofer}</p>
-
-    <p><b>Viaje:</b>
-    ${data.numero_viaje}</p>
-
-    <p><b>Hora salida:</b>
-    ${data.hora_salida}</p>
-
-    <p><b>Hora regreso:</b>
-    ${data.hora_regreso}</p>
-
-    <hr>
-
-    <h3>Botellones</h3>
-
-    <p>Cargados:
-    ${data.botellones_cargados}</p>
-
-    <p>Zona 1 Público:
-    ${data.zona1_publico}</p>
-
-    <p>Zona 1 Pulpería:
-    ${data.zona1_pulperia}</p>
-
-    <p>Zona 2 Público:
-    ${data.zona2_publico}</p>
-
-    <p>Zona 2 Pulpería:
-    ${data.zona2_pulperia}</p>
-
-    <p>Botellón nuevo + agua:
-    ${data.botellon_nuevo}</p>
-
-    <p>Vacíos recibidos:
-    ${data.botellones_vacios}</p>
-
-    <hr>
-
-    <h3>Agua en bolsa</h3>
-
-    <p>Cargada:
-    ${data.agua_cargada}</p>
-
-    <p>Vendida:
-    ${data.agua_vendida}</p>
-
-    <p>Regalada:
-    ${data.agua_regalada}</p>
-
-    <hr>
-
-    <h3>Juguitos</h3>
-
-    <p>Cargados:
-    ${data.juguitos_cargados}</p>
-
-    <p>Vendidos:
-    ${data.juguitos_vendidos}</p>
-
-    <hr>
-
-    <h3>Hielo</h3>
-
-    <p>Cargado:
-    ${data.hielo_cargado}</p>
-
-    <p>Vendido:
-    ${data.hielo_vendido}</p>
-
-    <hr>
-
-    <h3>Finanzas</h3>
-
-    <p>Total venta:
-    L ${data.total_venta}</p>
-
-    <p>Efectivo:
-    L ${data.efectivo_entregado}</p>
-
-    <p>Diferencia:
-    L ${data.diferencia}</p>
-
-    <p>Observaciones:
-    ${data.observaciones || ""}</p>
-
+    document.getElementById("tituloDetalle").textContent=`${v.camion} · Viaje ${v.numero_viaje}`;
+    document.getElementById("contenidoDetalle").innerHTML=`
+        ${seccionDetalle("Información del viaje",[["Fecha",fechaLegible(v.fecha)],["Conductor",v.chofer],["Horario",`${v.hora_salida||"--"} a ${v.hora_regreso||"--"}`]])}
+        ${seccionDetalle("Botellones",[["Cargados",v.botellones_cargados],["Z1 público",v.zona1_publico],["Z1 pulpería",v.zona1_pulperia],["Z2 público",v.zona2_publico],["Z2 pulpería",v.zona2_pulperia],["Nuevos + agua",v.botellon_nuevo],["Vacíos recibidos",v.botellones_vacios]])}
+        ${seccionDetalle("Otros productos",[["Agua cargada",v.agua_cargada],["Agua vendida",v.agua_vendida],["Agua regalada",v.agua_regalada],["Juguitos cargados",v.juguitos_cargados],["Juguitos vendidos",v.juguitos_vendidos],["Hielo cargado",v.hielo_cargado],["Hielo vendido",v.hielo_vendido]])}
+        ${seccionDetalle("Finanzas",[["Total venta",moneda(v.total_venta)],["Efectivo",moneda(v.efectivo_entregado)],["Diferencia",moneda(v.diferencia)],["Observaciones",v.observaciones||"Sin observaciones"]])}
     `;
-
-    document.getElementById(
-        "contenidoDetalle"
-    ).innerHTML = html;
-
-    document.getElementById(
-        "detalleViaje"
-    ).style.display = "block";
-
-    window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth"
-    });
+    document.getElementById("detalleViaje").classList.add("visible");
+    document.body.style.overflow="hidden";
 }
 
+function seccionDetalle(titulo,datos){
+    return `<section class="detalle-seccion"><h3>${escapar(titulo)}</h3><div class="detalle-grid">${datos.map(([etiqueta,valor])=>`<div class="detalle-item"><span>${escapar(etiqueta)}</span><strong>${escapar(valor??0)}</strong></div>`).join("")}</div></section>`;
+}
 
-cargarViajes();
+function cerrarDetalle(){document.getElementById("detalleViaje").classList.remove("visible");document.body.style.overflow=""}
+function cerrarDetalleFondo(evento){if(evento.target.id==="detalleViaje")cerrarDetalle()}
+
+function textoPeriodo(inicio,fin,camion){
+    let texto=inicio===fin?fechaLegible(inicio):`${fechaLegible(inicio)} — ${fechaLegible(fin)}`;
+    if(camion)texto+=" · "+camion;
+    return texto;
+}
+
+function formatoFecha(fecha){return `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,"0")}-${String(fecha.getDate()).padStart(2,"0")}`}
+function fechaLegible(valor){if(!valor)return "Sin fecha";return new Date(valor+"T12:00:00").toLocaleDateString("es-HN",{day:"2-digit",month:"short",year:"numeric"})}
+function moneda(valor){return "L "+numero(valor).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function numero(valor){return Number(valor||0)}
+function escapar(valor){return String(valor??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+
+document.addEventListener("keydown",evento=>{if(evento.key==="Escape")cerrarDetalle()});
 
 </script>
 
-    <script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js");
-}
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
 </script>
 
 </body>
