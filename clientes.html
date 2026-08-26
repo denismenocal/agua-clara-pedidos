@@ -192,7 +192,16 @@ button:disabled{opacity:.65;cursor:not-allowed;}
 <div class="campo-doble">
 <div>
 <label for="municipio">Municipio *</label>
-<input id="municipio" placeholder="Municipio">
+<select id="municipio">
+<option value="">Seleccione municipio</option>
+<option value="LA UNION">LA UNION</option>
+<option value="MANGULILE">MANGULILE</option>
+<option value="YOCON">YOCON</option>
+<option value="EL ROSARIO">EL ROSARIO</option>
+<option value="SALAMA">SALAMA</option>
+<option value="SILCA">SILCA</option>
+<option value="JANO">JANO</option>
+</select>
 </div>
 <div>
 <label for="barrio">Barrio o aldea *</label>
@@ -648,7 +657,7 @@ function editarCliente(id){
     cliente.telefono;
 
     document.getElementById("municipio").value=
-    cliente.municipio || "";
+    municipioEstandar(cliente.municipio);
 
     document.getElementById("barrio").value=
     cliente.barrio || "";
@@ -905,7 +914,15 @@ let configuracionesMayoristas = new Map();
 let latitudCliente = null;
 let longitudCliente = null;
 
-["nombre","municipio","barrio","referencia","nombre_negocio"].forEach(id=>{
+function municipioEstandar(valor){
+    const normalizado=String(valor||"")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+        .trim().toUpperCase();
+    const permitidos=["LA UNION","MANGULILE","YOCON","EL ROSARIO","SALAMA","SILCA","JANO"];
+    return permitidos.includes(normalizado) ? normalizado : "";
+}
+
+["nombre","barrio","referencia","nombre_negocio"].forEach(id=>{
 
     document.getElementById(id).addEventListener("input",evento=>{
         const inicio=evento.target.selectionStart;
