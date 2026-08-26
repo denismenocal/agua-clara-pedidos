@@ -183,7 +183,16 @@ Teléfono <span class="obligatorio">*</span>
 <label for="municipio">
 Municipio <span class="obligatorio">*</span>
 </label>
-<input id="municipio" placeholder="Municipio">
+<select id="municipio">
+<option value="">Seleccione municipio</option>
+<option value="LA UNION">LA UNION</option>
+<option value="MANGULILE">MANGULILE</option>
+<option value="YOCON">YOCON</option>
+<option value="EL ROSARIO">EL ROSARIO</option>
+<option value="SALAMA">SALAMA</option>
+<option value="SILCA">SILCA</option>
+<option value="JANO">JANO</option>
+</select>
 </div>
 
 <div class="campo">
@@ -276,7 +285,7 @@ document.addEventListener("input",evento=>{
 
     if(
         evento.target.matches(
-            "#nombre, #identificacion, #municipio, " +
+            "#nombre, #identificacion, " +
             "#barrio, #referencia, #nombreNegocio"
         )
     ){
