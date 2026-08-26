@@ -343,7 +343,16 @@ class="campo-mayuscula"
 autocomplete="name">
 
 <label for="municipio">Municipio</label>
-<input id="municipio" class="campo-mayuscula">
+<select id="municipio">
+<option value="">Seleccione municipio</option>
+<option value="LA UNION">LA UNION</option>
+<option value="MANGULILE">MANGULILE</option>
+<option value="YOCON">YOCON</option>
+<option value="EL ROSARIO">EL ROSARIO</option>
+<option value="SALAMA">SALAMA</option>
+<option value="SILCA">SILCA</option>
+<option value="JANO">JANO</option>
+</select>
 
 <label for="barrio">Barrio o aldea</label>
 <input id="barrio" class="campo-mayuscula">
@@ -533,7 +542,7 @@ function cargarClienteExistente(cliente){
     longitud=cliente.longitud;
 
     document.getElementById("nombre").value=cliente.nombre || "";
-    document.getElementById("municipio").value=cliente.municipio || "";
+    document.getElementById("municipio").value=municipioEstandar(cliente.municipio);
     document.getElementById("barrio").value=cliente.barrio || "";
     document.getElementById("referencia").value=
         cliente.referencia || "";
@@ -579,7 +588,9 @@ function mostrarDatosCliente(soloLectura){
     document.getElementById("datosCliente").classList.remove("oculto");
 
     ["nombre","municipio","barrio","referencia"].forEach(id=>{
-        document.getElementById(id).readOnly=soloLectura;
+        const campo=document.getElementById(id);
+        campo.readOnly=soloLectura;
+        if(id==="municipio") campo.disabled=soloLectura;
     });
 
 }
@@ -771,6 +782,14 @@ function cambiarCantidad(cambio){
     const actual=Math.max(1,parseInt(campo.value) || 1);
     campo.value=Math.max(1,actual + cambio);
 
+}
+
+function municipioEstandar(valor){
+    const normalizado=String(valor||"")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+        .trim().toUpperCase();
+    const permitidos=["LA UNION","MANGULILE","YOCON","EL ROSARIO","SALAMA","SILCA","JANO"];
+    return permitidos.includes(normalizado) ? normalizado : "";
 }
 
 async function guardarPedido(){
