@@ -195,6 +195,8 @@ main{
 .facturacion .modulo-icono{background:#fff4d6}
 .mayoristas .modulo-icono{background:#fce8ef}
 .clientes .modulo-icono{background:#e9f3ff}
+.rutas .modulo-icono{background:#dcfce7}
+.ruta-dia .modulo-icono{background:#ffedd5}
 
 .pie{
     display:flex;
@@ -294,7 +296,9 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 const MODULOS=[
     {clase:"pedidos",icono:"📦",titulo:"Pedidos y Reparto",descripcion:"Recibe pedidos, contacta clientes y controla las entregas.",pagina:"admin.html",roles:["administrador","chofer"]},
+    {clase:"ruta-dia",icono:"📍",titulo:"Ruta del Día",descripcion:"Visualiza las paradas del municipio y registra cada visita o entrega.",pagina:"ruta-repartidor.html",roles:["administrador","chofer"]},
     {clase:"cierres",icono:"🚚",titulo:"Cierre de Viajes",descripcion:"Registra carga, ventas, devoluciones y efectivo del viaje.",pagina:"cierres.html",roles:["administrador","chofer"]},
+    {clase:"rutas",icono:"🗺️",titulo:"Configurar Rutas",descripcion:"Programa municipios, días, coordenadas, clientes y repartidores.",pagina:"rutas.html",roles:["administrador"]},
     {clase:"reportes",icono:"📊",titulo:"Reportes",descripcion:"Analiza viajes, ventas, diferencias y movimiento de productos.",pagina:"reportes.html",roles:["administrador"]},
     {clase:"facturacion",icono:"🧾",titulo:"Facturación",descripcion:"Emite facturas y registra ventas por cliente y vendedor.",pagina:"facturacion.html",roles:["administrador"]},
     {clase:"mayoristas",icono:"🏪",titulo:"Clientes Mayoristas",descripcion:"Configura tiendas, precios especiales y estado comercial.",pagina:"mayoristas.html",roles:["administrador"]},
