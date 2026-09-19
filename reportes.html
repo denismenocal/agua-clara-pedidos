@@ -282,6 +282,12 @@ input:focus,select:focus{
 .viaje-dato span{display:block;color:var(--gris);font-size:11px}
 .viaje-dato strong{display:block;margin-top:4px;font-size:15px}
 
+.viaje-observaciones{margin:-2px 0 14px;padding:11px 12px;border-left:4px solid #38bdf8;border-radius:10px;background:#f0f9ff}
+.viaje-observaciones span{display:block;color:var(--gris);font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.03em}
+.viaje-observaciones p{margin:5px 0 0;color:var(--texto);font-size:13px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.viaje-observaciones.sin-observaciones{border-left-color:#cbd5e1;background:#f8fafc}
+.viaje-observaciones.sin-observaciones p{color:var(--gris);font-style:italic}
+
 .diferencia-ok{color:var(--verde)}
 .diferencia-alerta{color:var(--rojo)}
 
@@ -568,6 +574,7 @@ function mostrarViajes(viajes){
     lista.innerHTML=viajes.map(v=>{
         const diferencia=numero(v.diferencia);
         const clase=Math.abs(diferencia)<=.009?"diferencia-ok":"diferencia-alerta";
+        const observaciones=String(v.observaciones||"").trim();
         return `<article class="viaje">
             <div class="viaje-cabecera"><div><h3>Viaje ${escapar(v.numero_viaje)}</h3><span>${fechaLegible(v.fecha)} · ${escapar(v.chofer)}</span></div><span class="camion-etiqueta">${escapar(v.camion)}</span></div>
             <div class="viaje-cuerpo">
@@ -575,6 +582,10 @@ function mostrarViajes(viajes){
                     <div class="viaje-dato"><span>Venta</span><strong>${moneda(v.total_venta)}</strong></div>
                     <div class="viaje-dato"><span>Efectivo</span><strong>${moneda(v.efectivo_entregado)}</strong></div>
                     <div class="viaje-dato"><span>Diferencia</span><strong class="${clase}">${moneda(diferencia)}</strong></div>
+                </div>
+                <div class="viaje-observaciones ${observaciones?"":"sin-observaciones"}">
+                    <span>📝 Observaciones</span>
+                    <p>${escapar(observaciones||"Sin observaciones")}</p>
                 </div>
                 <button class="btn-detalle" onclick="verDetalle('${v.id}')">Ver detalle completo</button>
             </div>
