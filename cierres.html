@@ -262,6 +262,52 @@ button:hover{
     background:#0d8a75;
 }
 
+.captura-gasto{
+    display:grid;
+    grid-template-columns:1.2fr .8fr 1.5fr auto;
+    gap:10px;
+    align-items:end;
+}
+
+.btn-agregar-gasto{
+    width:auto;
+    min-height:48px;
+    white-space:nowrap;
+    background:#0d8a75;
+}
+
+.lista-gastos{
+    display:grid;
+    gap:9px;
+    margin-top:15px;
+}
+
+.gasto-vacio{
+    padding:16px;
+    text-align:center;
+    color:var(--gris);
+    background:#f7fafb;
+    border:1px dashed var(--borde);
+    border-radius:11px;
+}
+
+.gasto-fila{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    align-items:center;
+    gap:12px;
+    padding:11px 12px;
+    background:#f7fafb;
+    border:1px solid var(--borde);
+    border-radius:11px;
+}
+
+.gasto-fila strong,.gasto-fila small{display:block}
+.gasto-fila small{margin-top:3px;color:var(--gris)}
+.gasto-monto{font-size:17px;font-weight:bold}
+.btn-quitar-gasto{width:40px;height:40px;padding:0;color:var(--rojo);background:#fff0f1}
+.btn-quitar-gasto:hover{background:#ffe1e4}
+
 .resumen-facturas{
     margin:12px 0 0;
     padding:12px 14px;
@@ -353,6 +399,16 @@ button:hover{
 }
 
 @media(max-width:760px){
+
+    .captura-gasto{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .captura-gasto .detalle-gasto,
+    .captura-gasto .btn-agregar-gasto{
+        grid-column:1/-1;
+        width:100%;
+    }
 
     .grupo-productos{
         grid-template-columns:1fr;
@@ -597,26 +653,29 @@ id="hielo_vendido" placeholder="0">
 
 <section class="tarjeta">
 <h2 class="titulo-seccion"><span>🧾</span> Gastos del viaje</h2>
-<div class="rejilla tres">
 <div>
-<label for="gasto_combustible">Combustible</label>
-<input type="number" inputmode="decimal" min="0" step="0.01"
-id="gasto_combustible" placeholder="L 0.00">
+<div class="captura-gasto">
+<div>
+<label for="tipo_gasto">Tipo de gasto</label>
+<select id="tipo_gasto">
+<option value="">Seleccione</option>
+<option value="combustible">Combustible</option>
+<option value="reparaciones">Reparación</option>
+<option value="otros">Otro gasto</option>
+</select>
 </div>
 <div>
-<label for="gasto_reparaciones">Reparaciones</label>
-<input type="number" inputmode="decimal" min="0" step="0.01"
-id="gasto_reparaciones" placeholder="L 0.00">
+<label for="monto_gasto">Cantidad</label>
+<input type="number" inputmode="decimal" min="0.01" step="0.01"
+id="monto_gasto" placeholder="L 0.00">
 </div>
-<div>
-<label for="gasto_otros">Otros gastos</label>
-<input type="number" inputmode="decimal" min="0" step="0.01"
-id="gasto_otros" placeholder="L 0.00">
+<div class="detalle-gasto">
+<label for="descripcion_gasto">Descripción</label>
+<input type="text" id="descripcion_gasto" placeholder="Ejemplo: cambio de llanta">
 </div>
-<div class="campo-completo">
-<label for="detalle_gastos">Detalle de los gastos</label>
-<textarea id="detalle_gastos" placeholder="Ejemplo: cambio de llanta, reparación de manguera o compra de repuesto"></textarea>
+<button type="button" class="btn-agregar-gasto" onclick="agregarGasto()">＋ Agregar</button>
 </div>
+<div id="lista_gastos" class="lista-gastos"></div>
 </div>
 </section>
 
@@ -695,6 +754,8 @@ const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
+
+let gastosViaje = [];
 
         async function verificarSesion() {
 
@@ -884,6 +945,78 @@ const supabaseClient = supabase.createClient(
 
 }
 
+function agregarGasto(){
+    const tipo=document.getElementById("tipo_gasto").value;
+    const monto=parseFloat(document.getElementById("monto_gasto").value);
+    const descripcion=document.getElementById("descripcion_gasto").value.trim();
+
+    if(!tipo){
+        alert("Seleccione el tipo de gasto.");
+        document.getElementById("tipo_gasto").focus();
+        return;
+    }
+
+    if(!Number.isFinite(monto)||monto<=0){
+        alert("Ingrese una cantidad de gasto mayor que cero.");
+        document.getElementById("monto_gasto").focus();
+        return;
+    }
+
+    if(tipo==="otros"&&!descripcion){
+        alert("Escriba una descripción para el gasto de tipo Otro.");
+        document.getElementById("descripcion_gasto").focus();
+        return;
+    }
+
+    gastosViaje.push({tipo,monto,descripcion});
+    document.getElementById("tipo_gasto").value="";
+    document.getElementById("monto_gasto").value="";
+    document.getElementById("descripcion_gasto").value="";
+    mostrarGastos();
+    calcularTotales();
+}
+
+function quitarGasto(indice){
+    gastosViaje.splice(indice,1);
+    mostrarGastos();
+    calcularTotales();
+}
+
+function resumenGastos(){
+    return gastosViaje.reduce((resumen,gasto)=>{
+        resumen[gasto.tipo]+=gasto.monto;
+        resumen.total+=gasto.monto;
+        return resumen;
+    },{combustible:0,reparaciones:0,otros:0,total:0});
+}
+
+function mostrarGastos(){
+    const lista=document.getElementById("lista_gastos");
+    if(!gastosViaje.length){
+        lista.innerHTML='<div class="gasto-vacio">Todavía no se han agregado gastos a este viaje.</div>';
+        return;
+    }
+
+    const nombres={combustible:"Combustible",reparaciones:"Reparación",otros:"Otro gasto"};
+    lista.innerHTML=gastosViaje.map((gasto,indice)=>`
+        <div class="gasto-fila">
+            <div><strong>${nombres[gasto.tipo]}</strong><small>${escaparTexto(gasto.descripcion||"Sin descripción")}</small></div>
+            <span class="gasto-monto">L ${gasto.monto.toFixed(2)}</span>
+            <button type="button" class="btn-quitar-gasto" title="Eliminar gasto" onclick="quitarGasto(${indice})">✕</button>
+        </div>`).join("");
+}
+
+function detalleGastos(){
+    const nombres={combustible:"Combustible",reparaciones:"Reparación",otros:"Otro gasto"};
+    return gastosViaje.map(gasto=>
+        `${nombres[gasto.tipo]}: L ${gasto.monto.toFixed(2)}${gasto.descripcion?" — "+gasto.descripcion:""}`
+    ).join("\n");
+}
+
+function escaparTexto(valor){
+    return String(valor??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
         function calcularTotales() {
 
     const botellones_cargados =
@@ -943,17 +1076,7 @@ const supabaseClient = supabase.createClient(
         parseFloat(document.getElementById(
             "efectivo_entregado").value) || 0;
 
-    const gasto_combustible =
-        parseFloat(document.getElementById(
-            "gasto_combustible").value) || 0;
-
-    const gasto_reparaciones =
-        parseFloat(document.getElementById(
-            "gasto_reparaciones").value) || 0;
-
-    const gasto_otros =
-        parseFloat(document.getElementById(
-            "gasto_otros").value) || 0;
+    const gastos = resumenGastos();
 
     const total_botellones =
         z1p * 40 +
@@ -977,10 +1100,7 @@ const supabaseClient = supabase.createClient(
         total_juguitos +
         total_hielo;
 
-    const total_gastos =
-        gasto_combustible +
-        gasto_reparaciones +
-        gasto_otros;
+    const total_gastos = gastos.total;
 
     const efectivo_esperado =
         total - total_gastos;
@@ -1028,6 +1148,16 @@ const supabaseClient = supabase.createClient(
 }
 
 async function guardarViaje() {
+
+    if (
+        document.getElementById("tipo_gasto").value ||
+        document.getElementById("monto_gasto").value ||
+        document.getElementById("descripcion_gasto").value.trim()
+    ) {
+        alert("Tiene un gasto pendiente. Presione Agregar antes de guardar el cierre.");
+        document.getElementById("tipo_gasto").focus();
+        return;
+    }
 
     const fecha = new Date()
     .toLocaleDateString('en-CA');
@@ -1126,21 +1256,11 @@ async function guardarViaje() {
         parseFloat(document.getElementById(
             "efectivo_entregado").value) || 0;
 
-    const gasto_combustible =
-        parseFloat(document.getElementById(
-            "gasto_combustible").value) || 0;
-
-    const gasto_reparaciones =
-        parseFloat(document.getElementById(
-            "gasto_reparaciones").value) || 0;
-
-    const gasto_otros =
-        parseFloat(document.getElementById(
-            "gasto_otros").value) || 0;
-
-    const detalle_gastos =
-        document.getElementById(
-            "detalle_gastos").value.trim();
+    const gastos = resumenGastos();
+    const gasto_combustible = gastos.combustible;
+    const gasto_reparaciones = gastos.reparaciones;
+    const gasto_otros = gastos.otros;
+    const detalle_gastos = detalleGastos();
 
     const observaciones =
         document.getElementById(
@@ -1252,25 +1372,7 @@ for (let campo of camposObligatorios) {
         total_juguitos +
         total_hielo;
 
-    const total_gastos =
-        gasto_combustible +
-        gasto_reparaciones +
-        gasto_otros;
-
-    if (
-        gasto_combustible < 0 ||
-        gasto_reparaciones < 0 ||
-        gasto_otros < 0
-    ) {
-        alert("Los gastos no pueden tener valores negativos.");
-        return;
-    }
-
-    if (gasto_otros > 0 && !detalle_gastos) {
-        alert("Explique en el detalle a qué corresponde el monto de otros gastos.");
-        document.getElementById("detalle_gastos").focus();
-        return;
-    }
+    const total_gastos = gastos.total;
 
     if (total_gastos > total_venta) {
         alert("El total de gastos no puede ser mayor que la venta del viaje.");
@@ -1331,6 +1433,9 @@ for (let campo of camposObligatorios) {
 
         document.getElementById("resumen_facturas").innerHTML="";
 
+        gastosViaje=[];
+        mostrarGastos();
+
         calcularTotales();
     }
 }
@@ -1357,6 +1462,8 @@ document.getElementById("usuario_vendedor").addEventListener(
     "change",
     limpiarVentasFacturadas
 );
+
+mostrarGastos();
 
 function limpiarVentasFacturadas(){
 
