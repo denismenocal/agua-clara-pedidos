@@ -213,7 +213,7 @@ input:focus,select:focus{
 
 .resumen-financiero{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(5,minmax(0,1fr));
     gap:12px;
 }
 
@@ -231,6 +231,8 @@ input:focus,select:focus{
 .indicador strong{display:block;margin-top:5px;font-size:25px}
 .indicador.positivo strong{color:var(--verde)}
 .indicador.alerta strong{color:var(--rojo)}
+.indicador.neto{background:linear-gradient(145deg,#ffffff,#eefaf4);border-color:#bfe5cf}
+.indicador.neto strong{color:var(--verde)}
 
 .resumen-productos{
     display:grid;
@@ -423,6 +425,7 @@ input:focus,select:focus{
 <section class="resumen-financiero">
 <div class="indicador"><div class="icono">🚚</div><span>Viajes registrados</span><strong id="totalViajes">0</strong></div>
 <div class="indicador"><div class="icono">💰</div><span>Total vendido</span><strong id="totalVendido">L 0.00</strong></div>
+<div class="indicador neto"><div class="icono">📈</div><span>Venta neta</span><strong id="totalNeto">L 0.00</strong></div>
 <div class="indicador"><div class="icono">💵</div><span>Efectivo recibido</span><strong id="totalEfectivo">L 0.00</strong></div>
 <div id="indicadorDiferencia" class="indicador positivo"><div class="icono">⚖️</div><span>Diferencia acumulada</span><strong id="totalDiferencia">L 0.00</strong></div>
 </section>
@@ -541,14 +544,16 @@ async function cargarViajes(){
 function actualizarResumen(viajes){
     const totales=viajes.reduce((t,v)=>{
         t.venta+=numero(v.total_venta);t.efectivo+=numero(v.efectivo_entregado);t.diferencia+=numero(v.diferencia);
+        t.gastos+=numero(v.total_gastos);t.credito+=numero(v.total_credito);
         t.botellones+=numero(v.zona1_publico)+numero(v.zona1_pulperia)+numero(v.zona2_publico)+numero(v.zona2_pulperia);
         t.nuevos+=numero(v.botellon_nuevo);t.vacios+=numero(v.botellones_vacios);
         t.agua+=numero(v.agua_vendida);t.regalada+=numero(v.agua_regalada);t.juguitos+=numero(v.juguitos_vendidos);t.hielo+=numero(v.hielo_vendido);
         return t;
-    },{venta:0,efectivo:0,diferencia:0,botellones:0,nuevos:0,vacios:0,agua:0,regalada:0,juguitos:0,hielo:0});
+    },{venta:0,efectivo:0,diferencia:0,gastos:0,credito:0,botellones:0,nuevos:0,vacios:0,agua:0,regalada:0,juguitos:0,hielo:0});
 
     document.getElementById("totalViajes").textContent=viajes.length;
     document.getElementById("totalVendido").textContent=moneda(totales.venta);
+    document.getElementById("totalNeto").textContent=moneda(totales.venta-totales.gastos-totales.credito);
     document.getElementById("totalEfectivo").textContent=moneda(totales.efectivo);
     document.getElementById("totalDiferencia").textContent=moneda(totales.diferencia);
     document.getElementById("botellonesVendidos").textContent=totales.botellones;
