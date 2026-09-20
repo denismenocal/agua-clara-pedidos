@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#075985">
+<title>Gastos y Créditos | Agua Clara</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/favicon_64.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--azul:#0077b6;--azul-oscuro:#034d75;--fondo:#edf6fa;--texto:#17324d;--gris:#667085;--borde:#dbe7ed;--verde:#198754;--rojo:#c1121f;--naranja:#e97912;--morado:#7450b8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--texto);background:var(--fondo)}
+button,input,select{font:inherit}
+.cabecera{padding:18px;color:white;background:linear-gradient(135deg,var(--azul),var(--azul-oscuro));box-shadow:0 4px 20px rgba(3,77,117,.2)}
+.cabecera-interior{max-width:1120px;margin:auto}
+.barra{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.marca{display:flex;align-items:center;gap:12px}.marca img{width:56px;height:56px;object-fit:contain}.marca h1{margin:0;font-size:clamp(23px,5vw,32px)}.marca p{margin:4px 0 0;opacity:.88}
+.acciones{display:flex;gap:8px}.btn-icono{width:46px;height:46px;padding:0;color:white;border:1px solid rgba(255,255,255,.35);border-radius:12px;background:rgba(255,255,255,.12);cursor:pointer;font-size:20px}
+.perfil{margin-top:15px;padding:12px 14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:13px}.perfil strong,.perfil span{display:block}.perfil span{margin-top:3px;opacity:.85;font-size:13px}
+main{width:min(1120px,calc(100% - 28px));margin:20px auto 42px}
+.tarjeta{padding:18px;background:white;border:1px solid var(--borde);border-radius:17px;box-shadow:0 7px 24px rgba(3,77,117,.08)}
+.filtros{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end}
+label{display:block;margin-bottom:7px;font-size:14px;font-weight:bold}
+input,select,.btn-consultar{width:100%;min-height:48px;padding:11px 13px;border-radius:10px;font-size:16px}
+input,select{color:var(--texto);background:white;border:1px solid var(--borde);outline:none}input:focus,select:focus{border-color:var(--azul);box-shadow:0 0 0 4px rgba(0,119,182,.1)}
+.btn-consultar{min-width:160px;color:white;background:var(--azul);border:0;cursor:pointer;font-weight:bold}
+.resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.indicador{padding:18px;background:white;border:1px solid var(--borde);border-radius:16px;box-shadow:0 6px 20px rgba(3,77,117,.07)}.indicador span{display:block;color:var(--gris);font-size:13px}.indicador strong{display:block;margin-top:7px;font-size:25px}.indicador.gastos strong{color:var(--naranja)}.indicador.creditos strong{color:var(--morado)}.indicador.neto strong{color:var(--verde)}
+.pestanas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;padding:6px;background:#dfeef4;border-radius:14px}.pestana{min-height:48px;padding:10px;color:var(--texto);background:transparent;border:0;border-radius:10px;cursor:pointer;font-weight:bold}.pestana.activa{color:white;background:var(--azul);box-shadow:0 4px 12px rgba(0,119,182,.24)}
+.cabecera-lista{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 12px}.cabecera-lista h2{margin:0;font-size:21px}.cabecera-lista span{color:var(--gris);font-size:13px}
+.lista{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.movimiento{overflow:hidden;background:white;border:1px solid var(--borde);border-radius:16px;box-shadow:0 6px 20px rgba(3,77,117,.07)}
+.movimiento-cabecera{display:flex;justify-content:space-between;gap:12px;padding:15px;background:#f7fbfc;border-bottom:1px solid var(--borde)}.movimiento-cabecera h3{margin:0 0 4px;font-size:18px}.movimiento-cabecera p{margin:0;color:var(--gris);font-size:13px}.etiqueta{height:max-content;padding:6px 9px;color:#075985;background:#e0f2fe;border-radius:999px;font-size:12px;font-weight:bold}
+.movimiento-cuerpo{padding:15px}.monto{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;padding:12px;background:#f7fafb;border-radius:11px}.monto span{color:var(--gris);font-size:13px}.monto strong{font-size:20px}.gasto .monto strong{color:var(--naranja)}.credito .monto strong{color:var(--morado)}
+.desglose{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}.dato{padding:9px;background:#f7fafb;border-radius:9px}.dato span,.dato strong{display:block}.dato span{color:var(--gris);font-size:11px}.dato strong{margin-top:4px;font-size:14px}
+.detalle{margin:0;padding:11px;color:#41566b;background:#f7fafb;border-left:4px solid #b8ddeb;border-radius:9px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}
+.vacio{grid-column:1/-1;padding:48px 20px;text-align:center;background:white;border:1px dashed #b8cbd5;border-radius:17px}.vacio div{font-size:45px}.vacio h3{margin:10px 0 5px}.vacio p{margin:0;color:var(--gris)}
+.oculto{display:none}
+@media(max-width:760px){.filtros{grid-template-columns:1fr 1fr}.btn-consultar{grid-column:1/-1}.resumen{grid-template-columns:1fr 1fr}.indicador.neto{grid-column:1/-1}.lista{grid-template-columns:1fr}}
+@media(max-width:500px){.marca p{display:none}.filtros{grid-template-columns:1fr}.btn-consultar{grid-column:auto}.resumen{grid-template-columns:1fr}.indicador.neto{grid-column:auto}.desglose{grid-template-columns:1fr}.acciones .salir{display:none}}
+</style>
+</head>
+<body>
+<header class="cabecera"><div class="cabecera-interior"><div class="barra"><div class="marca"><img src="img/logo_menu_192.webp" alt="Agua Clara"><div><h1>Gastos y Créditos</h1><p>Control administrativo por periodo</p></div></div><div class="acciones"><button class="btn-icono" title="Menú" onclick="location.href='menu.html'">⌂</button><button class="btn-icono salir" title="Cerrar sesión" onclick="cerrarSesion()">⇥</button></div></div><div class="perfil"><strong id="nombreAdministrador">Cargando administrador...</strong><span>Acceso exclusivo para administración</span></div></div></header>
+<main>
+<section class="tarjeta"><div class="filtros"><div><label for="fechaInicio">Desde</label><input type="date" id="fechaInicio"></div><div><label for="fechaFin">Hasta</label><input type="date" id="fechaFin"></div><div><label for="camion">Camión</label><select id="camion"><option value="">Todos los camiones</option><option>JAC 1</option><option>JAC 2</option></select></div><button class="btn-consultar" onclick="cargarDatos()">🔍 Consultar</button></div></section>
+<section class="resumen"><div class="indicador gastos"><span>🧾 Total de gastos</span><strong id="resumenGastos">L 0.00</strong></div><div class="indicador creditos"><span>🏛️ Total a crédito</span><strong id="resumenCreditos">L 0.00</strong></div><div class="indicador neto"><span>💵 Venta menos gastos y créditos</span><strong id="resumenNeto">L 0.00</strong></div></section>
+<div class="pestanas"><button id="tabGastos" class="pestana activa" onclick="cambiarPestana('gastos')">🧾 Gastos</button><button id="tabCreditos" class="pestana" onclick="cambiarPestana('creditos')">🏛️ Créditos</button></div>
+<div class="cabecera-lista"><h2 id="tituloLista">Detalle de gastos</h2><span id="estadoLista">Cargando...</span></div>
+<section id="lista" class="lista"></section>
+</main>
+<script>
+const SUPABASE_URL="https://ayzddkcxeswjfpinwvth.supabase.co";
+const SUPABASE_KEY="sb_publishable_34T_1LZ8Brpa_3sq2vT_Ew_AIvOuTDl";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let viajes=[];
+let pestanaActual="gastos";
+window.onload=iniciar;
+async function iniciar(){if(!await verificarSesion())return;const hoy=formatoFecha(new Date());document.getElementById("fechaInicio").value=hoy;document.getElementById("fechaFin").value=hoy;await cargarDatos()}
+async function verificarSesion(){const {data:sesion}=await supabaseClient.auth.getSession();if(!sesion.session){location.href="login.html";return false}const {data:perfil,error}=await supabaseClient.from("usuarios").select("nombre,rol").eq("id",sesion.session.user.id).single();if(error||!perfil||perfil.rol!=="administrador"){alert("Acceso exclusivo para administradores.");location.href="menu.html";return false}document.getElementById("nombreAdministrador").textContent=perfil.nombre||"Administrador";return true}
+async function cargarDatos(){const inicio=document.getElementById("fechaInicio").value;const fin=document.getElementById("fechaFin").value;const camion=document.getElementById("camion").value;if(inicio&&fin&&inicio>fin){alert("La fecha inicial no puede ser posterior a la final.");return}document.getElementById("lista").innerHTML='<div class="vacio"><div>⏳</div><h3>Cargando movimientos...</h3></div>';let consulta=supabaseClient.from("viajes").select("id,fecha,camion,chofer,numero_viaje,total_venta,total_gastos,gasto_combustible,gasto_reparaciones,gasto_otros,detalle_gastos,total_credito,detalle_credito").order("fecha",{ascending:false});if(inicio)consulta=consulta.gte("fecha",inicio);if(fin)consulta=consulta.lte("fecha",fin);if(camion)consulta=consulta.eq("camion",camion);const {data,error}=await consulta;if(error){console.error(error);alert("No fue posible cargar los movimientos: "+error.message);document.getElementById("lista").innerHTML="";return}viajes=data||[];actualizarResumen();mostrarLista()}
+function actualizarResumen(){const totales=viajes.reduce((t,v)=>{t.venta+=numero(v.total_venta);t.gastos+=numero(v.total_gastos);t.creditos+=numero(v.total_credito);return t},{venta:0,gastos:0,creditos:0});document.getElementById("resumenGastos").textContent=moneda(totales.gastos);document.getElementById("resumenCreditos").textContent=moneda(totales.creditos);document.getElementById("resumenNeto").textContent=moneda(totales.venta-totales.gastos-totales.creditos)}
+function cambiarPestana(pestana){pestanaActual=pestana;document.getElementById("tabGastos").classList.toggle("activa",pestana==="gastos");document.getElementById("tabCreditos").classList.toggle("activa",pestana==="creditos");mostrarLista()}
+function mostrarLista(){const esGasto=pestanaActual==="gastos";const movimientos=viajes.filter(v=>numero(esGasto?v.total_gastos:v.total_credito)>0);document.getElementById("tituloLista").textContent=esGasto?"Detalle de gastos":"Detalle de créditos";document.getElementById("estadoLista").textContent=movimientos.length+(movimientos.length===1?" registro":" registros");if(!movimientos.length){document.getElementById("lista").innerHTML=`<div class="vacio"><div>${esGasto?"🧾":"🏛️"}</div><h3>Sin ${esGasto?"gastos":"créditos"} en este periodo</h3><p>Cambie las fechas o el camión para ampliar la búsqueda.</p></div>`;return}document.getElementById("lista").innerHTML=movimientos.map(v=>esGasto?tarjetaGasto(v):tarjetaCredito(v)).join("")}
+function cabeceraTarjeta(v){return `<div class="movimiento-cabecera"><div><h3>Viaje ${escapar(v.numero_viaje)}</h3><p>${fechaLegible(v.fecha)} · ${escapar(v.chofer||"Sin conductor")}</p></div><span class="etiqueta">${escapar(v.camion||"Sin camión")}</span></div>`}
+function tarjetaGasto(v){return `<article class="movimiento gasto">${cabeceraTarjeta(v)}<div class="movimiento-cuerpo"><div class="monto"><span>Total de gastos</span><strong>${moneda(v.total_gastos)}</strong></div><div class="desglose"><div class="dato"><span>Combustible</span><strong>${moneda(v.gasto_combustible)}</strong></div><div class="dato"><span>Reparaciones</span><strong>${moneda(v.gasto_reparaciones)}</strong></div><div class="dato"><span>Otros</span><strong>${moneda(v.gasto_otros)}</strong></div></div><p class="detalle">${escapar(v.detalle_gastos||"Sin detalle registrado")}</p></div></article>`}
+function tarjetaCredito(v){return `<article class="movimiento credito">${cabeceraTarjeta(v)}<div class="movimiento-cuerpo"><div class="monto"><span>Total vendido a crédito</span><strong>${moneda(v.total_credito)}</strong></div><p class="detalle">${escapar(v.detalle_credito||"Sin detalle registrado")}</p></div></article>`}
+function formatoFecha(fecha){return `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,"0")}-${String(fecha.getDate()).padStart(2,"0")}`}
+function fechaLegible(valor){if(!valor)return"Sin fecha";return new Date(valor+"T12:00:00").toLocaleDateString("es-HN",{day:"2-digit",month:"short",year:"numeric"})}
+function numero(valor){return Number(valor||0)}
+function moneda(valor){return"L "+numero(valor).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function escapar(valor){return String(valor??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+async function cerrarSesion(){await supabaseClient.auth.signOut();location.href="login.html"}
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}</script>
+</body>
+</html>
