@@ -602,7 +602,8 @@ function verDetalle(id){
         ${seccionDetalle("Información del viaje",[["Fecha",fechaLegible(v.fecha)],["Conductor",v.chofer],["Horario",`${v.hora_salida||"--"} a ${v.hora_regreso||"--"}`]])}
         ${seccionDetalle("Botellones",[["Cargados",v.botellones_cargados],["Z1 público",v.zona1_publico],["Z1 pulpería",v.zona1_pulperia],["Z2 público",v.zona2_publico],["Z2 pulpería",v.zona2_pulperia],["Nuevos + agua",v.botellon_nuevo],["Vacíos recibidos",v.botellones_vacios]])}
         ${seccionDetalle("Otros productos",[["Agua cargada",v.agua_cargada],["Agua vendida",v.agua_vendida],["Agua regalada",v.agua_regalada],["Juguitos cargados",v.juguitos_cargados],["Juguitos vendidos",v.juguitos_vendidos],["Hielo cargado",v.hielo_cargado],["Hielo vendido",v.hielo_vendido]])}
-        ${seccionDetalle("Finanzas",[["Total venta",moneda(v.total_venta)],["Efectivo",moneda(v.efectivo_entregado)],["Diferencia",moneda(v.diferencia)],["Observaciones",v.observaciones||"Sin observaciones"]])}
+        ${seccionDetalle("Gastos del viaje",[["Combustible",moneda(v.gasto_combustible)],["Reparaciones",moneda(v.gasto_reparaciones)],["Otros gastos",moneda(v.gasto_otros)],["Total gastos",moneda(v.total_gastos)],["Detalle",v.detalle_gastos||"Sin gastos adicionales"]])}
+        ${seccionDetalle("Finanzas",[["Total venta",moneda(v.total_venta)],["Efectivo esperado",moneda(numero(v.total_venta)-numero(v.total_gastos))],["Efectivo entregado",moneda(v.efectivo_entregado)],["Diferencia",moneda(v.diferencia)],["Observaciones",v.observaciones||"Sin observaciones"]])}
     `;
     document.getElementById("detalleViaje").classList.add("visible");
     document.body.style.overflow="hidden";
