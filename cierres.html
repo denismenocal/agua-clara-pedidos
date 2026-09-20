@@ -187,6 +187,13 @@ main{
     background:#e6f5fb;
 }
 
+.ayuda-seccion{
+    margin:-7px 0 16px;
+    color:var(--gris);
+    font-size:13px;
+    line-height:1.45;
+}
+
 .rejilla{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
@@ -377,6 +384,10 @@ button:hover{
 
 .total.efectivo-esperado{
     background:#eef7ff;
+}
+
+.total.credito{
+    background:#f1edff;
 }
 
 .total > span{
@@ -680,6 +691,35 @@ id="monto_gasto" placeholder="L 0.00">
 </section>
 
 <section class="tarjeta">
+<h2 class="titulo-seccion"><span>🏛️</span> Ventas a crédito</h2>
+<p class="ayuda-seccion">Agregue aquí los productos entregados a crédito. Estas cantidades también deben estar incluidas en los productos vendidos del cierre.</p>
+<div class="captura-gasto captura-credito">
+<div>
+<label for="cliente_credito">Cliente</label>
+<select id="cliente_credito">
+<option value="">Seleccione</option>
+<option value="MUNICIPALIDAD LA UNION">Municipalidad La Unión</option>
+</select>
+</div>
+<div>
+<label for="producto_credito">Producto</label>
+<select id="producto_credito">
+<option value="">Seleccione</option>
+<option value="botellon">Botellón — L 40.00</option>
+<option value="pack_agua">Pack Agua Bolsa — L 25.00</option>
+</select>
+</div>
+<div>
+<label for="cantidad_credito">Cantidad</label>
+<input type="number" inputmode="numeric" min="1" step="1"
+id="cantidad_credito" placeholder="0">
+</div>
+<button type="button" class="btn-agregar-gasto" onclick="agregarCredito()">＋ Agregar</button>
+</div>
+<div id="lista_creditos" class="lista-gastos"></div>
+</section>
+
+<section class="tarjeta">
 <h2 class="titulo-seccion"><span>💵</span> Caja y observaciones</h2>
 <div class="rejilla">
 <div>
@@ -725,6 +765,10 @@ id="efectivo_entregado" placeholder="L 0.00">
 <span>Total de gastos</span>
 <strong>L <span id="total_gastos">0.00</span></strong>
 </div>
+<div class="total credito">
+<span>Total vendido a crédito</span>
+<strong>L <span id="total_credito">0.00</span></strong>
+</div>
 <div class="total efectivo-esperado">
 <span>Efectivo esperado</span>
 <strong>L <span id="efectivo_esperado">0.00</span></strong>
@@ -756,6 +800,7 @@ const supabaseClient = supabase.createClient(
 );
 
 let gastosViaje = [];
+let creditosViaje = [];
 
         async function verificarSesion() {
 
@@ -1017,6 +1062,74 @@ function escaparTexto(valor){
     return String(valor??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
 
+function agregarCredito(){
+    const cliente=document.getElementById("cliente_credito").value;
+    const producto=document.getElementById("producto_credito").value;
+    const cantidad=parseInt(document.getElementById("cantidad_credito").value,10);
+    const precios={botellon:40,pack_agua:25};
+
+    if(!cliente){
+        alert("Seleccione el cliente del crédito.");
+        document.getElementById("cliente_credito").focus();
+        return;
+    }
+
+    if(!producto){
+        alert("Seleccione el producto vendido a crédito.");
+        document.getElementById("producto_credito").focus();
+        return;
+    }
+
+    if(!Number.isInteger(cantidad)||cantidad<=0){
+        alert("Ingrese una cantidad válida mayor que cero.");
+        document.getElementById("cantidad_credito").focus();
+        return;
+    }
+
+    creditosViaje.push({cliente,producto,cantidad,precio:precios[producto]});
+    document.getElementById("producto_credito").value="";
+    document.getElementById("cantidad_credito").value="";
+    mostrarCreditos();
+    calcularTotales();
+}
+
+function quitarCredito(indice){
+    creditosViaje.splice(indice,1);
+    mostrarCreditos();
+    calcularTotales();
+}
+
+function resumenCreditos(){
+    return creditosViaje.reduce((resumen,credito)=>{
+        resumen[credito.producto]+=credito.cantidad;
+        resumen.total+=credito.cantidad*credito.precio;
+        return resumen;
+    },{botellon:0,pack_agua:0,total:0});
+}
+
+function mostrarCreditos(){
+    const lista=document.getElementById("lista_creditos");
+    if(!creditosViaje.length){
+        lista.innerHTML='<div class="gasto-vacio">Todavía no se han agregado ventas a crédito a este viaje.</div>';
+        return;
+    }
+
+    const nombres={botellon:"Botellón",pack_agua:"Pack Agua Bolsa"};
+    lista.innerHTML=creditosViaje.map((credito,indice)=>`
+        <div class="gasto-fila">
+            <div><strong>${nombres[credito.producto]} × ${credito.cantidad}</strong><small>${escaparTexto(credito.cliente)} · L ${credito.precio.toFixed(2)} cada uno</small></div>
+            <span class="gasto-monto">L ${(credito.cantidad*credito.precio).toFixed(2)}</span>
+            <button type="button" class="btn-quitar-gasto" title="Eliminar crédito" onclick="quitarCredito(${indice})">✕</button>
+        </div>`).join("");
+}
+
+function detalleCreditos(){
+    const nombres={botellon:"Botellón",pack_agua:"Pack Agua Bolsa"};
+    return creditosViaje.map(credito=>
+        `${credito.cliente} — ${nombres[credito.producto]}: ${credito.cantidad} × L ${credito.precio.toFixed(2)} = L ${(credito.cantidad*credito.precio).toFixed(2)}`
+    ).join("\n");
+}
+
         function calcularTotales() {
 
     const botellones_cargados =
@@ -1077,6 +1190,7 @@ function escaparTexto(valor){
             "efectivo_entregado").value) || 0;
 
     const gastos = resumenGastos();
+    const creditos = resumenCreditos();
 
     const total_botellones =
         z1p * 40 +
@@ -1103,7 +1217,7 @@ function escaparTexto(valor){
     const total_gastos = gastos.total;
 
     const efectivo_esperado =
-        total - total_gastos;
+        total - total_gastos - creditos.total;
 
     const diferencia =
         efectivo - efectivo_esperado;
@@ -1139,6 +1253,10 @@ function escaparTexto(valor){
         total_gastos.toFixed(2);
 
     document.getElementById(
+        "total_credito").innerText =
+        creditos.total.toFixed(2);
+
+    document.getElementById(
         "efectivo_esperado").innerText =
         efectivo_esperado.toFixed(2);
 
@@ -1156,6 +1274,15 @@ async function guardarViaje() {
     ) {
         alert("Tiene un gasto pendiente. Presione Agregar antes de guardar el cierre.");
         document.getElementById("tipo_gasto").focus();
+        return;
+    }
+
+    if (
+        document.getElementById("producto_credito").value ||
+        document.getElementById("cantidad_credito").value
+    ) {
+        alert("Tiene una venta a crédito pendiente. Presione Agregar antes de guardar el cierre.");
+        document.getElementById("cliente_credito").focus();
         return;
     }
 
@@ -1261,6 +1388,9 @@ async function guardarViaje() {
     const gasto_reparaciones = gastos.reparaciones;
     const gasto_otros = gastos.otros;
     const detalle_gastos = detalleGastos();
+    const creditos = resumenCreditos();
+    const total_credito = creditos.total;
+    const detalle_credito = detalleCreditos();
 
     const observaciones =
         document.getElementById(
@@ -1379,9 +1509,24 @@ for (let campo of camposObligatorios) {
         return;
     }
 
+    if (creditos.botellon > zona1_publico) {
+        alert("Los botellones a crédito no pueden ser mayores que los botellones de Zona 1 público vendidos.");
+        return;
+    }
+
+    if (creditos.pack_agua > agua_vendida) {
+        alert("Los packs de agua a crédito no pueden ser mayores que los paquetes vendidos.");
+        return;
+    }
+
+    if (total_gastos + total_credito > total_venta) {
+        alert("La suma de gastos y ventas a crédito no puede ser mayor que la venta total.");
+        return;
+    }
+
     const diferencia =
         efectivo_entregado -
-        (total_venta - total_gastos);
+        (total_venta - total_gastos - total_credito);
 
     const { error } =
         await supabaseClient
@@ -1414,6 +1559,8 @@ for (let campo of camposObligatorios) {
             gasto_otros,
             total_gastos,
             detalle_gastos,
+            total_credito,
+            detalle_credito,
             diferencia,
             observaciones
         }]);
@@ -1435,6 +1582,8 @@ for (let campo of camposObligatorios) {
 
         gastosViaje=[];
         mostrarGastos();
+        creditosViaje=[];
+        mostrarCreditos();
 
         calcularTotales();
     }
@@ -1464,6 +1613,7 @@ document.getElementById("usuario_vendedor").addEventListener(
 );
 
 mostrarGastos();
+mostrarCreditos();
 
 function limpiarVentasFacturadas(){
 
