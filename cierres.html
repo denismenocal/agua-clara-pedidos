@@ -325,6 +325,14 @@ button:hover{
     background:#fff4d6;
 }
 
+.total.gastos{
+    background:#fff0e6;
+}
+
+.total.efectivo-esperado{
+    background:#eef7ff;
+}
+
 .total > span{
     display:block;
     color:var(--gris);
@@ -588,6 +596,31 @@ id="hielo_vendido" placeholder="0">
 </div>
 
 <section class="tarjeta">
+<h2 class="titulo-seccion"><span>🧾</span> Gastos del viaje</h2>
+<div class="rejilla tres">
+<div>
+<label for="gasto_combustible">Combustible</label>
+<input type="number" inputmode="decimal" min="0" step="0.01"
+id="gasto_combustible" placeholder="L 0.00">
+</div>
+<div>
+<label for="gasto_reparaciones">Reparaciones</label>
+<input type="number" inputmode="decimal" min="0" step="0.01"
+id="gasto_reparaciones" placeholder="L 0.00">
+</div>
+<div>
+<label for="gasto_otros">Otros gastos</label>
+<input type="number" inputmode="decimal" min="0" step="0.01"
+id="gasto_otros" placeholder="L 0.00">
+</div>
+<div class="campo-completo">
+<label for="detalle_gastos">Detalle de los gastos</label>
+<textarea id="detalle_gastos" placeholder="Ejemplo: cambio de llanta, reparación de manguera o compra de repuesto"></textarea>
+</div>
+</div>
+</section>
+
+<section class="tarjeta">
 <h2 class="titulo-seccion"><span>💵</span> Caja y observaciones</h2>
 <div class="rejilla">
 <div>
@@ -628,6 +661,14 @@ id="efectivo_entregado" placeholder="L 0.00">
 <div class="total">
 <span>Total de venta</span>
 <strong>L <span id="total_venta">0.00</span></strong>
+</div>
+<div class="total gastos">
+<span>Total de gastos</span>
+<strong>L <span id="total_gastos">0.00</span></strong>
+</div>
+<div class="total efectivo-esperado">
+<span>Efectivo esperado</span>
+<strong>L <span id="efectivo_esperado">0.00</span></strong>
 </div>
 <div class="total diferencia">
 <span>Diferencia de caja</span>
@@ -902,6 +943,18 @@ const supabaseClient = supabase.createClient(
         parseFloat(document.getElementById(
             "efectivo_entregado").value) || 0;
 
+    const gasto_combustible =
+        parseFloat(document.getElementById(
+            "gasto_combustible").value) || 0;
+
+    const gasto_reparaciones =
+        parseFloat(document.getElementById(
+            "gasto_reparaciones").value) || 0;
+
+    const gasto_otros =
+        parseFloat(document.getElementById(
+            "gasto_otros").value) || 0;
+
     const total_botellones =
         z1p * 40 +
         z1pu * 35 +
@@ -924,8 +977,16 @@ const supabaseClient = supabase.createClient(
         total_juguitos +
         total_hielo;
 
+    const total_gastos =
+        gasto_combustible +
+        gasto_reparaciones +
+        gasto_otros;
+
+    const efectivo_esperado =
+        total - total_gastos;
+
     const diferencia =
-        efectivo - total;
+        efectivo - efectivo_esperado;
 
     document.getElementById(
         "botellones_devueltos").innerText =
@@ -952,6 +1013,14 @@ const supabaseClient = supabase.createClient(
     document.getElementById(
         "total_venta").innerText =
         total.toFixed(2);
+
+    document.getElementById(
+        "total_gastos").innerText =
+        total_gastos.toFixed(2);
+
+    document.getElementById(
+        "efectivo_esperado").innerText =
+        efectivo_esperado.toFixed(2);
 
     document.getElementById(
         "diferencia").innerText =
@@ -1056,6 +1125,22 @@ async function guardarViaje() {
     const efectivo_entregado =
         parseFloat(document.getElementById(
             "efectivo_entregado").value) || 0;
+
+    const gasto_combustible =
+        parseFloat(document.getElementById(
+            "gasto_combustible").value) || 0;
+
+    const gasto_reparaciones =
+        parseFloat(document.getElementById(
+            "gasto_reparaciones").value) || 0;
+
+    const gasto_otros =
+        parseFloat(document.getElementById(
+            "gasto_otros").value) || 0;
+
+    const detalle_gastos =
+        document.getElementById(
+            "detalle_gastos").value.trim();
 
     const observaciones =
         document.getElementById(
@@ -1167,9 +1252,34 @@ for (let campo of camposObligatorios) {
         total_juguitos +
         total_hielo;
 
+    const total_gastos =
+        gasto_combustible +
+        gasto_reparaciones +
+        gasto_otros;
+
+    if (
+        gasto_combustible < 0 ||
+        gasto_reparaciones < 0 ||
+        gasto_otros < 0
+    ) {
+        alert("Los gastos no pueden tener valores negativos.");
+        return;
+    }
+
+    if (gasto_otros > 0 && !detalle_gastos) {
+        alert("Explique en el detalle a qué corresponde el monto de otros gastos.");
+        document.getElementById("detalle_gastos").focus();
+        return;
+    }
+
+    if (total_gastos > total_venta) {
+        alert("El total de gastos no puede ser mayor que la venta del viaje.");
+        return;
+    }
+
     const diferencia =
         efectivo_entregado -
-        total_venta;
+        (total_venta - total_gastos);
 
     const { error } =
         await supabaseClient
@@ -1197,6 +1307,11 @@ for (let campo of camposObligatorios) {
             hielo_vendido,
             efectivo_entregado,
             total_venta,
+            gasto_combustible,
+            gasto_reparaciones,
+            gasto_otros,
+            total_gastos,
+            detalle_gastos,
             diferencia,
             observaciones
         }]);
