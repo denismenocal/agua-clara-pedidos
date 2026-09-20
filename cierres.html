@@ -672,6 +672,8 @@ id="hielo_vendido" placeholder="0">
 <option value="">Seleccione</option>
 <option value="combustible">Combustible</option>
 <option value="reparaciones">Reparación</option>
+<option value="posta_la_union">Posta La Unión</option>
+<option value="posta_yocon">Posta Yocón</option>
 <option value="otros">Otro gasto</option>
 </select>
 </div>
@@ -1032,7 +1034,7 @@ function resumenGastos(){
         resumen[gasto.tipo]+=gasto.monto;
         resumen.total+=gasto.monto;
         return resumen;
-    },{combustible:0,reparaciones:0,otros:0,total:0});
+    },{combustible:0,reparaciones:0,posta_la_union:0,posta_yocon:0,otros:0,total:0});
 }
 
 function mostrarGastos(){
@@ -1042,7 +1044,7 @@ function mostrarGastos(){
         return;
     }
 
-    const nombres={combustible:"Combustible",reparaciones:"Reparación",otros:"Otro gasto"};
+    const nombres={combustible:"Combustible",reparaciones:"Reparación",posta_la_union:"Posta La Unión",posta_yocon:"Posta Yocón",otros:"Otro gasto"};
     lista.innerHTML=gastosViaje.map((gasto,indice)=>`
         <div class="gasto-fila">
             <div><strong>${nombres[gasto.tipo]}</strong><small>${escaparTexto(gasto.descripcion||"Sin descripción")}</small></div>
@@ -1052,7 +1054,7 @@ function mostrarGastos(){
 }
 
 function detalleGastos(){
-    const nombres={combustible:"Combustible",reparaciones:"Reparación",otros:"Otro gasto"};
+    const nombres={combustible:"Combustible",reparaciones:"Reparación",posta_la_union:"Posta La Unión",posta_yocon:"Posta Yocón",otros:"Otro gasto"};
     return gastosViaje.map(gasto=>
         `${nombres[gasto.tipo]}: L ${gasto.monto.toFixed(2)}${gasto.descripcion?" — "+gasto.descripcion:""}`
     ).join("\n");
@@ -1386,7 +1388,7 @@ async function guardarViaje() {
     const gastos = resumenGastos();
     const gasto_combustible = gastos.combustible;
     const gasto_reparaciones = gastos.reparaciones;
-    const gasto_otros = gastos.otros;
+    const gasto_otros = gastos.otros + gastos.posta_la_union + gastos.posta_yocon;
     const detalle_gastos = detalleGastos();
     const creditos = resumenCreditos();
     const total_credito = creditos.total;
