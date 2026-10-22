@@ -14,6 +14,7 @@ content="width=device-width, initial-scale=1">
 <title>Pedidos y Reparto | Agua Clara</title>
 
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="icon" href="img/favicon_64.png">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -159,6 +160,79 @@ main{
 
 .alerta.visible{
     display:block;
+}
+
+/* ===== Notificaciones en el celular ===== */
+.notificaciones{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+    padding:14px 16px;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:14px;
+    box-shadow:0 5px 16px rgba(7,89,133,.07);
+}
+
+.notificaciones[hidden]{
+    display:none !important;
+}
+
+.notificaciones .icono-noti{
+    font-size:28px;
+    flex:none;
+}
+
+.notificaciones .texto-noti{
+    flex:1;
+    min-width:0;
+}
+
+.notificaciones strong{
+    display:block;
+    font-size:15px;
+}
+
+.notificaciones span{
+    display:block;
+    margin-top:2px;
+    color:var(--gris);
+    font-size:13px;
+    line-height:1.4;
+}
+
+.notificaciones.activas{
+    border-color:rgba(25,135,84,.35);
+    background:#f1fbf5;
+}
+
+.notificaciones.aviso{
+    border-color:rgba(233,121,18,.4);
+    background:#fff8f1;
+}
+
+.btn-noti{
+    flex:none;
+    padding:10px 14px;
+    color:white;
+    background:var(--azul);
+    border:0;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn-noti.suave{
+    color:var(--azul-oscuro);
+    background:transparent;
+    border:1px solid var(--borde);
+}
+
+.btn-noti:disabled{
+    opacity:.6;
+    cursor:default;
 }
 
 .resumen{
@@ -536,6 +610,15 @@ onclick="cerrarSesion()">
 </header>
 
 <main>
+
+<div id="panelNotificaciones" class="notificaciones" hidden>
+    <div class="icono-noti" id="iconoNoti">🔔</div>
+    <div class="texto-noti">
+        <strong id="tituloNoti">Recibe los pedidos en tu celular</strong>
+        <span id="detalleNoti">Te avisamos con sonido y vibración aunque la app esté cerrada.</span>
+    </div>
+    <button id="btnNoti" class="btn-noti" type="button" hidden>Activar</button>
+</div>
 
 <div id="alertaPedidos" class="alerta">
 🔔 Nuevo pedido recibido
@@ -1104,6 +1187,177 @@ function escapar(valor){
 if("serviceWorker" in navigator){
     navigator.serviceWorker.register("sw.js");
 }
+
+// ===== Notificaciones de pedidos nuevos en el celular =====
+// Llave pública VAPID (la privada vive solo en Supabase, tabla push_config)
+const VAPID_PUBLICA="BEF84DyqrUtvyGr2mviXoqpDIXtrYs2wv_fcplaWtTdWDpqHWI79DGdphO2d_lyp4_2eTXEPrb_3QL07ZlrU8S8";
+
+const notiUI={
+    panel:document.getElementById("panelNotificaciones"),
+    icono:document.getElementById("iconoNoti"),
+    titulo:document.getElementById("tituloNoti"),
+    detalle:document.getElementById("detalleNoti"),
+    boton:document.getElementById("btnNoti")
+};
+
+function pintarNoti(estado,icono,titulo,detalle,textoBoton,accion){
+    notiUI.panel.className="notificaciones"+(estado ? " "+estado : "");
+    notiUI.icono.textContent=icono;
+    notiUI.titulo.textContent=titulo;
+    notiUI.detalle.textContent=detalle;
+    notiUI.boton.hidden=!textoBoton;
+    notiUI.boton.disabled=false;
+    notiUI.boton.textContent=textoBoton||"";
+    notiUI.boton.className="btn-noti"+(estado==="activas" ? " suave" : "");
+    notiUI.boton.onclick=accion||null;
+    notiUI.panel.hidden=false;
+}
+
+function llaveABytes(base64){
+    const relleno="=".repeat((4-base64.length%4)%4);
+    const texto=atob((base64+relleno).replace(/-/g,"+").replace(/_/g,"/"));
+    return Uint8Array.from(texto,c=>c.charCodeAt(0));
+}
+
+function nombreDispositivo(){
+    const ua=navigator.userAgent;
+    if(/iPhone/i.test(ua)) return "iPhone";
+    if(/iPad/i.test(ua)) return "iPad";
+    if(/Android/i.test(ua)) return "Android";
+    return "Computadora";
+}
+
+async function guardarSuscripcion(suscripcion){
+    const { data:sesion }=await supabaseClient.auth.getSession();
+    const datos=suscripcion.toJSON();
+    const { error }=await supabaseClient
+        .from("push_suscripciones")
+        .upsert({
+            usuario_id:sesion.session.user.id,
+            endpoint:datos.endpoint,
+            p256dh:datos.keys.p256dh,
+            auth:datos.keys.auth,
+            dispositivo:nombreDispositivo(),
+            updated_at:new Date().toISOString()
+        },{ onConflict:"endpoint" });
+    return error;
+}
+
+async function activarNotificaciones(){
+
+    notiUI.boton.disabled=true;
+    notiUI.boton.textContent="Activando...";
+
+    try{
+        const permiso=await Notification.requestPermission();
+        if(permiso!=="granted"){
+            await revisarNotificaciones();
+            return;
+        }
+
+        const registro=await navigator.serviceWorker.ready;
+        let suscripcion=await registro.pushManager.getSubscription();
+        if(!suscripcion){
+            suscripcion=await registro.pushManager.subscribe({
+                userVisibleOnly:true,
+                applicationServerKey:llaveABytes(VAPID_PUBLICA)
+            });
+        }
+
+        const error=await guardarSuscripcion(suscripcion);
+        if(error){ throw error; }
+
+        // Notificación de prueba para confirmar sonido y vibración
+        await registro.showNotification("🔔 Notificaciones activadas",{
+            body:"Así te avisaremos cuando entre un pedido nuevo.",
+            icon:"img/icon-192.png",
+            badge:"img/favicon_64.png",
+            tag:"prueba-notificaciones",
+            vibrate:[700,250,700,250,700]
+        });
+
+        await revisarNotificaciones();
+
+    }catch(e){
+        console.error(e);
+        pintarNoti("aviso","⚠️","No se pudieron activar las notificaciones",
+            (e && e.message) ? e.message : "Intenta de nuevo en unos segundos.",
+            "Reintentar",activarNotificaciones);
+    }
+
+}
+
+async function desactivarNotificaciones(){
+
+    if(!confirm("¿Dejar de recibir notificaciones de pedidos en este celular?")){
+        return;
+    }
+
+    notiUI.boton.disabled=true;
+    const registro=await navigator.serviceWorker.ready;
+    const suscripcion=await registro.pushManager.getSubscription();
+    if(suscripcion){
+        await supabaseClient.from("push_suscripciones").delete().eq("endpoint",suscripcion.endpoint);
+        await suscripcion.unsubscribe();
+    }
+    await revisarNotificaciones();
+
+}
+
+async function revisarNotificaciones(){
+
+    const ua=navigator.userAgent;
+    const esIos=/iPhone|iPad|iPod/i.test(ua) ||
+        (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+    const instalada=window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone===true;
+
+    // iPhone solo permite notificaciones si la app está instalada en la pantalla de inicio
+    if(esIos && !instalada){
+        pintarNoti("aviso","📲","Instala la app para recibir notificaciones",
+            "En iPhone: toca Compartir ⬆️ → “Agregar a inicio”. Luego abre la app desde el ícono, entra con tu usuario y vuelve aquí para activarlas.");
+        return;
+    }
+
+    if(!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)){
+        pintarNoti("aviso","ℹ️","Este navegador no permite notificaciones",
+            "Usa Chrome en Android o la app instalada en iPhone (iOS 16.4 o más reciente).");
+        return;
+    }
+
+    if(Notification.permission==="denied"){
+        pintarNoti("aviso","🔕","Las notificaciones están bloqueadas",
+            esIos
+            ? "Actívalas en Ajustes → Notificaciones → Pedidos y Reparto (o el nombre de la app)."
+            : "Toca el candado 🔒 junto a la dirección (o Información de la app) → Permisos → Notificaciones → Permitir. Luego recarga esta página.");
+        return;
+    }
+
+    const registro=await navigator.serviceWorker.ready;
+    const suscripcion=await registro.pushManager.getSubscription();
+
+    if(Notification.permission==="granted" && suscripcion){
+        // Asegura que la suscripción siga guardada (por si cambió de usuario o se renovó)
+        await guardarSuscripcion(suscripcion);
+        pintarNoti("activas","✅","Notificaciones activas en este celular",
+            "Te avisaremos con sonido y vibración cada vez que entre un pedido.",
+            "Desactivar",desactivarNotificaciones);
+        return;
+    }
+
+    pintarNoti("","🔔","Recibe los pedidos en tu celular",
+        "Te avisamos con sonido y vibración aunque la app esté cerrada.",
+        "Activar",activarNotificaciones);
+
+}
+
+// Esperar a que la sesión esté verificada antes de revisar
+(async function(){
+    const { data:sesion }=await supabaseClient.auth.getSession();
+    if(sesion.session){
+        revisarNotificaciones().catch(e=>console.error(e));
+    }
+})();
 </script>
 
 </body>

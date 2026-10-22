@@ -8,6 +8,14 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - Publicación: Cloudflare Pages despliega automáticamente cada push a `main` → https://agua-clara-pedidos.pages.dev
 - App instalable: `manifest.json` (personal, abre en login) y `manifest-clientes.json` (clientes, abre en `index.html`, con aviso de instalación para Android e iPhone) + `sw.js` (service worker básico, sin caché).
 
+## Notificaciones push de pedidos
+- `admin.html` tiene el panel "Recibe los pedidos en tu celular": suscribe el celular y lo guarda en `push_suscripciones`.
+- Al insertar en `pedidos`, el disparador `pedidos_notificar_nuevo` llama (pg_net) a la Edge Function `notificar-pedido` (código en `supabase/functions/notificar-pedido/`), que envía el push a choferes y administradores y marca `pedidos.notificado_at`.
+- `sw.js` muestra la notificación (vibración ~2.5 s, se queda en la cortina hasta tocarla).
+- Llaves VAPID: la pública está en `admin.html`; la privada solo en la tabla `push_config` (sin acceso para anon/authenticated). Nunca ponerla en el repo.
+- iPhone: solo funciona con la app instalada en la pantalla de inicio (iOS 16.4+). La vibración y el sonido los decide iOS.
+- SQL: `notificaciones-push.sql`.
+
 ## Forma de trabajar (obligatoria)
 - Cambios pequeños y verificables.
 - Si un cambio necesita columnas, tablas o funciones nuevas: **primero el SQL en Supabase, después publicar la interfaz**, para que la app activa nunca intente usar algo que no existe.
