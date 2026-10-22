@@ -504,14 +504,9 @@ async function buscarCliente(telefono){
 
     mostrarEstadoCliente("Buscando tu registro...","cargando");
 
-    const telefonoConGuion=
-        telefono.slice(0,4) + "-" + telefono.slice(4);
-
+    // Busca solo con la funcion segura; acepta el numero con o sin guion
     const { data,error }=await supabaseClient
-        .from("clientes")
-        .select("*")
-        .in("telefono",[telefono,telefonoConGuion])
-        .limit(1);
+        .rpc("pedido_buscar_cliente",{ p_telefono:telefono });
 
     if(numeroConsulta!==consultaActual){
         return;
@@ -538,8 +533,8 @@ async function buscarCliente(telefono){
 function cargarClienteExistente(cliente){
 
     cliente_id=cliente.id;
-    latitud=cliente.latitud;
-    longitud=cliente.longitud;
+    latitud=cliente.latitud ?? null;
+    longitud=cliente.longitud ?? null;
 
     document.getElementById("nombre").value=cliente.nombre || "";
     document.getElementById("municipio").value=municipioEstandar(cliente.municipio);
@@ -734,19 +729,15 @@ async function guardarCliente(){
     boton.innerHTML="Guardando datos...";
 
     const { data,error }=await supabaseClient
-        .from("clientes")
-        .insert({
-            telefono,
-            nombre,
-            municipio,
-            barrio,
-            referencia,
-            latitud,
-            longitud,
-            tipo_cliente:"Delivery"
-        })
-        .select("id")
-        .single();
+        .rpc("pedido_registrar_cliente",{
+            p_telefono:telefono,
+            p_nombre:nombre,
+            p_municipio:municipio,
+            p_barrio:barrio,
+            p_referencia:referencia,
+            p_latitud:latitud,
+            p_longitud:longitud
+        });
 
     if(error){
 
@@ -761,7 +752,7 @@ async function guardarCliente(){
 
     }
 
-    cliente_id=data.id;
+    cliente_id=data;
     boton.classList.add("oculto");
     document.getElementById("btnUbicacion").classList.add("oculto");
     mostrarDatosCliente(true);
@@ -819,11 +810,10 @@ async function guardarPedido(){
     boton.innerHTML="Enviando pedido...";
 
     const { error }=await supabaseClient
-        .from("pedidos")
-        .insert({
-            cliente_id,
-            cantidad,
-            comentario
+        .rpc("pedido_crear",{
+            p_cliente_id:cliente_id,
+            p_cantidad:cantidad,
+            p_comentario:comentario
         });
 
     if(error){
