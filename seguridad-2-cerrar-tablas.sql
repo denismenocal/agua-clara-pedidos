@@ -1,7 +1,7 @@
 -- Seguridad paso 2 - Agua Clara La Muralla
 -- Cierra las tablas que estaban abiertas a cualquier persona sin sesion.
 -- Requisito: index.html ya usa las funciones de seguridad-1-funciones-pedidos.sql.
--- ESTADO: PENDIENTE de aplicar en Supabase hasta confirmar que la pagina publica de pedidos funciona.
+-- ESTADO: APLICADO en Supabase el 22/10/2026 (ejecutado manualmente en SQL Editor y verificado).
 -- Acceso resultante:
 --   clientes, pedidos, viajes, clientes_mayoristas -> solo choferes y administradores
 --   borrar clientes y mayoristas                    -> solo administradores
