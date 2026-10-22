@@ -6,7 +6,7 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - Frontend: archivos HTML autónomos con CSS y JS integrados. Sin framework ni build.
 - Datos y login: Supabase (proyecto `ayzddkcxeswjfpinwvth`, "AguaClara_Muralla Project"). Cliente en `js/supabase.js` con la clave **publicable** (puede estar en el frontend). Nunca poner la `service_role` ni otras claves secretas en el repo: el repo es **público**.
 - Publicación: Cloudflare Pages despliega automáticamente cada push a `main` → https://agua-clara-pedidos.pages.dev
-- App instalable: `manifest.json` + `sw.js` (service worker básico, sin caché).
+- App instalable: `manifest.json` (personal, abre en login) y `manifest-clientes.json` (clientes, abre en `index.html`, con aviso de instalación para Android e iPhone) + `sw.js` (service worker básico, sin caché).
 
 ## Forma de trabajar (obligatoria)
 - Cambios pequeños y verificables.
@@ -41,7 +41,6 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 `usuarios`, `clientes`, `clientes_mayoristas`, `pedidos`, `productos`, `configuracion`, `empresa`, `cai_facturacion`, `facturas`, `factura_detalle`, `viajes`, `rutas`, `ruta_municipios`, `ruta_choferes`, `ruta_clientes`, `ruta_jornadas`, `ruta_visitas`.
 
 ## Pendientes conocidos
-- Íconos `img/icon-192.png` e `img/icon-512.png` referenciados en `manifest.json` no existen.
 - Mover precios del código a una tabla de configuración.
 - Guardar factura + detalle + CAI en una sola función atómica (RPC).
 - Gastos y créditos en tablas de detalle propias.
