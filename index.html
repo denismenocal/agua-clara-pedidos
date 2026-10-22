@@ -13,8 +13,15 @@ content="width=device-width, initial-scale=1">
 
 <title>Pedir Agua | Agua Clara La Muralla</title>
 
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest-clientes.json">
 <link rel="icon" href="img/favicon_64.png">
+
+<!-- Instalación en iPhone/iPad -->
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pedir Agua">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -311,6 +318,98 @@ button:disabled{
     color:var(--verde);
 }
 
+/* ===== Aviso para instalar la app ===== */
+.instalar{
+    position:fixed;
+    left:12px;
+    right:12px;
+    bottom:12px;
+    z-index:50;
+    max-width:520px;
+    margin:0 auto;
+    padding:14px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:white;
+    border:1px solid var(--borde);
+    border-radius:16px;
+    box-shadow:0 12px 32px rgba(3,77,117,.22);
+    animation:instalarEntrada .35s ease-out;
+}
+
+.instalar[hidden]{
+    display:none !important;
+}
+
+@keyframes instalarEntrada{
+    from{ transform:translateY(24px); opacity:0; }
+    to{ transform:translateY(0); opacity:1; }
+}
+
+.instalar img{
+    width:48px;
+    height:48px;
+    flex:none;
+    border-radius:12px;
+    border:1px solid var(--borde);
+}
+
+.instalar-texto{
+    flex:1;
+    min-width:0;
+}
+
+.instalar-texto strong{
+    display:block;
+    margin-bottom:3px;
+    font-size:16px;
+}
+
+.instalar-texto p{
+    margin:0;
+    color:#52677b;
+    font-size:14px;
+    line-height:1.4;
+}
+
+.instalar-pasos{
+    margin:8px 0 0;
+    padding-left:20px;
+    color:#52677b;
+    font-size:14px;
+    line-height:1.55;
+}
+
+.icono-compartir{
+    display:inline-block;
+    width:16px;
+    height:16px;
+    vertical-align:-3px;
+}
+
+.instalar .btn-instalar{
+    width:auto;
+    min-height:40px;
+    margin-top:10px;
+    padding:9px 18px;
+    font-size:15px;
+    border-radius:10px;
+}
+
+.instalar .btn-cerrar{
+    width:32px;
+    min-height:32px;
+    height:32px;
+    padding:0;
+    flex:none;
+    color:#71869a;
+    background:transparent;
+    font-size:22px;
+    line-height:1;
+    border-radius:8px;
+}
+
 @media(max-width:480px){
 
     .tarjeta{
@@ -328,6 +427,28 @@ button:disabled{
 </head>
 
 <body>
+
+<!-- Aviso para instalar la app (Android e iPhone) -->
+<div id="avisoInstalar" class="instalar" role="dialog" aria-label="Instalar la app" hidden>
+    <img src="img/icon-192.png" alt="">
+    <div class="instalar-texto">
+        <strong>Instala Pedir Agua</strong>
+        <p id="instalarMensaje">Pide tus botellones más rápido desde tu pantalla de inicio.</p>
+        <ol id="instalarPasosIos" class="instalar-pasos" hidden>
+            <li>Toca el botón <b>Compartir</b>
+                <svg class="icono-compartir" viewBox="0 0 24 24" fill="none" stroke="#0077b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+                abajo o arriba de la pantalla.</li>
+            <li>Elige <b>“Agregar a inicio”</b>.</li>
+            <li>Toca <b>Agregar</b>.</li>
+        </ol>
+        <ol id="instalarPasosAndroid" class="instalar-pasos" hidden>
+            <li>Toca el menú <b>⋮</b> del navegador.</li>
+            <li>Elige <b>“Instalar app”</b> o <b>“Agregar a pantalla de inicio”</b>.</li>
+        </ol>
+        <button id="btnInstalar" class="btn-instalar" type="button" hidden>📲 Instalar</button>
+    </div>
+    <button id="btnCerrarInstalar" class="btn-cerrar" type="button" aria-label="Cerrar">×</button>
+</div>
 
 <header class="cabecera">
 
@@ -885,6 +1006,96 @@ function nuevoPedido(){
 
 }
 
+</script>
+
+<script>
+// ===== Instalación de la app (Android e iPhone) =====
+(function(){
+
+    if("serviceWorker" in navigator){
+        navigator.serviceWorker.register("sw.js").catch(function(){});
+    }
+
+    var aviso=document.getElementById("avisoInstalar");
+    var btnInstalar=document.getElementById("btnInstalar");
+    var CLAVE="aguaClaraInstalarCerrado";
+    var DIAS_OCULTO=7;
+    var eventoInstalar=null;
+
+    var ua=navigator.userAgent||"";
+    var esIos=/iPhone|iPad|iPod/i.test(ua) ||
+        (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+    var esAndroid=/Android/i.test(ua);
+    var yaInstalada=window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone===true;
+
+    function cerradoRecientemente(){
+        try{
+            var fecha=Number(localStorage.getItem(CLAVE)||0);
+            return fecha && (Date.now()-fecha) < DIAS_OCULTO*24*60*60*1000;
+        }catch(e){ return false; }
+    }
+
+    // Deja espacio al final de la página para que el aviso no tape el botón de pedido
+    function mostrar(){
+        aviso.hidden=false;
+        document.body.style.paddingBottom=(aviso.offsetHeight+24)+"px";
+    }
+
+    function ocultar(recordar){
+        aviso.hidden=true;
+        document.body.style.paddingBottom="";
+        if(recordar){
+            try{ localStorage.setItem(CLAVE,String(Date.now())); }catch(e){}
+        }
+    }
+
+    document.getElementById("btnCerrarInstalar")
+        .addEventListener("click",function(){ ocultar(true); });
+
+    if(yaInstalada || cerradoRecientemente()){
+        return;
+    }
+
+    // Android (Chrome, Samsung Internet, Edge): botón de instalar directo
+    window.addEventListener("beforeinstallprompt",function(e){
+        e.preventDefault();
+        eventoInstalar=e;
+        document.getElementById("instalarPasosAndroid").hidden=true;
+        btnInstalar.hidden=false;
+        mostrar();
+    });
+
+    btnInstalar.addEventListener("click",async function(){
+        if(!eventoInstalar){ return; }
+        eventoInstalar.prompt();
+        var resultado=await eventoInstalar.userChoice;
+        eventoInstalar=null;
+        ocultar(resultado.outcome!=="accepted");
+    });
+
+    window.addEventListener("appinstalled",function(){ ocultar(false); });
+
+    if(esIos){
+        // iPhone/iPad no tiene botón automático: se muestran los pasos
+        setTimeout(function(){
+            document.getElementById("instalarMensaje").textContent=
+                "Agrega esta página a tu pantalla de inicio para pedir agua en un toque:";
+            document.getElementById("instalarPasosIos").hidden=false;
+            mostrar();
+        },1500);
+    }else if(esAndroid){
+        // Navegadores Android sin botón automático: pasos por el menú
+        setTimeout(function(){
+            if(eventoInstalar || !aviso.hidden){ return; }
+            document.getElementById("instalarMensaje").textContent=
+                "Agrega esta página a tu pantalla de inicio:";
+            document.getElementById("instalarPasosAndroid").hidden=false;
+            mostrar();
+        },4000);
+    }
+
+})();
 </script>
 
 </body>
