@@ -16,6 +16,12 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - iPhone: solo funciona con la app instalada en la pantalla de inicio (iOS 16.4+). La vibración y el sonido los decide iOS.
 - SQL: `notificaciones-push.sql`.
 
+## WhatsApp automático "tu pedido va en camino"
+- Al pasar un pedido a "En ruta", el disparador `pedidos_whatsapp_en_camino` llama a la Edge Function `whatsapp-en-camino` (código en `supabase/functions/whatsapp-en-camino/`), que envía la plantilla de Meta (Cloud API) al cliente al `504` + teléfono. Una sola vez por pedido (`pedidos.whatsapp_at`); resultado en `pedidos.whatsapp_estado` (`enviado`, `enviando`, `error: ...`), visible en `admin.html`.
+- Configuración en `integraciones_config` (sin acceso para anon/authenticated): `whatsapp_activo` ('si' para encender), `whatsapp_phone_number_id`, `whatsapp_plantilla` (`pedido_en_camino`), `whatsapp_idioma` (`es`). Token de Meta solo como secreto de Edge Function `WHATSAPP_TOKEN`.
+- Plantilla con 2 variables: {{1}} nombre del cliente, {{2}} cantidad de botellones.
+- SQL: `whatsapp-en-camino.sql`.
+
 ## Forma de trabajar (obligatoria)
 - Cambios pequeños y verificables.
 - Si un cambio necesita columnas, tablas o funciones nuevas: **primero el SQL en Supabase, después publicar la interfaz**, para que la app activa nunca intente usar algo que no existe.
@@ -52,5 +58,4 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - Mover precios del código a una tabla de configuración.
 - Guardar factura + detalle + CAI en una sola función atómica (RPC).
 - Gastos y créditos en tablas de detalle propias.
-- Notificación por WhatsApp con proveedor oficial.
 - Copias de seguridad, ambiente de pruebas y pruebas de regresión antes de cambios grandes.

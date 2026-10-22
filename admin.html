@@ -162,6 +162,31 @@ main{
     display:block;
 }
 
+/* ===== Estado del WhatsApp al cliente ===== */
+.wa-etiqueta{
+    display:inline-block;
+    margin:0 0 8px 6px;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.wa-ok{
+    color:#0f6b3d;
+    background:#e3f7ec;
+}
+
+.wa-espera{
+    color:#7a5a00;
+    background:#fff4d6;
+}
+
+.wa-error{
+    color:var(--rojo);
+    background:#fdecee;
+}
+
 /* ===== Notificaciones en el celular ===== */
 .notificaciones{
     display:flex;
@@ -1026,6 +1051,8 @@ function crearTarjetaPedido(pedido){
                     ${escapar(pedido.estado)}
                 </span>
 
+                ${etiquetaWhatsApp(pedido)}
+
                 <div class="dato">
                     <span class="dato-icono">📞</span>
                     <span>${escapar(cliente.telefono || "Sin teléfono")}</span>
@@ -1068,6 +1095,26 @@ function crearTarjetaPedido(pedido){
             </div>
         </article>
     `;
+
+}
+
+// Estado del WhatsApp automático "tu pedido va en camino"
+function etiquetaWhatsApp(pedido){
+
+    const estado=String(pedido.whatsapp_estado || "");
+    if(!estado){
+        return "";
+    }
+
+    if(estado==="enviado"){
+        return `<span class="wa-etiqueta wa-ok">💬 Cliente avisado por WhatsApp</span>`;
+    }
+
+    if(estado==="enviando"){
+        return `<span class="wa-etiqueta wa-espera">💬 Enviando WhatsApp...</span>`;
+    }
+
+    return `<span class="wa-etiqueta wa-error" title="${escapar(estado)}">⚠️ WhatsApp no enviado</span>`;
 
 }
 
