@@ -1267,7 +1267,24 @@ function detalleCreditos(){
         diferencia.toFixed(2);
 }
 
+// Evita guardar el mismo cierre dos veces por doble toque o conexion lenta
+let guardandoCierre=false;
+
 async function guardarViaje() {
+    if (guardandoCierre) return;
+    guardandoCierre=true;
+    const boton=document.getElementById("btnGuardarCierre");
+    const textoBoton=boton ? boton.innerHTML : "";
+    if (boton) { boton.disabled=true; boton.innerHTML="Guardando..."; }
+    try {
+        await guardarViajeDatos();
+    } finally {
+        guardandoCierre=false;
+        if (boton) { boton.disabled=false; boton.innerHTML=textoBoton; }
+    }
+}
+
+async function guardarViajeDatos() {
 
     if (
         document.getElementById("tipo_gasto").value ||

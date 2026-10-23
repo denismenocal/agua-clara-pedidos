@@ -77,6 +77,12 @@ input:focus,select:focus{border-color:var(--azul);box-shadow:0 0 0 4px rgba(0,11
 .vacio div{font-size:40px}
 .mov-detalle .etiqueta{display:inline-block;margin:0 6px 0 0}
 .btn-mas[hidden]{display:none}
+.mov-cantidad.grupo{display:grid;gap:4px;min-width:200px}
+.linea-grupo{display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:baseline;text-align:left}
+.linea-grupo span{color:var(--texto);font-size:13px}
+.linea-grupo strong{font-size:16px;text-align:right}
+.linea-grupo em{grid-column:1/-1;color:var(--gris);font-size:11px;font-style:normal;text-align:right;margin-top:-2px}
+@media(max-width:500px){.mov-cantidad.grupo{grid-column:1/-1;min-width:0}}
 .btn-mas{display:block;width:100%;padding:13px;color:var(--azul-oscuro);background:#f7fbfc;border:0;border-top:1px solid var(--borde);cursor:pointer;font-weight:bold}
 
 @media(max-width:820px){.formulario{grid-template-columns:1fr 1fr}.formulario .nota{grid-column:1/-1}.btn-guardar{grid-column:1/-1}}
@@ -293,7 +299,7 @@ async function cargarMovimientos(reiniciar){
     const filtro=document.getElementById("filtroInsumo").value;
     let consulta=supabaseClient
         .from("insumo_movimientos")
-        .select("id,insumo_id,tipo,cantidad,existencia_resultante,nota,usuario_nombre,created_at")
+        .select("id,insumo_id,tipo,cantidad,existencia_resultante,nota,usuario_nombre,viaje_id,created_at")
         .order("created_at",{ ascending:false })
         .range(movimientosCargados,movimientosCargados+POR_PAGINA-1);
     if(filtro) consulta=consulta.eq("insumo_id",filtro);
@@ -306,7 +312,7 @@ async function cargarMovimientos(reiniciar){
         return;
     }
 
-    const html=(data||[]).map(crearMovimiento).join("");
+    const html=agruparMovimientos(data||[]).map(g=>g.length===1 ? crearMovimiento(g[0]) : crearGrupoCierre(g)).join("");
     if(reiniciar){
         lista.innerHTML=html || `<div class="vacio"><div>📦</div>Todavía no hay movimientos.<br>Empieza registrando un <b>conteo físico</b> de cada insumo.</div>`;
     }else{
@@ -314,6 +320,46 @@ async function cargarMovimientos(reiniciar){
     }
     movimientosCargados+=(data||[]).length;
     document.getElementById("btnMas").hidden=(data||[]).length<POR_PAGINA;
+}
+
+// Un cierre descuenta varios insumos a la vez: se muestran juntos en una sola fila
+function agruparMovimientos(lista){
+    const grupos=[];
+    lista.forEach(m=>{
+        const ultimo=grupos[grupos.length-1];
+        const primero=ultimo && ultimo[0];
+        if(
+            primero && m.tipo==="cierre" && primero.tipo==="cierre" &&
+            m.created_at===primero.created_at &&
+            (m.nota||"")===(primero.nota||"") &&
+            (m.viaje_id||"")===(primero.viaje_id||"")
+        ){
+            ultimo.push(m);
+        }else{
+            grupos.push([m]);
+        }
+    });
+    return grupos;
+}
+
+function crearGrupoCierre(grupo){
+    const m=grupo[0];
+    const fecha=new Date(m.created_at);
+    const orden=id=>{ const i=insumos.findIndex(x=>x.id===id); return i<0 ? 99 : i; };
+    const lineas=[...grupo].sort((a,b)=>orden(a.insumo_id)-orden(b.insumo_id)).map(x=>{
+        const nombre=(insumos.find(i=>i.id===x.insumo_id)||{}).nombre || x.insumo_id;
+        const color=x.cantidad>0 ? "suma" : (x.cantidad<0 ? "resta" : "cero");
+        return `<div class="linea-grupo"><span>${escapar(nombre)}</span><strong class="${color}">${x.cantidad>0 ? "+" : ""}${formatoNumero(x.cantidad)}</strong><em>quedan ${formatoNumero(x.existencia_resultante)}</em></div>`;
+    }).join("");
+    return `
+    <div class="mov">
+        <div class="mov-fecha">${fecha.toLocaleDateString("es-HN",{day:"2-digit",month:"short",year:"numeric"})}<br>${fecha.toLocaleTimeString("es-HN",{hour:"numeric",minute:"2-digit"})}</div>
+        <div class="mov-detalle">
+            <strong><span class="etiqueta et-cierre">Cierre de viaje</span>${escapar(m.nota || "")}</strong>
+            <span>${m.usuario_nombre ? "👤 " + escapar(m.usuario_nombre) : ""}</span>
+        </div>
+        <div class="mov-cantidad grupo">${lineas}</div>
+    </div>`;
 }
 
 function crearMovimiento(m){
