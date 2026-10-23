@@ -22,6 +22,16 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - Plantilla con 2 variables: {{1}} nombre del cliente, {{2}} cantidad de botellones.
 - SQL: `whatsapp-en-camino.sql`.
 
+## Inventario de insumos
+- Pantalla `inventario-insumos.html` (solo administrador, opción "Inventario de Insumos" en el menú). Insumos: `botellon`, `tapon`, `sello` en la tabla `insumos`; historial en `insumo_movimientos` (tipos `entrada`, `conteo`, `cierre`).
+- Descuento automático **solo al guardar el cierre** (disparador `viajes_insumos` sobre `viajes`), nunca al facturar, porque las ventas facturadas ya se cargan dentro del cierre:
+  - cada botellón vendido Z1/Z2 público/pulpería → −1 tapón, −1 sello
+  - cada botellón nuevo con agua (L 150, `viajes.botellon_nuevo`) → −1 botellón, −1 tapón, −1 sello
+  - si un cierre se corrige o elimina, se aplica la diferencia.
+- Entradas y conteo físico solo con `insumo_registrar(p_insumo, 'entrada'|'conteo', p_cantidad, p_nota)`; mínimo de aviso con `insumo_definir_minimo`. Las existencias pueden quedar negativas (un cierre nunca se bloquea).
+- Si se agrega un producto que use botellón, tapón o sello, actualizar `insumos_por_cierre()`.
+- SQL: `inventario-insumos.sql`.
+
 ## Forma de trabajar (obligatoria)
 - Cambios pequeños y verificables.
 - Si un cambio necesita columnas, tablas o funciones nuevas: **primero el SQL en Supabase, después publicar la interfaz**, para que la app activa nunca intente usar algo que no existe.
