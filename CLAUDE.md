@@ -32,6 +32,11 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - Si se agrega un producto que use botellón, tapón o sello, actualizar `insumos_por_cierre()`.
 - SQL: `inventario-insumos.sql`.
 
+## Meta Pixel (campañas de Facebook/Instagram)
+- Solo en la página pública `index.html` (no en las páginas internas). ID del píxel: `1442775751319659` (es público, puede estar en el repo).
+- Eventos: `PageView` al abrir, `CompleteRegistration` al registrar un cliente nuevo, `Purchase` al confirmar un pedido (valor estimado `cantidad × L 40`, moneda `HNL`).
+- Se envían con `metaEvento()`, que nunca debe bloquear ni romper el registro o el pedido.
+
 ## Forma de trabajar (obligatoria)
 - Cambios pequeños y verificables.
 - Si un cambio necesita columnas, tablas o funciones nuevas: **primero el SQL en Supabase, después publicar la interfaz**, para que la app activa nunca intente usar algo que no existe.
