@@ -33,7 +33,7 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - SQL: `inventario-insumos.sql`.
 
 ## Meta Pixel (campañas de Facebook/Instagram)
-- Solo en la página pública `index.html` (no en las páginas internas). ID del píxel: `1442775751319659` (es público, puede estar en el repo).
+- Solo en la página pública `index.html` (no en las páginas internas). ID del píxel: `2705043613278584` (es público, puede estar en el repo).
 - Eventos: `PageView` al abrir, `CompleteRegistration` al registrar un cliente nuevo, `Purchase` al confirmar un pedido (valor estimado `cantidad × L 40`, moneda `HNL`).
 - Se envían con `metaEvento()`, que nunca debe bloquear ni romper el registro o el pedido.
 
