@@ -1,7 +1,8 @@
 // Edge Function: notificar-cierre
 // La llama el disparador viajes_notificar_cierre (ver notificaciones-cierre.sql) al guardar un cierre.
 // Envia a los ADMINISTRADORES suscritos un resumen del cierre:
-//   total vendido, gastos, creditos y venta neta (vendido - gastos - creditos).
+//   total vendido, gastos, creditos, venta neta (vendido - gastos - creditos),
+//   transferencia a cuenta y efectivo esperado (venta neta - transferencia).
 //
 // Seguridad: no requiere JWT porque la llama la base de datos, pero solo actua sobre
 // cierres guardados hace menos de 10 minutos y que aun no fueron notificados.
@@ -44,7 +45,7 @@ Deno.serve(async (req) => {
     .eq("id", viajeId)
     .is("notificado_at", null)
     .gte("created_at", hace10min)
-    .select("id, fecha, camion, chofer, numero_viaje, total_venta, total_gastos, total_credito")
+    .select("id, fecha, camion, chofer, numero_viaje, total_venta, total_gastos, total_credito, total_transferencia, efectivo_entregado, diferencia")
     .maybeSingle();
 
   if (errorViaje) return respuesta({ error: errorViaje.message }, 500);
@@ -75,6 +76,8 @@ Deno.serve(async (req) => {
   const gastos = Number(viaje.total_gastos) || 0;
   const creditos = Number(viaje.total_credito) || 0;
   const neta = vendido - gastos - creditos;
+  const transferencia = Number(viaje.total_transferencia) || 0;
+  const esperado = neta - transferencia;
 
   const quien = [viaje.camion, viaje.chofer].filter(Boolean).join(" · ");
   const mensaje = {
@@ -82,7 +85,9 @@ Deno.serve(async (req) => {
     body:
       `Total vendido: ${lempiras(vendido)}\n` +
       `Gastos + créditos: ${lempiras(gastos + creditos)} (G ${lempiras(gastos)} · C ${lempiras(creditos)})\n` +
-      `Venta neta: ${lempiras(neta)}`,
+      `Venta neta: ${lempiras(neta)}\n` +
+      `Transferencia: ${lempiras(transferencia)}\n` +
+      `Efectivo esperado: ${lempiras(esperado)} · Entregado: ${lempiras(Number(viaje.efectivo_entregado) || 0)}`,
     tag: `cierre-${viaje.id}`,
     url: "/menu.html",
   };

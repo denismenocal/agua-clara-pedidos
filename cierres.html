@@ -678,6 +678,7 @@ id="hielo_vendido" placeholder="0">
 <option value="reparaciones">Reparación</option>
 <option value="posta_la_union">Posta La Unión</option>
 <option value="posta_yocon">Posta Yocón</option>
+<option value="descuento">Descuento</option>
 <option value="otros">Otro gasto</option>
 </select>
 </div>
@@ -729,6 +730,11 @@ id="cantidad_credito" placeholder="0">
 <h2 class="titulo-seccion"><span>💵</span> Caja y observaciones</h2>
 <div class="rejilla">
 <div>
+<label for="transferencia">Transferencia a cuenta</label>
+<input type="number" inputmode="decimal" min="0" step="0.01"
+id="transferencia" placeholder="L 0.00">
+</div>
+<div>
 <label for="efectivo_entregado">Efectivo entregado</label>
 <input type="number" inputmode="decimal" min="0" step="0.01"
 id="efectivo_entregado" placeholder="L 0.00">
@@ -774,6 +780,10 @@ id="efectivo_entregado" placeholder="L 0.00">
 <div class="total credito">
 <span>Total vendido a crédito</span>
 <strong>L <span id="total_credito">0.00</span></strong>
+</div>
+<div class="total credito">
+<span>Total por transferencia</span>
+<strong>L <span id="total_transferencia">0.00</span></strong>
 </div>
 <div class="total efectivo-esperado">
 <span>Efectivo esperado</span>
@@ -1038,7 +1048,7 @@ function resumenGastos(){
         resumen[gasto.tipo]+=gasto.monto;
         resumen.total+=gasto.monto;
         return resumen;
-    },{combustible:0,reparaciones:0,posta_la_union:0,posta_yocon:0,otros:0,total:0});
+    },{combustible:0,reparaciones:0,posta_la_union:0,posta_yocon:0,descuento:0,otros:0,total:0});
 }
 
 function mostrarGastos(){
@@ -1048,7 +1058,7 @@ function mostrarGastos(){
         return;
     }
 
-    const nombres={combustible:"Combustible",reparaciones:"Reparación",posta_la_union:"Posta La Unión",posta_yocon:"Posta Yocón",otros:"Otro gasto"};
+    const nombres={combustible:"Combustible",reparaciones:"Reparación",posta_la_union:"Posta La Unión",posta_yocon:"Posta Yocón",descuento:"Descuento",otros:"Otro gasto"};
     lista.innerHTML=gastosViaje.map((gasto,indice)=>`
         <div class="gasto-fila">
             <div><strong>${nombres[gasto.tipo]}</strong><small>${escaparTexto(gasto.descripcion||"Sin descripción")}</small></div>
@@ -1058,7 +1068,7 @@ function mostrarGastos(){
 }
 
 function detalleGastos(){
-    const nombres={combustible:"Combustible",reparaciones:"Reparación",posta_la_union:"Posta La Unión",posta_yocon:"Posta Yocón",otros:"Otro gasto"};
+    const nombres={combustible:"Combustible",reparaciones:"Reparación",posta_la_union:"Posta La Unión",posta_yocon:"Posta Yocón",descuento:"Descuento",otros:"Otro gasto"};
     return gastosViaje.map(gasto=>
         `${nombres[gasto.tipo]}: L ${gasto.monto.toFixed(2)}${gasto.descripcion?" — "+gasto.descripcion:""}`
     ).join("\n");
@@ -1222,8 +1232,12 @@ function detalleCreditos(){
 
     const total_gastos = gastos.total;
 
+    const transferencia =
+        parseFloat(document.getElementById(
+            "transferencia").value) || 0;
+
     const efectivo_esperado =
-        total - total_gastos - creditos.total;
+        total - total_gastos - creditos.total - transferencia;
 
     const diferencia =
         efectivo - efectivo_esperado;
@@ -1261,6 +1275,10 @@ function detalleCreditos(){
     document.getElementById(
         "total_credito").innerText =
         creditos.total.toFixed(2);
+
+    document.getElementById(
+        "total_transferencia").innerText =
+        transferencia.toFixed(2);
 
     document.getElementById(
         "efectivo_esperado").innerText =
@@ -1409,11 +1427,14 @@ async function guardarViajeDatos() {
     const gastos = resumenGastos();
     const gasto_combustible = gastos.combustible;
     const gasto_reparaciones = gastos.reparaciones;
-    const gasto_otros = gastos.otros + gastos.posta_la_union + gastos.posta_yocon;
+    const gasto_otros = gastos.otros + gastos.posta_la_union + gastos.posta_yocon + gastos.descuento;
     const detalle_gastos = detalleGastos();
     const creditos = resumenCreditos();
     const total_credito = creditos.total;
     const detalle_credito = detalleCreditos();
+    const total_transferencia =
+        parseFloat(document.getElementById(
+            "transferencia").value) || 0;
 
     const observaciones =
         document.getElementById(
@@ -1542,14 +1563,20 @@ for (let campo of camposObligatorios) {
         return;
     }
 
-    if (total_gastos + total_credito > total_venta) {
-        alert("La suma de gastos y ventas a crédito no puede ser mayor que la venta total.");
+    if (total_transferencia < 0) {
+        alert("La transferencia no puede ser negativa.");
+        document.getElementById("transferencia").focus();
+        return;
+    }
+
+    if (total_gastos + total_credito + total_transferencia > total_venta) {
+        alert("La suma de gastos, ventas a crédito y transferencias no puede ser mayor que la venta total.");
         return;
     }
 
     const diferencia =
         efectivo_entregado -
-        (total_venta - total_gastos - total_credito);
+        (total_venta - total_gastos - total_credito - total_transferencia);
 
     const { error } =
         await supabaseClient
@@ -1584,6 +1611,7 @@ for (let campo of camposObligatorios) {
             detalle_gastos,
             total_credito,
             detalle_credito,
+            total_transferencia,
             diferencia,
             observaciones
         }]);

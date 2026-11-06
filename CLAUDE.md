@@ -15,7 +15,7 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - Llaves VAPID: la pública está en `admin.html`; la privada solo en la tabla `push_config` (sin acceso para anon/authenticated). Nunca ponerla en el repo.
 - iPhone: solo funciona con la app instalada en la pantalla de inicio (iOS 16.4+). La vibración y el sonido los decide iOS.
 - SQL: `notificaciones-push.sql`.
-- Cierres de viaje: al insertar en `viajes`, el disparador `viajes_notificar_cierre` llama a la Edge Function `notificar-cierre` (código en `supabase/functions/notificar-cierre/`), que envía **solo a administradores** el resumen: total vendido, gastos + créditos (desglosados) y venta neta (`total_venta − total_gastos − total_credito`). Una vez por cierre (`viajes.notificado_at`). SQL: `notificaciones-cierre.sql`.
+- Cierres de viaje: al insertar en `viajes`, el disparador `viajes_notificar_cierre` llama a la Edge Function `notificar-cierre` (código en `supabase/functions/notificar-cierre/`), que envía **solo a administradores** el resumen: total vendido, gastos + créditos (desglosados), venta neta (`total_venta − total_gastos − total_credito`), transferencia y efectivo esperado. Una vez por cierre (`viajes.notificado_at`). SQL: `notificaciones-cierre.sql`.
 - Una suscripción pertenece al usuario con el que se activó (o reactivó) en ese celular; si en el mismo celular entra otro usuario a `admin.html`, la suscripción pasa a ese usuario.
 
 ## WhatsApp automático "tu pedido va en camino"
@@ -61,12 +61,13 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
   - Botellón Z1 público L 40 · Z1 pulpería L 35 · Z2 público L 35 · Z2 pulpería L 30
   - Botellón nuevo con agua L 150 · Pack agua en bolsa L 25 · Juguitos L 25 · Hielo L 25
 - Cierre de viaje: toma conductor y camión de la sesión. Vendidos ≤ cargados; vendidos + regalados ≤ carga.
-- Gastos: tipos Combustible, Reparación, Posta La Unión, Posta Yocón, Otro gasto. Montos > 0; "Otro" exige descripción. Las postas se suman en `viajes.gasto_otros` pero conservan su nombre en el detalle.
+- Gastos: tipos Combustible, Reparación, Posta La Unión, Posta Yocón, Descuento, Otro gasto. Montos > 0; "Otro" exige descripción. Las postas y los descuentos se suman en `viajes.gasto_otros` pero conservan su nombre en el detalle.
+- Transferencia a cuenta: monto opcional del cierre (`viajes.total_transferencia`, ≥ 0). Es venta cobrada, no se resta de la venta neta, pero sí del efectivo esperado. SQL: `cierres-transferencias.sql`.
 - Créditos (cliente actual: MUNICIPALIDAD LA UNION): botellón L 40, pack bolsa L 25. Son parte de lo vendido (también cuentan en ventas normales); no pueden superar lo vendido de ese producto.
-- **Efectivo esperado = Venta total − Gastos − Ventas a crédito**
+- **Efectivo esperado = Venta total − Gastos − Ventas a crédito − Transferencias**
 - **Diferencia de caja = Efectivo entregado − Efectivo esperado**
 - **Venta neta = Total vendido − Gastos − Créditos**
-- Gastos + créditos no pueden superar la venta total.
+- Gastos + créditos + transferencias no pueden superar la venta total.
 
 ## Tablas principales
 `usuarios`, `clientes`, `clientes_mayoristas`, `pedidos`, `productos`, `configuracion`, `empresa`, `cai_facturacion`, `facturas`, `factura_detalle`, `viajes`, `rutas`, `ruta_municipios`, `ruta_choferes`, `ruta_clientes`, `ruta_jornadas`, `ruta_visitas`.

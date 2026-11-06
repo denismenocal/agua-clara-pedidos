@@ -613,7 +613,7 @@ function verDetalle(id){
         ${seccionDetalle("Otros productos",[["Agua cargada",v.agua_cargada],["Agua vendida",v.agua_vendida],["Agua regalada",v.agua_regalada],["Juguitos cargados",v.juguitos_cargados],["Juguitos vendidos",v.juguitos_vendidos],["Hielo cargado",v.hielo_cargado],["Hielo vendido",v.hielo_vendido]])}
         ${seccionDetalle("Gastos del viaje",[["Combustible",moneda(v.gasto_combustible)],["Reparaciones",moneda(v.gasto_reparaciones)],["Otros gastos",moneda(v.gasto_otros)],["Total gastos",moneda(v.total_gastos)],["Detalle",v.detalle_gastos||"Sin gastos adicionales"]])}
         ${seccionDetalle("Ventas a crédito",[["Total a crédito",moneda(v.total_credito)],["Detalle",v.detalle_credito||"Sin ventas a crédito"]])}
-        ${seccionDetalle("Finanzas",[["Total venta",moneda(v.total_venta)],["Efectivo esperado",moneda(numero(v.total_venta)-numero(v.total_gastos)-numero(v.total_credito))],["Efectivo entregado",moneda(v.efectivo_entregado)],["Diferencia",moneda(v.diferencia)],["Observaciones",v.observaciones||"Sin observaciones"]])}
+        ${seccionDetalle("Finanzas",[["Total venta",moneda(v.total_venta)],["Transferencia a cuenta",moneda(v.total_transferencia)],["Efectivo esperado",moneda(numero(v.total_venta)-numero(v.total_gastos)-numero(v.total_credito)-numero(v.total_transferencia))],["Efectivo entregado",moneda(v.efectivo_entregado)],["Diferencia",moneda(v.diferencia)],["Observaciones",v.observaciones||"Sin observaciones"]])}
     `;
     document.getElementById("detalleViaje").classList.add("visible");
     document.body.style.overflow="hidden";
