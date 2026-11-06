@@ -15,6 +15,8 @@ Contexto para trabajar en este repositorio. Fuente: resumen integral del proyect
 - Llaves VAPID: la pública está en `admin.html`; la privada solo en la tabla `push_config` (sin acceso para anon/authenticated). Nunca ponerla en el repo.
 - iPhone: solo funciona con la app instalada en la pantalla de inicio (iOS 16.4+). La vibración y el sonido los decide iOS.
 - SQL: `notificaciones-push.sql`.
+- Cierres de viaje: al insertar en `viajes`, el disparador `viajes_notificar_cierre` llama a la Edge Function `notificar-cierre` (código en `supabase/functions/notificar-cierre/`), que envía **solo a administradores** el resumen: total vendido, gastos + créditos (desglosados) y venta neta (`total_venta − total_gastos − total_credito`). Una vez por cierre (`viajes.notificado_at`). SQL: `notificaciones-cierre.sql`.
+- Una suscripción pertenece al usuario con el que se activó (o reactivó) en ese celular; si en el mismo celular entra otro usuario a `admin.html`, la suscripción pasa a ese usuario.
 
 ## WhatsApp automático "tu pedido va en camino"
 - Al pasar un pedido a "En ruta", el disparador `pedidos_whatsapp_en_camino` llama a la Edge Function `whatsapp-en-camino` (código en `supabase/functions/whatsapp-en-camino/`), que envía la plantilla de Meta (Cloud API) al cliente al `504` + teléfono. Una sola vez por pedido (`pedidos.whatsapp_at`); resultado en `pedidos.whatsapp_estado` (`enviado`, `enviando`, `error: ...`), visible en `admin.html`.
